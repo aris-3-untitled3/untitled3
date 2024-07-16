@@ -15,7 +15,6 @@ class Record_API:
         # Instantiates a client
         self.client = speech.SpeechClient()
         self.file_name = file_name
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/sophie/untitled3-speech-API.json"
     
     # 음성 녹음 함수
     def record_audio(self):
