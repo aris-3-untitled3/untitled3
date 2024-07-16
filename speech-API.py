@@ -10,8 +10,8 @@ client = speech.SpeechClient()
 # The name of the audio file to transcribe
 file_name = os.path.join(
     os.path.dirname(__file__),
-    '..',
-    'untitled3.flac')
+    '.',
+    'vanilla_topB.flac')
 
 # Loads the audio into memory
 with io.open(file_name, 'rb') as audio_file:
@@ -28,6 +28,13 @@ config = speech.RecognitionConfig(
 # Detects speech in the audio file
 response = client.recognize(config=config, audio=audio)
 
+save_path = "vanilla_topB.txt"
+
 for result in response.results:
     print('Transcript: {}'.format(result.alternatives[0].transcript))
-
+    with open(save_path, 'w') as sp:
+        sp.write(result.alternatives[0].transcript)
+    if save_path:
+        print("saved!!")
+    else:   
+        print("Error saving")
