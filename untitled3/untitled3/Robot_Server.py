@@ -97,6 +97,9 @@ class RobotServer(Node):
         self.robot_control
         self.ui
 
+        # Gender_Age_preditor로 토픽 퍼블리셔
+        self.ga_publisher = self.create_publisher(TopicString, '/Server_to_GA', 10)
+
         # Robot_Control로 토픽 퍼블리셔
         self.robot_control_publisher = self.create_publisher(TopicString, '/Server_to_Robot', 10)
 
@@ -118,33 +121,42 @@ class RobotServer(Node):
         if msg.command == "human_detect":
             self.get_logger().info('Processing human_detect')
             # 호객행위 여부 (호객 or stop) : 토픽 : Robot_Server -> Robot_Control
-            self.robot_control_publisher.publish(msg)
+            time.sleep(3)
+            # self.robot_control_publisher.publish(msg)
 
         # 손님 감지
         elif msg.command == "guest_detect":
             self.get_logger().info('Processing guest_detect')
-            # 3초 정면 대기 : 토픽 : Robot_Server -> UI
-            self.ui_publisher.publish(msg)
             # 호객행위 중지 : 토픽 : Robot_Server -> Robot_Control
-            self.robot_control_publisher.publish(msg)
+            time.sleep(3)
+            # self.robot_control_publisher.publish(msg)
+            # 3초 정면 대기 : 토픽 : Robot_Server -> UI
+            # self.ui_publisher.publish(msg)
+            # 3초동안 얼굴 성별 , 연령대 판별
+            self.ga_publisher.publish(msg)
+
 
         # 손님 인지 (성별,연령대)
-        elif msg.command == "guest_confirm":
+        elif "Age" and "Gender" in msg.command:
             self.get_logger().info('Processing guest_confirm')
+            print(msg.command)
             # 인사문구 (or 복귀): 토픽 : Robot_Server -> UI
-            self.ui_publisher.publish(msg)
-            time.sleep(10)
+            # self.ui_publisher.publish(msg)
+            # time.sleep(10)
             # 환영인사 : 서비스 : Robot_Server -> Robot_Control
-            await self.send_robot_control(msg.command)
-            time.sleep(3)
+            # await self.send_robot_control(msg.command)
+            # time.sleep(3)
             # 메뉴얼 시작: 토픽 : Robot_Server -> UI
-            self.ui_publisher.publish(msg)
+            # self.ui_publisher.publish(msg)
                 # 손님 성별,연령대: 서비스 : UI -> DB_Manager
                 # 음성 받기: 서비스 : UI -> Voice_Input (or 마우스 클릭)
 
         # 예외 처리
         else:
             self.get_logger().error('Unknown command received')
+            # 대기 상태 복귀
+            time.sleep(3)
+            # self.robot_control_publisher.publish(msg)
 
     # 아이스크림 감지 , 아이스크림 제조완료
     async def robot_control_callback(self, msg):
