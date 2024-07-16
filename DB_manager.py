@@ -140,6 +140,8 @@ class DB_Manager:
     return값은 가장 많은 flavor, topping 인데, 만약 한 번도 구매하지 않은 조합이면 None으로 반환
     None을 읽은 문장에서는 추천하는 UI 따로 띄우지 않기??
     ------------------------------------------------------------------------해결되지 않은 부분: max가 중복이면?
+
+    선호도 추천시에 정보가 없거나 중복이면 팀원과 정한 데이터를 기반으로 추천해준다.
     '''
     def load_sales(self, Age, Gender):
         query = "SELECT flavor, COUNT(*) as count FROM sales WHERE age = %s and gender = %s GROUP BY flavor;"
@@ -151,6 +153,9 @@ class DB_Manager:
             most_flavor = None
         else:
             most_flavor = max(flavor_dict, key=flavor_dict.get)
+            cnt_flavor = list(flavor_dict.values()).count(flavor_dict[most_flavor])
+            if cnt_flavor > 1:
+                most_flavor = [flavor for flavor, count in flavor_dict.items() if count == flavor_dict[most_flavor]]
 
         query = "SELECT topping, COUNT(*) as count FROM sales WHERE age = %s and gender = %s GROUP BY topping;"
         self.cur.execute(query, (Age, Gender))
@@ -161,6 +166,9 @@ class DB_Manager:
             most_topping = None
         else:
             most_topping = max(topping_dict, key=topping_dict.get)
+            cnt_topping = list(topping_dict.values).count(flavor_dict[most_flavor])
+            if cnt_topping > 1:
+                most_topping = [topping for topping, count in topping_dict.items() if count == topping_dict[most_topping]]
         
         return most_flavor, most_topping
 
@@ -234,5 +242,4 @@ class DB_Manager:
         else:
             topping_flag = None
 
-        return stock_dict, flavor_flag, topping_flag
-
+        return stock_dict, flavor_flag, topping_flag    
