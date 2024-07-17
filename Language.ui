@@ -6,14 +6,9 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1280</height>
+    <width>400</width>
+    <height>378</height>
    </rect>
-  </property>
-  <property name="font">
-   <font>
-    <pointsize>15</pointsize>
-   </font>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
@@ -21,39 +16,47 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>810</x>
-     <y>70</y>
-     <width>311</width>
-     <height>161</height>
+     <x>70</x>
+     <y>20</y>
+     <width>301</width>
+     <height>81</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>28</pointsize>
+     <pointsize>14</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
    <property name="text">
-    <string>안녕히 가십시오!</string>
+    <string>안녕하세요!   언어를 선택해 주세요</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_8">
+  <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>610</x>
-     <y>340</y>
-     <width>641</width>
-     <height>411</height>
+     <x>50</x>
+     <y>140</y>
+     <width>131</width>
+     <height>131</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <pointsize>15</pointsize>
-    </font>
+   <property name="text">
+    <string>한국어</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_2">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>140</y>
+     <width>131</width>
+     <height>131</height>
+    </rect>
    </property>
    <property name="text">
-    <string>토핑 재고</string>
+    <string>English</string>
    </property>
   </widget>
  </widget>
