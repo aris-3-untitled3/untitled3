@@ -1,11 +1,3 @@
-import rclpy as rp
-from rclpy.node import Node
-from untitled_msgs.msg import TopicString
-from untitled_msgs.srv import ServiceString
-import time
-import threading
-
-
 ### 대기 상태
     # 사람감지 여부 (사람 or not) : 토픽 : Guest_detect -> Robot_Server 
         # 호객행위 여부 (호객 or stop) : 토픽 : Robot_Server -> Robot_Control
@@ -58,16 +50,28 @@ import threading
     # UI -(서비스)> DB_Manager , Voice_Input
 
 
+import rclpy as rp
+from rclpy.node import Node
+from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
+from untitled_msgs.msg import TopicString
+from untitled_msgs.srv import ServiceString
+import time
+
+
 class RobotServer(Node):
     def __init__(self):
         super().__init__('RobotServer')
+
+        # MutuallyExclusiveCallbackGroup 생성
+        callback_group = MutuallyExclusiveCallbackGroup()
 
         # Guest_Detect에서 토픽 받기 (사람 / 손님 / 성별,연령대)
         self.guest_detect = self.create_subscription(
             TopicString,
             '/Guest_Info',
             self.guest_detect_callback,
-            10
+            10,
+            callback_group=callback_group
         )
 
         # Robot_Control 토픽 받기 (아이스크림 감지 / 아이스크림 제조 완료)
@@ -75,7 +79,8 @@ class RobotServer(Node):
             TopicString,
             '/Robot_to_Server',
             self.robot_control_callback,
-            10
+            10,
+            callback_group=callback_group
         )
 
         # UI에서 토픽 받기 (제조준비 / 마무리 상황)
@@ -83,7 +88,8 @@ class RobotServer(Node):
             TopicString,
             '/UI_to_Server',
             self.ui_callback,
-            10
+            10,
+            callback_group=callback_group
         )
 
         # prevent unused variable warning
@@ -91,10 +97,13 @@ class RobotServer(Node):
         self.robot_control
         self.ui
 
+        # Gender_Age_preditor로 토픽 퍼블리셔
+        self.ga_publisher = self.create_publisher(TopicString, '/Server_to_GA', 10)
+
         # Robot_Control로 토픽 퍼블리셔
         self.robot_control_publisher = self.create_publisher(TopicString, '/Server_to_Robot', 10)
 
-        # ui로 토픽 퍼블리셔
+        # UI로 토픽 퍼블리셔
         self.ui_publisher = self.create_publisher(TopicString, '/Server_to_UI', 10)
 
         # Cup_detect로 서비스를 요청
@@ -103,15 +112,12 @@ class RobotServer(Node):
         # Robot_Control로 서비스를 요청
         self.robot_control_client = self.create_client(ServiceString, '/Signal_Robot')
 
-        # ui로 서비스를 요청
+        # UI로 서비스를 요청
         self.ui_client = self.create_client(ServiceString, '/Signal_UI')
 
-
     # 사람 / 손님 / 성별,연령대
-    def guest_detect_callback(self, msg):
-        threading.Thread(target=self.handle_guest_detect,args=(msg,)).start()
-
-    def handle_guest_detect(self, msg):
+    ### 1,2번 상황 통합완료
+    async def guest_detect_callback(self, msg):
         # 사람 감지
         if msg.command == "human_detect":
             self.get_logger().info('Processing human_detect')
@@ -121,24 +127,21 @@ class RobotServer(Node):
         # 손님 감지
         elif msg.command == "guest_detect":
             self.get_logger().info('Processing guest_detect')
-            # 3초 정면 대기 : 토픽 : Robot_Server -> UI
-            self.ui_publisher.publish(msg)
             # 호객행위 중지 : 토픽 : Robot_Server -> Robot_Control
             self.robot_control_publisher.publish(msg)
+            # 3초 정면 대기 : 토픽 : Robot_Server -> UI
+            self.ui_publisher.publish(msg)
+            # 3초동안 얼굴 성별 , 연령대 판별
+            self.ga_publisher.publish(msg)
 
         # 손님 인지 (성별,연령대)
-        elif msg.command == "guest_confirm":
+        elif "Age" and "Gender" in msg.command:
             self.get_logger().info('Processing guest_confirm')
-            # 인사문구 (or 복귀): 토픽 : Robot_Server -> UI
-            self.ui_publisher.publish(msg)
-            time.sleep(3)
-            # 환영인사 : 서비스 : Robot_Server -> Robot_Control
-            self.send_robot_control(msg.command)
-            time.sleep(3)
+            print(msg.command)
+            # 환영인사 : 토픽 : Robot_Server -> Robot_Control
+            self.robot_control_publisher.publish(msg)
             # 메뉴얼 시작: 토픽 : Robot_Server -> UI
             self.ui_publisher.publish(msg)
-                # 손님 성별,연령대: 서비스 : UI -> DB_Manager
-                # 음성 받기: 서비스 : UI -> Voice_Input (or 마우스 클릭)
 
         # 예외 처리
         else:
@@ -146,15 +149,12 @@ class RobotServer(Node):
 
 
     # 아이스크림 감지 , 아이스크림 제조완료
-    def robot_control_callback(self, msg):
-        threading.Thread(target=self.handle_robot_control,args=(msg,)).start()
-    
-    def handle_robot_control(self, msg):
+    async def robot_control_callback(self, msg):
         # 아이스크림 감지
         if msg.command == "ice_cream_Bucket_detect":
             self.get_logger().info('Processing ice_cream_Bucket_detect')
             # 아이스크림 준비 : 서비스 : Robot_Server -> UI (음성대기)
-            self.send_ui(msg.command)
+            await self.send_ui(msg.command)
             # 아이스크림 제조 시작 : 토픽 : Robot_Server -> Robot_Control
             self.robot_control_publisher.publish(msg)
         # 아이스크림 제조완료
@@ -162,54 +162,53 @@ class RobotServer(Node):
             self.get_logger().info('Processing ice_cream_production_complete')
             # 제조 완료 : 토픽 : Robot_Server -> UI
             self.ui_publisher.publish(msg) 
-                # 쿠폰 개수 : 서비스 : UI -> DB_Manager
-                # 맛 가격 : 서비스 : UI -> DB_Manager
-                # 일 매출 : 서비스 : UI -> DB_Manager
         # 예외 처리
         else:
             self.get_logger().error('Unknown command received')
 
-
     # 제조 준비 , 마무리 상황
-    def ui_callback(self, msg):
-        threading.Thread(target=self.handle_ui,args=(msg,)).start()
-    
-    def handle_ui(self, msg):
+    async def ui_callback(self, msg):
         # 제조 준비
         if msg.command == "Pre-production":
             self.get_logger().info('Processing Pre-production')
             # 쓰레기 감지 (ArCUoMarker 좌표) : 서비스 : Robot_Server -> Cup_detect
-            self.send_cup_detect(msg.command)
+            # 감지 후 상황판다
+            await self.send_cup_detect(msg.command)
+            
             # 쓰레기 전달 : 서비스 : Robot_Server -> UI (음성대기)
-            self.send_ui(msg.command)
+            await self.send_ui(msg.command)
             # 쓰레기 청소 : 서비스 : Robot_Server -> Robot_Control
-            self.send_robot_control(msg.command) 
+            await self.send_robot_control(msg.command) 
             # 쓰레기 청소 끝 및 아이스크림 대기 : 토픽 : Robot_Server -> UI
             self.ui_publisher.publish(msg)
         # 마무리 상황
-        elif msg.command == "Conclusion":
+        elif "Conclusion" in msg.command :
             self.get_logger().info('Processing Conclusion')
-            # 작별 문구 : 토픽 : Robot_Server -> UI
-            self.ui_publisher.publish(msg)
-            # 작별 인사 : 서비스 : Robot_Server -> Robot_Control
-            self.send_robot_control(msg.command)
+            # 작별 인사 : 토픽 : Robot_Server -> Robot_Control
+            self.robot_control_publisher.publish(msg)
+            time.sleep(10)
             # 쓰레기 감지 (ArCUoMarker 좌표) : 서비스 : Robot_Server -> Cup_detect
-            self.send_cup_detect(msg.command)
+            # 감지 후 상황판다
+            await self.send_cup_detect(msg.command)
             # 쓰레기 전달 : 서비스 : Robot_Server -> UI (음성대기)
-            self.send_ui(msg.command)
-            # 쓰레기 청소 및 토핑 무게 확인 : 서비스 : Robot_Server -> Robot_Control
-            self.send_robot_control(msg.command)  
-            # 토핑 무게 전달 및 쓰레기 청소 완료 : 토픽 : Robot_Server -> UI
-            self.ui_publisher.publish(msg)
-                # 토핑 재고량 전달 : 서비스 : UI -> DB_Manager
-            ## Guest_detect 토픽 다시 받기
+            await self.send_ui(msg.command)
+            # 쓰레기 청소 : 서비스 : Robot_Server -> Robot_Control
+            await self.send_robot_control(msg.command)
+            if "o" in msg.command :
+                ## Guest_detect 토픽 다시 받기
+                self.ga_publisher.publish(msg)
+            else :
+                print("재고량 없음")
+                return
+        elif msg.command == "start":
+            self.get_logger().info('START!')
+            self.ga_publisher.publish(msg)
         # 예외 처리
         else:
             self.get_logger().error('Unknown command received')
 
-        
     # 쓰레기 컵 감지 요청 (ArCUoMarker 좌표)
-    def send_cup_detect(self, msg: str):
+    async def send_cup_detect(self, msg: str):
         if not self.Cup_detect_client.wait_for_service(timeout_sec=5.0):
             self.get_logger().error('/Cup_Info service not available')
             return
@@ -217,18 +216,22 @@ class RobotServer(Node):
         request = ServiceString.Request()
         request.command = msg
 
-        future = self.Cup_detect_client.call(request)
+        future = self.Cup_detect_client.call_async(request)
 
-        response = future
+        future.add_done_callback(self.handle_response_1)
 
-        if response.success:
-            self.get_logger().info('Success (Server to Cup): %s' % response.result)
-        else:
-            self.get_logger().error('Failed (Server to Cup): %s' % response.result)
-
+    def handle_response_1(self, future):
+        try:
+            response = future.result()
+            if response.success:
+                self.get_logger().info('Success (Server to Cup): %s' % response.result)
+            else:
+                self.get_logger().error('Failed (Server to Cup): %s' % response.result)
+        except Exception as e:
+            self.get_logger().error(f'Service call failed: {str(e)}')
 
     # [환영 인사 , 쓰레기 청소 , 작별 인사 , 쓰레기 청소 및 토핑 무게 확인] 요청
-    def send_robot_control(self, msg: str):
+    async def send_robot_control(self, msg: str):
         if not self.robot_control_client.wait_for_service(timeout_sec=5.0):
             self.get_logger().error('/Signal_Robot service not available')
             return
@@ -236,17 +239,22 @@ class RobotServer(Node):
         request = ServiceString.Request()
         request.command = msg
 
-        future = self.robot_control_client.call(request)  # 비동기 호출
+        future = self.robot_control_client.call_async(request)  # 비동기 호출
 
-        response = future
+        future.add_done_callback(self.handle_response_2)
 
-        if response.success:
-            self.get_logger().info('Success (Server to Robot): %s' % response.result)
-        else:
-            self.get_logger().error('Failed (Server to Robot): %s' % response.result)
+    def handle_response_2(self, future):
+        try:
+            response = future.result()
+            if response.success:
+                self.get_logger().info('Success (Server to Control): %s' % response.result)
+            else:
+                self.get_logger().error('Failed (Server to Control): %s' % response.result)
+        except Exception as e:
+            self.get_logger().error(f'Service call failed: {str(e)}')
 
-    # [쓰레기 상황 전달 (음성) , 아이스크림 준비 (음성)] 요청
-    def send_ui(self, msg: str):
+    # [쓰레기 상황 전달 (음성) , 아이스크림 준비 (음성)] 요청 - 굳이 안보내고 여기서 음성출력도 가능!!!
+    async def send_ui(self, msg: str):
         if not self.ui_client.wait_for_service(timeout_sec=5.0):
             self.get_logger().error('/Signal_UI service not available')
             return
@@ -254,24 +262,24 @@ class RobotServer(Node):
         request = ServiceString.Request()
         request.command = msg
 
-        future = self.ui_client.call(request)
+        future = self.ui_client.call_async(request)
 
-        response = future
-    
-        if response.success:
-            self.get_logger().info('Success (Server to UI): %s' % response.result)
-        else:
-            self.get_logger().error('Failed (Server to UI): %s' % response.result)
+        future.add_done_callback(self.handle_response_3)
 
+    def handle_response_3(self, future):
+        try:
+            response = future.result()
+            if response.success:
+                self.get_logger().info('Success (Server to UI): %s' % response.result)
+            else:
+                self.get_logger().error('Failed (Server to UI): %s' % response.result)
+        except Exception as e:
+            self.get_logger().error(f'Service call failed: {str(e)}')
 
 def main(args=None):
-
     rp.init(args=args)
-
     Robot_Server = RobotServer()
-
     rp.spin(Robot_Server)
-
     Robot_Server.destroy_node()
     rp.shutdown()
 

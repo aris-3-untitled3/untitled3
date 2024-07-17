@@ -31,6 +31,28 @@ class RobotControl(Node):
     def robot_server_callback(self, msg):
         self.get_logger().info(f'Received command: {msg.command}')
 
+        if msg.command == "human_detect":
+            print("호객행위")
+        elif msg.command == "guest_detect":
+            print("중지")
+        elif "Age" and "Gender" in msg.command:
+            print("환영인사")
+        elif msg.command == "ice_cream_Bucket_detect":
+            print("아이스크림 제조 시작")
+
+        elif "Conclusion" in msg.command:
+            print("작별인사")
+        else:
+            return
+        
+    def ice_cream_making(self):
+        # 로봇이 아이스크림 무게를 감지하면 시그널
+        self.ice_cream_Bucket_detect()
+
+    def ice_cream_making_complete(self):
+        # 로봇이 아이스크림을 다 만들면 시그널
+        self.ice_cream_production_complete()
+
     
     def ice_cream_Bucket_detect(self):
         self.get_logger().info('ice_cream_Bucket_detect detected!')
@@ -53,6 +75,8 @@ class RobotControl(Node):
     def robot_control_callback(self, request, response):
         self.get_logger().info(f'Received command: {request.command}')
 
+        print("쓰레기 청소")
+        print(request.command)
         time.sleep(3)
 
         response.success = True

@@ -49,7 +49,7 @@ class GuestDetect(Node):
         self.ageList = ['(0-2)', '(3-6)', '(7-12)', '(13-18)', '(19-29)', '(30-43)', '(44-49)', '(50-100)']
         self.genderList = ['M', 'F']
 
-        self.run()
+        # self.run()
 
     def load_model(self):
         return torch.hub.load('ultralytics/yolov5', 'custom', path=self.model_path, force_reload=True)

@@ -27,7 +27,6 @@ setup(
             'Robot_Control = untitled3.Robot_Control:main',
             'Cup_detect = untitled3.Cup_detect:main',
             'Guest_detect = untitled3.Guest_detect:main',
-            'Gender_Age_predictor = untitled3.Gender_Age_predictor:main',
             'UI = untitled3.UI:main',
             'Voice_Input = untitled3.Voice_Input:main',
             'DB_manager = untitled3.DB_manager:main',
