@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS sales(
     flavor varchar(7) NOT NULL,
     topping varchar(4) NOT NULL,
     price int NOT NULL,
-    phone INT(15) NOT NULL,
+    phone INT(15),
     age varchar(6) NOT NULL,
     gender varchar(1) NOT NULL,
     use_coupon varchar(1) NOT NULL
