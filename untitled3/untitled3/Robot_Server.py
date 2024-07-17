@@ -129,6 +129,7 @@ class RobotServer(Node):
             self.get_logger().info('Processing guest_detect')
             # 호객행위 중지 : 토픽 : Robot_Server -> Robot_Control
             time.sleep(3)
+            print("OK")
             # self.robot_control_publisher.publish(msg)
             # 3초 정면 대기 : 토픽 : Robot_Server -> UI
             # self.ui_publisher.publish(msg)
@@ -210,6 +211,7 @@ class RobotServer(Node):
             self.ui_publisher.publish(msg)
                 # 토핑 재고량 전달 : 서비스 : UI -> DB_Manager
             ## Guest_detect 토픽 다시 받기
+            self.ga_publisher.publish(msg)
         # 예외 처리
         else:
             self.get_logger().error('Unknown command received')

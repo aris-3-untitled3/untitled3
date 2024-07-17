@@ -7,7 +7,7 @@ import torch
 import numpy as np
 import argparse
 import time
-
+import threading
 
 class GuestDetect(Node):
     def __init__(self):
@@ -18,12 +18,38 @@ class GuestDetect(Node):
 
         self.model_path = '/home/jchj/Untitled3/src/models/Best.pt'
         self.model = self.load_model()
-        self.cap = cv2.VideoCapture(1)
 
         # 상태 변수 초기화
         self.guest_detected = False
         self.human_detected = False
         self.no_human_detected = False
+        self.loop_running = True  # 루프 실행 상태 변수 추가
+
+        # Server에서 토픽 받기 (guest_detect)
+        self.ui = self.create_subscription(
+            TopicString,
+            '/Server_to_GA',
+            self.ga_callback,
+            10
+        )
+
+        self.parser = argparse.ArgumentParser()
+        self.parser.add_argument('--image')
+
+        self.args = self.parser.parse_args()
+
+        self.faceProto = "/home/jchj/Untitled3/src/models/age_gender/opencv_face_detector.pbtxt"
+        self.faceModel = "/home/jchj/Untitled3/src/models/age_gender/opencv_face_detector_uint8.pb"
+        self.ageProto = "/home/jchj/Untitled3/src/models/age_gender/age_deploy.prototxt"
+        self.ageModel = "/home/jchj/Untitled3/src/models/age_gender/age_net.caffemodel"
+        self.genderProto = "/home/jchj/Untitled3/src/models/age_gender/gender_deploy.prototxt"
+        self.genderModel = "/home/jchj/Untitled3/src/models/age_gender/gender_net.caffemodel"   
+
+        self.MODEL_MEAN_VALUES = (78.4263377603, 87.7689143744, 114.895847746)
+        self.ageList = ['(0-2)', '(3-6)', '(7-12)', '(13-18)', '(19-29)', '(30-43)', '(44-49)', '(50-100)']
+        self.genderList = ['M', 'F']
+
+        self.run()
 
     def load_model(self):
         return torch.hub.load('ultralytics/yolov5', 'custom', path=self.model_path, force_reload=True)
@@ -63,6 +89,7 @@ class GuestDetect(Node):
             self.guest_detected = True
             self.human_detected = False
             self.no_human_detected = False
+            self.loop_running = False  # 루프 중지
         elif 0.5 < distance <= 2 and not self.human_detected:
             self.human_detect()
             self.human_detected = True
@@ -75,7 +102,9 @@ class GuestDetect(Node):
             self.human_detected = False
 
     def run(self):
-        while True:
+        self.cap = cv2.VideoCapture(0)
+
+        while self.loop_running:
             ret, frame = self.cap.read()
             if not ret:
                 print("웹캠에서 프레임을 읽을 수 없습니다.")
@@ -119,46 +148,20 @@ class GuestDetect(Node):
 
         self.robot_server_publisher.publish(msg)
 
-
-class Gender_Age_predictor(Node):
-    def __init__(self):
-        super().__init__('Gender_Age_predictor')
-
-        # Server에서 토픽 받기 (guest_detect)
-        self.ui = self.create_subscription(
-            TopicString,
-            '/Server_to_GA',
-            self.ga_callback,
-            10
-        )
-
-        # Robot_Server로 토픽 퍼블리셔
-        self.robot_server_publisher = self.create_publisher(TopicString, '/Guest_Info', 10)
-
-        self.parser = argparse.ArgumentParser()
-        self.parser.add_argument('--image')
-
-        self.args = self.parser.parse_args()
-
-        self.faceProto = "/home/jchj/Untitled3/src/models/age_gender/opencv_face_detector.pbtxt"
-        self.faceModel = "/home/jchj/Untitled3/src/models/age_gender/opencv_face_detector_uint8.pb"
-        self.ageProto = "/home/jchj/Untitled3/src/models/age_gender/age_deploy.prototxt"
-        self.ageModel = "/home/jchj/Untitled3/src/models/age_gender/age_net.caffemodel"
-        self.genderProto = "/home/jchj/Untitled3/src/models/age_gender/gender_deploy.prototxt"
-        self.genderModel = "/home/jchj/Untitled3/src/models/age_gender/gender_net.caffemodel"   
-
-        self.MODEL_MEAN_VALUES = (78.4263377603, 87.7689143744, 114.895847746)
-        self.ageList = ['(0-2)', '(3-6)', '(7-12)', '(13-18)', '(19-29)', '(30-43)', '(44-49)', '(50-100)']
-        self.genderList = ['M', 'F']
-
     def ga_callback(self, msg):
-        # 성별, 연령대 판별
-        most_common_age, most_common_gender = self.run()
-        
-        # 결과 메시지 작성 및 발행  
-        result_msg = TopicString()
-        result_msg.command = f"Age: {most_common_age}, Gender: {most_common_gender}"
-        self.robot_server_publisher.publish(result_msg)
+        if msg.command == "guest_detect":
+            # 성별, 연령대 판별
+            most_common_age, most_common_gender = self.run_2()
+            
+            # 결과 메시지 작성 및 발행  
+            result_msg = TopicString()
+            result_msg.command = f"Age: {most_common_age}, Gender: {most_common_gender}"
+            self.robot_server_publisher.publish(result_msg)
+        else:
+            self.get_logger().info('Restarting detection...')
+            self.loop_running = True
+            self.run() # 다시 사람검출 시작
+
 
     def highlightFace(self, net, frame, conf_threshold=0.7):
         frameOpencvDnn = frame.copy()
@@ -180,12 +183,12 @@ class Gender_Age_predictor(Node):
                 cv2.rectangle(frameOpencvDnn, (x1, y1), (x2, y2), (0, 255, 0), int(round(frameHeight / 150)), 8)
         return frameOpencvDnn, faceBoxes
 
-    def run(self):
+    def run_2(self):
         self.faceNet = cv2.dnn.readNet(self.faceModel, self.faceProto)
         self.ageNet = cv2.dnn.readNet(self.ageModel, self.ageProto)
         self.genderNet = cv2.dnn.readNet(self.genderModel, self.genderProto)
 
-        video = cv2.VideoCapture(self.args.image if self.args.image else 1)
+        video = cv2.VideoCapture(self.args.image if self.args.image else 0)
         
         Most_Gender = {gender: 0 for gender in self.genderList}
         Most_Age = {age: 0 for age in ['0-6', '7-18', '19-29', '30-49', '50-']}
@@ -308,17 +311,11 @@ def main(args=None):
     rp.init(args=args)
 
     guest_detect_node = GuestDetect()
-    prediction_node = Gender_Age_predictor()
-
-    executor = MultiThreadedExecutor()
-    executor.add_node(guest_detect_node)
-    executor.add_node(prediction_node)
 
     try:
-        executor.spin()
+        rp.spin(guest_detect_node)
     finally:
         guest_detect_node.destroy_node()
-        prediction_node.destroy_node()
         rp.shutdown()
 
 
