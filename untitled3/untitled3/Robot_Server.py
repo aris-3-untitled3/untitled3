@@ -181,7 +181,7 @@ class RobotServer(Node):
             if "," in response.result :
 
                 # 쓰레기 전달 : 서비스 : Robot_Server -> UI (음성대기)
-                self.send_ui(msg.command)
+                self.send_ui(response)
 
                 # 쓰레기 청소 : 서비스 : Robot_Server -> Robot_Control
                 msg.command = f"Pre-production : {response.result}"
@@ -194,6 +194,7 @@ class RobotServer(Node):
 
             else :
                 print("쓰레기 없음")
+                self.ui_publisher.publish(msg)
 
         # 마무리 상황
         elif "Conclusion" in msg.command :
@@ -209,7 +210,8 @@ class RobotServer(Node):
             if "," in response.result :
 
                 # 쓰레기 전달 : 서비스 : Robot_Server -> UI (음성대기)
-                self.send_ui(msg.command)
+                self.send_ui(response)
+                # Concluson 
 
                 # 쓰레기 청소 : 서비스 : Robot_Server -> Robot_Control
                 msg.command = f"Conclusion : {response.result}"
@@ -220,6 +222,7 @@ class RobotServer(Node):
                 self.ui_publisher.publish(final)
             else :
                 print("쓰레기 없음")
+                self.ui_publisher.publish(final)
 
             if "ok" in final :
                 print("재고량 있음")

@@ -19,8 +19,8 @@ def generate_launch_description():
             Node(
                 namespace= "" , package= "untitled3" ,
                 executable= "UI" , output = "screen"),
-            # Node(
-            #     namespace= "" , package= "untitled3" ,
-            #     executable= "Voice_Input" , output = "screen"),
+            Node(
+                namespace= "" , package= "untitled3" ,
+                executable= "Voice_Input" , output = "screen"),
         ]
     )
