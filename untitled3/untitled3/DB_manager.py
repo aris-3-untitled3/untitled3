@@ -52,6 +52,48 @@ class DB_Manager:
     def create_table(self):
         self.execute_table("DB_table.sql")
         
+    def create_sample_data(self):
+        #customer_info
+        query = "INSERT INTO customer_info (phone, age, gender, coupon) VALUES (12341234, '19-29', 'F', 1);"
+        self.cur.execute(query)
+        query = "INSERT INTO customer_info (phone, age, gender, coupon) VALUES (12341223, '19-29', 'F', 1);"
+        self.cur.execute(query)
+        query = "INSERT INTO customer_info (phone, age, gender, coupon) VALUES (33331234, '19-29', 'F', 1);"
+        self.cur.execute(query)
+        query = "INSERT INTO customer_info (phone, age, gender, coupon) VALUES (12312363, '19-29', 'F', 1);"
+        self.cur.execute(query)
+        query = "INSERT INTO customer_info (phone, age, gender, coupon) VALUES (50302060, '19-29', 'F', 1);"
+        self.cur.execute(query)
+        self.conn.commit()
+
+
+        #sales
+        query = "INSERT INTO customer_info (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('berry', 'topA', 3650, 12341234, '19-29', 'F', 'N');"
+        self.cur.execute(query)
+        query = "INSERT INTO customer_info (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('choco', 'topB', 3652, 12341223, '7-18', 'M', 'N');"
+        self.cur.execute(query)
+        query = "INSERT INTO customer_info (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('vanilla', 'topA', 3590, 12341234, '19-29', 'F', 'N');"
+        self.cur.execute(query)
+        query = "INSERT INTO customer_info (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('berry', 'topC', 3650, 50302060, '19-29', 'M', 'N');"
+        self.cur.execute(query)
+        query = "INSERT INTO customer_info (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('vanilla', 'topC', 3650, 12341234, '19-29', 'F', 'N');"
+        self.cur.execute(query)
+        query = "INSERT INTO customer_info (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('berry', 'topA', 0, 12341234, '19-29', 'F', 'Y');"
+        self.cur.execute(query)
+        self.conn.commit()
+
+
+
+        #price
+        query = "INSERT INTO price (topC) VALUES (20);"
+        self.cur.execute(query)
+        self.conn.commit()
+
+        #stock
+        query = "INSERT INTO stock (topC) VALUES (500);"
+        self.cur.execute(query)
+        self.conn.commit()
+
 
     def execute_table(self, file_path):
         with open(file_path, 'r') as f:
@@ -75,14 +117,14 @@ class DB_Manager:
         result = self.cur.fetchall()
         phone_numbers = [row[0] for row in result]
 
-        if Phone in phone_numbers:
+        if Phone in phone_numbers: #기존 회원
             query = "SELECT coupon FROM customer_info WHERE phone = %s;"
             self.cur.execute(query, (Phone, ))
             result = self.cur.fetchone()[0]
             return result
-        else:
+        else:                       #신규 회원
             print("No Customer data")
-            result = None
+            result = 0
             return result
 
     # 계산 후 손님 정보 저장하는 함수 (Age, Gender는 얼굴 인식 때, main에서 저장된 txt 파일에서 불러옴) & return = user_id // 최최최최최종
@@ -113,11 +155,13 @@ class DB_Manager:
             self.conn.commit()
 
         # 이건 그냥 return 준건데 사용 안해도 됨 ------------------
-        query = "SELECT phone FROM customer_info WHERE phone=%s;"
+        query = "SELECT phone, coupon FROM customer_info WHERE phone=%s;"
         self.cur.execute(query, (Phone, ))
-        user_id = self.cur.fetchone()[0]
+        result_update = self.cur.fetchone()
+        user_id = result_update[0]
+        coupon = result_update[1]
         
-        return user_id
+        return user_id, coupon
     
 
     #매출 저장 함수 // 매출 저장 -> 손님 정보 저장 or 업데이트
@@ -153,9 +197,9 @@ class DB_Manager:
             most_flavor = None
         else:
             most_flavor = max(flavor_dict, key=flavor_dict.get)
-            cnt_flavor = list(flavor_dict.values()).count(flavor_dict[most_flavor])
-            if cnt_flavor > 1:
-                most_flavor = [flavor for flavor, count in flavor_dict.items() if count == flavor_dict[most_flavor]]
+            # cnt_flavor = list(flavor_dict.values()).count(flavor_dict[most_flavor])
+            # if cnt_flavor > 1:
+            #     most_flavor = [flavor for flavor, count in flavor_dict.items() if count == flavor_dict[most_flavor]]
 
         query = "SELECT topping, COUNT(*) as count FROM sales WHERE age = %s and gender = %s GROUP BY topping;"
         self.cur.execute(query, (Age, Gender))
@@ -166,9 +210,9 @@ class DB_Manager:
             most_topping = None
         else:
             most_topping = max(topping_dict, key=topping_dict.get)
-            cnt_topping = list(topping_dict.values).count(flavor_dict[most_flavor])
-            if cnt_topping > 1:
-                most_topping = [topping for topping, count in topping_dict.items() if count == topping_dict[most_topping]]
+            # cnt_topping = list(topping_dict.values()).count(flavor_dict[most_flavor])
+            # if cnt_topping > 1:
+            #     most_topping = [topping for topping, count in topping_dict.items() if count == topping_dict[most_topping]]
         
         return most_flavor, most_topping
 
@@ -242,4 +286,4 @@ class DB_Manager:
         else:
             topping_flag = None
 
-        return stock_dict, flavor_flag, topping_flag  
+        return result, stock_dict, flavor_flag, topping_flag

@@ -30,7 +30,7 @@ setup(
             'UI = untitled3.UI:main',
             'Voice_Input = untitled3.Voice_Input:main',
             'DB_manager = untitled3.DB_manager:main',
-            'test = untitled3.test:main',
+            'Hand_Interrupt = untitled3.Hand_Interrupt:main',
         ],
     },
 )

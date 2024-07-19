@@ -1,21 +1,12 @@
-# main 파일에서 VtoT = Record_API(file_name) 와 같은 형식으로 불러오고 
-# VtoT.record_audio() 이런식으로 넣으면 실행 될 것임
-
-# Imports the Google Cloud client library
-
-import io
-import os
-
 import speech_recognition as sr
 from playsound import playsound
-from google.cloud import speech
 
 class Record_API:
-    def __init__(self, file_name):
-        # Instantiates a client
-        self.client = speech.SpeechClient()
+    def __init__(self, file_name, save_path, respone_time):
         self.file_name = file_name
-    
+        self.save_path = save_path
+        self.respone_time = respone_time
+
     # 음성 녹음 함수
     def record_audio(self):
         # Recognizer 객체 생성
@@ -23,10 +14,13 @@ class Record_API:
 
         # 마이크를 오디오 소스로 사용
         mic = sr.Microphone()
-
+        
         with mic as source:
+            print("################################################################################################")
+            print("################################################################################################")
+            print("################################################################################################")
             print("녹음 시작...")
-            audio_data = r.listen(source, phrase_time_limit=5)
+            audio_data = r.listen(source, phrase_time_limit=self.respone_time)
 
             print("녹음 완료!")
             return audio_data
@@ -35,51 +29,48 @@ class Record_API:
     def play_audio(self):
         playsound(self.file_name)
 
+    def speech_to_text(self, audio_path):
+        recognizer = sr.Recognizer()
 
-    def speech_API(self):
+        # Load audio file
+        with sr.AudioFile(audio_path) as source:
+            audio_data = recognizer.record(source)
 
-        # Loads the audio into memory
-        with io.open(self.file_name, 'rb') as audio_file:
-            content = audio_file.read()
-            audio = speech.RecognitionAudio(content=content)
-        #FLAC ==> encoding=speech.RecognitionConfig.AudioEncoding.FLAC
-        config = speech.RecognitionConfig(
-            encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
-            sample_rate_hertz=44100,
-            language_code='ko-KR',
-            audio_channel_count=1  # FLAC 파일의 오디오 채널 수는 2, wav는 1
-        )
-
-        # Detects speech in the audio file
-        response = self.client.recognize(config=config, audio=audio)
-
-        save_path = "response.txt"
-
-        for result in response.results:
-            print('Transcript: {}'.format(result.alternatives[0].transcript))
-            with open(save_path, 'w') as sp:
-                sp.write(result.alternatives[0].transcript)
-            if save_path:
-                print("saved!!")
-            else:   
-                print("Error saving")
+        try:
+            # Perform speech recognition
+            text = recognizer.recognize_google(audio_data, language='ko-KR')  # 한국어로 설정
+            return text
+        except sr.UnknownValueError:
+            print(f"Speech recognition could not understand audio: {audio_path}")
+            return None
+        except sr.RequestError as e:
+            print(f"Could not request results from Google Speech Recognition service for {audio_path}: {e}")
+            return None
 
     def run(self):
         audio_data = self.record_audio()
 
-        if audio_data is not None:
-        # 오디오 파일로 저장
+        if audio_data:
+            # 오디오 파일로 저장
             with open(self.file_name, "wb") as f:
                 f.write(audio_data.get_wav_data())
-            ## 오디오 파일 재생
-            #self.play_audio()
-            self.speech_API()
-            print("성공적으로 작동됨!!!!!!!")
 
+            # 음성 파일을 텍스트로 변환
+            text = self.speech_to_text(self.file_name)
+            if text:
+                with open(self.save_path, 'w') as sp:
+                    sp.write(text)
+                print(f"Transcript: {text}")
+                return text  # 텍스트 반환
+            else:
+                return None
+        
         else:
             print("녹음 실패. 오디오 파일이 생성되지 않았습니다.")
+            return None
 
+
+# 사용 예제
 if __name__ == "__main__":
-    file_name = "response3333.wav"
-    record_api = Record_API(file_name)
-    record_api.run()
+    VtoT = Record_API(file_name="/home/jchj/Untitled3/src/untitled3/resource/output.wav", save_path="/home/jchj/Untitled3/src/untitled3/resource/response.txt", respone_time=5)
+    VtoT.run()

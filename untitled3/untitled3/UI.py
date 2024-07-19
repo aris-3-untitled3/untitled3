@@ -2,21 +2,20 @@ import rclpy as rp
 from rclpy.node import Node
 from untitled_msgs.msg import TopicString
 from untitled_msgs.srv import ServiceString
-from untitled_msgs.action import ActionString
 import time
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QMessageBox, QStackedWidget, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QStackedWidget
 from PyQt5 import uic
 from PyQt5.QtGui import QPixmap, QMovie
-from PyQt5.QtCore import QTimer , pyqtSignal, QObject, QThread
-from PyQt5 import QtWidgets, uic 
-from pydub import AudioSegment
-from pydub.playback import play
-from playsound import playsound
+from PyQt5.QtCore import pyqtSignal, QThread
+from PyQt5 import uic 
 import pygame
 import os
 import threading
 import numpy as np
+from Voice_Input import Record_API
+import datetime
+from DB_manager import DB_Manager
 
 # UI 파일 경로 설정
 ui_file = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Title.ui")
@@ -42,11 +41,12 @@ from_class_Payment = uic.loadUiType(ui_Payment)[0]
 from_class_Bye = uic.loadUiType(ui_Bye)[0]
 
 
+
 class PyQt(Node):
     # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
     ui_update_signal = pyqtSignal(str)
 
-    def __init__(self , main_window , loading_window , recommend_window , preparing_window , making_window , maked_window , bye_window):
+    def __init__(self , first_window ,loading_window , recommend_window , preparing_window , making_window , maked_window , bye_window):
         super().__init__('PyQt')
 
         # Robot_Server에서 토픽 받기 ( 3초 정면 대기 / 메뉴얼 시작 / 제조완료 / 쓰레기 청소 끝 및 아이스크림 대기 / 작별문구 / 토핑 무게 전달 및 쓰레기 청소 완료)
@@ -71,7 +71,7 @@ class PyQt(Node):
         msg.command = "start"
         self.robot_server_publisher.publish(msg)
 
-        self.main_window = main_window
+        self.first_window = first_window
         self.loading_window = loading_window
         self.recommend_window = recommend_window
         self.preparing_window = preparing_window
@@ -84,7 +84,7 @@ class PyQt(Node):
         self.get_logger().info(f'Received command: {msg.command}')
 
         if msg.command == "guest_detect":
-            self.main_window.update_signal.emit(msg.command)
+            self.first_window.update_signal.emit(msg.command)
 
 
         elif "Age" and "Gender" in msg.command:
@@ -144,44 +144,288 @@ class PyQt(Node):
         response.result = f'Command {request.command} received and being processed' 
 
         return response
+
+
+# DB_test.py 함수 구현 부분
+class DB_main:
+    def __init__(self):
+        self.mydb = DB_Manager()
+        self.mydb.DB_connect()
+        self.mydb.create_table()
+
+        # 팀원과 임의로 정한 맛 추천 테이블
+        self.None_flavor = {'0-6': {'F':'berry', 'M':'choco'},
+                    '7-18': {'F':'berry', 'M':'choco'},
+                    '19-29': {'F':'choco', 'M':'choco'},
+                    '30-49': {'F': 'vanilla', 'M':'vanilla'},
+                        '50-': {'F': 'vanilla', 'M':'vanilla'}
+                        }
+
+        self.None_topping = {'0-6': {'F':'topA', 'M':'topC'},
+                    '7-18': {'F':'topB', 'M':'topA'},
+                    '19-29': {'F':'topA', 'M':'topC'},
+                    '30-49': {'F': 'topB', 'M':'topB'},
+                        '50-': {'F': 'topB', 'M':'topA'}
+                        }
+
+    def load_age_gender(self):
+        with open('latest_age_gender.txt','r') as f:
+            info_txt = f.read()
+
+        infos = info_txt.split('\t')  # 탭 문자로 분리
+
+        if len(infos) >= 2:
+            age = infos[0].strip()  # 첫 번째 요소를 age 변수에 저장하고 좌우 공백 제거
+            gender = infos[1].strip()  # 두 번째 요소를 gender 변수에 저장하고 좌우 공백 제거
+            print(f"{age} {gender} Load Success")
+        else:
+            print("Failed to load age and gender information from the file.")
+
+        return age,gender
+
+    def recommend_flavor_topping(self):
+        age, gender = self.load_age_gender()
+        most_flavor, most_topping = self.mydb.load_sales(age, gender)
+
+        if most_flavor is None:
+            most_flavor = self.None_flavor[age][gender]
+            print(f"맛 추천 정보가 없어서 임의로 출력함 fl  avor = {self.None_flavor[age][gender]}")
+        if most_topping is None:
+            most_topping = self.None_topping[age][gender]
+            print(f"토핑 추천 정보가 없어서 임의로 출력함 topping = {self.None_topping[age][gender]}")
+
+        print (f"맛 추천 {most_flavor}, {most_topping}")
+
+        return age, gender, most_flavor, most_topping
+
+    def API_module(self, audio_file, text_file, response_time):
+        # 추천 메뉴에 대한 응답 음성 인식
+        if response_time == 3:
+            print("추천드린 맛으로 선택하시겠습니까? (네/아니요)")
+            time.sleep(0.5)
+        if response_time == 5:
+            print("메뉴 선택 후 말씀해주세요")
+            print("예시) 딸기맛 하나랑 토핑 A로 부탁해")
+            time.sleep(0.5)
+
+        record_api = Record_API(audio_file, text_file, response_time)
+        flag = record_api.run()
+
+        if text_file:
+            print(f"audio_file = {audio_file}. VoicetoText = {text_file} 성공적으로 저장됨")
+        else:
+            print("API_module --> text_file 생성되지 않음")
+            audio_file, response_time = None
+
+        return text_file, response_time, flag
     
-class MainWindow(QMainWindow, from_class):
-    # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
-    update_signal = pyqtSignal(str)
+    def word_detect(self, text_file, response_time, flag):
+        flavor_list = ["딸기", 
+                       "초코",
+                       "바닐라"]
+        
+        topping_list = ["A", "에이",
+                        "B", "비", "삐",
+                        "C", "씨", "시"]
+
+        # 응답 Y/N 판별하는 구문
+        if response_time == 3:
+            with open(text_file, 'r') as f:
+                vtot = f.read()
+            if '네' in vtot:
+                YorN = 'Y'
+            elif "아니요" in vtot or "아니오" in vtot or "아니" in vtot:
+                YorN = 'N'
+            else:
+                print("다시 말씀해주세요")
+                YorN = 'E' #error
+            return YorN
+
+        # Flavor, Topping 녹화-변환-저장 파일 불러오기(ex. 딸기맛 하나랑 토핑 A로 부탁해)
+        if response_time == 5:
+            if flag == 1:
+                with open(text_file,'r') as f:
+                    text_file = f.read()
+                text_file = text_file.upper()
+                flavor_topping = text_file.split(' ') # (ex. ['딸기맛', '하나랑', '토핑A로', '부탁해'])
+                print(f"flavor_topping --> {flavor_topping}")
+                flavor = [flavor for flavor in flavor_list 
+                    if any(flavor in word for word in flavor_topping)]
+            else:
+                flavor = None
+                
+            print(f"인식된 flavor --> {flavor}")
+
+
+            if flag == 1 and len(flavor) == 1:
+                if flavor[0] == flavor_list[0]:
+                    Flavor = "berry"
+                if flavor[0] == flavor_list[1]:
+                    Flavor = "choco"
+                if flavor[0] == flavor_list[2]:
+                    Flavor = "vanilla"
+            elif flag == 1 and len(flavor) > 1:
+                print("flavor -- 중복되었습니다.")
+                Flavor = "error"
+            else:
+                print("flavor -- 다시 말씀해주세요")
+                Flavor = "error"
+
+            if flag == 1:
+                topping = [topping for topping in topping_list
+                        if any(topping in word for word in flavor_topping)]
+            else:
+                topping = None
+            print(f"인식된 topping --> {topping}")
+
+
+            if flag == 1 and len(topping) == 1:
+                if topping[0] in [topping_list[0], topping_list[1]]:
+                    Topping = "topA"
+                if topping[0] in [topping_list[2], topping_list[3], topping_list[4]]:
+                    Topping = "topB"
+                if topping[0] in [topping_list[5], topping_list[6], topping_list[7]]:
+                    Topping = "topC"
+
+            elif flag == 1 and len(topping) > 1:
+                print("topping -- 중복되었습니다")
+                Topping = "error"
+            else:
+                print("topping -- 다시 말씀해주세요")
+                Topping = "error"
+
+            return Flavor, Topping
+        
+    def YorN_response(self, most_flavor, most_topping): #(self, response_time, most_flavor, most_topping):
+        current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        print(f"{current_time} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        YorN_audio = f"YorN_response{current_time}.wav"
+        YorN_vtot = f"YorN_response{current_time}.txt"
+
+        text_file, response_time, flag = self.API_module(YorN_audio, YorN_vtot, 3)
+        YorN = self.word_detect(text_file, response_time, flag)
+
+        cnt = 0 #다시 음성 요청할 때, 리밋하기 위한 카운터
+        # 추천 메뉴 Y --> 그대로 return, N --> (1) 음성으로 메뉴 고르기 (2) 클릭으로 메뉴 고르기 값이 return
+        if YorN == 'Y':
+            Flavor = most_flavor
+            Topping = most_topping
+
+        # 만약 음성으로 인식받는다고 하면 아래 파일 실행, 아니면 버튼에서 눌린 데이터값 불러와서 저장
+        elif YorN == 'N':
+            flavor_audio = f"Flavor_Topping{current_time}.wav"
+            flavor_vtot = f"Flavor_Topping{current_time}.txt"
+            # error값이 나오면 cnt = 0, 1, 2로 증가하는데 3이 되기 전까지 API_module과 word_detect 반복하는?
+            cnt = 0 #다시 음성 요청할 때, 리밋하기 위한 카운터
+            while cnt < 2:
+                text_file, response_time, flag = self.API_module(flavor_audio, flavor_vtot, 5)
+                Flavor, Topping = self.word_detect(text_file, response_time, flag)
+
+                if Flavor == "error" or Topping == "error":
+                    Flavor = None
+                    Topping = None
+                    cnt += 1
+                else:
+                    break
+        else:
+            flavor_audio = f"Flavor_Topping{current_time}.wav"
+            flavor_vtot = f"Flavor_Topping{current_time}.txt"
+            while cnt < 2:
+                text_file, response_time, flag = self.API_module(YorN_audio, YorN_vtot, 3)
+                YorN = self.word_detect(text_file, response_time, flag)
+
+                if YorN == 'E':
+                    Flavor = None
+                    Topping = None
+                    cnt += 1
+                else:
+                    break
+
+        print(f"YorN_response return {Flavor}, {Topping} _=====================================================")
+        return Flavor, Topping
+
+    def YorN_stamp(self, YorN, phone):
+        if YorN == 'Y':
+            print("continue coupon")
+
+            Phone = phone
+            coupon = self.mydb.load_customer_info(Phone) # 쿠폰 갯수 load
+
+        else:
+            Phone = ""
+            coupon = None
+
+        return str(Phone), coupon
+    
+    def YorN_use_coupon(self, coupon, use_coupon):
+        if use_coupon == 'Y' and coupon >= 10:
+                price = 0
+                coupon -= 10
+                print(f"{price}, 쿠폰 사용 {use_coupon} --> 선택한 use coupon 값")
+        return coupon, price
+
+    def show_price(self, Topping, topping_time):
+        flavor_price, toppic_price = self.mydb.load_price(Topping)
+        price = flavor_price + (toppic_price*topping_time)
+
+        return price
+
+    def update_infos(self, Flavor, Topping, price, Phone, age, gender, Use_coupon): 
+        save_sale = self.mydb.save_sales(Flavor, Topping, price, Phone, age, gender, Use_coupon)
+
+        if Phone:
+            user_id, coupon = self.mydb.save_customer_info(Phone, age, gender, Use_coupon)
+            print(f"고객정보 업데이트 완료 --> {user_id}")
+            return user_id, coupon
+        else:
+            coupon = None
+            print("쿠폰 적립하지 않는다고 해서 손님 저장하지 않음")
+            print(f"saved sales ----> {save_sale}")
+            return Phone, coupon
+    
+    def update_stock(self, Flavor, Topping):
+        result, stock_dict, flavor_flag, topping_flag = self.mydb.save_stock(Flavor, Topping)
+
+        if stock_dict and flavor_flag and topping_flag is not None:
+            print("**********************************재고 리스트****************************************")
+            print(f"*-{stock_dict}-*")
+            print("************************************************************************************")
+
+            if flavor_flag is not None:
+                print(f"Out of stock {flavor_flag}")
+            if topping_flag is not None:
+                print(f"Out of stock {topping_flag}")
+
+            print("성공적으로 마쳤다!!")
+        else:
+            print("Final ERROR------------------------------")
+
+        return result, stock_dict, flavor_flag, topping_flag
+
+
+# 전체 UI 관리   
+class MainlWindow(QMainWindow):
     
     def __init__(self):
         super().__init__()
-        self.setupUi(self)
-    
-        self.load_image()
     
         self.stacked_widget = QStackedWidget(self)  # QStackedWidget 인스턴스 생성   
-        # self.setCentralWidget(self.stacked_widget)  # MainWindow의 중앙 위젯으로 설정 
+        self.setCentralWidget(self.stacked_widget)  # MainWindow의 중앙 위젯으로 설정 
     
-        # self.stacked_widget.addWidget(self)  # 메인 위젯을 stacked widget에 추가
-        self.stacked_widget.setCurrentWidget(self)  # 메인 위젯을 보여줌
-    
-        self.pushButton.clicked.connect(self.open_LoadingWindow)
-        self.pushButton.clicked.connect(self.on_click)
-    
-        self.update_signal.connect(self.open_LoadingWindow)
+        self.open_FirstWindow()
 
-    def load_image(self):
-        pixmap = QPixmap("/home/jchj/Untitled3/src/untitled3/UI/Title.jpg")
-        self.label_2.setPixmap(pixmap)
-        self.label_2.setScaledContents(True)
+    def voice_input(self):
+        file_name="/home/jchj/Untitled3/src/untitled3/resource/output.wav"
+        save_path="/home/jchj/Untitled3/src/untitled3/resource/response.txt"
+        VtoT = Record_API(file_name, save_path, respone_time=10)
+        text = VtoT.run()
+        print(text)
 
-    def on_click(self):
-        threading.Thread(target=self.play_mp3).start()
-
-    def play_mp3(self):
-        song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/cat_like1b.mp3")
-        play(song)
-
-    def open_MainWindow(self):
-        self.MainWindow = MainWindow()
-        self.stacked_widget.addWidget(self.MainWindow)  # MainWindow 페이지를 stacked widget에 추가
-        self.stacked_widget.setCurrentWidget(self.MainWindow)  # MainWindow 페이지를 보여줌
+    def open_FirstWindow(self):
+        self.FirstWindow = FirstWindow(self)
+        self.stacked_widget.addWidget(self.FirstWindow)  # MainWindow 페이지를 stacked widget에 추가
+        self.stacked_widget.setCurrentWidget(self.FirstWindow)  # MainWindow 페이지를 보여줌
 
     def open_LoadingWindow(self):
         self.LoadingWindow = LoadingWindow(self)
@@ -218,8 +462,8 @@ class MainWindow(QMainWindow, from_class):
         self.stacked_widget.addWidget(self.CouponWindow)  # CouponWindow 페이지를 stacked widget에 추가
         self.stacked_widget.setCurrentWidget(self.CouponWindow)  # CouponWindow 페이지를 보여줌
     
-    def open_PaymentWindow(self):
-        self.PaymentWindow = PaymentWindow(self)
+    def open_PaymentWindow(self,coupon,number):
+        self.PaymentWindow = PaymentWindow(self,coupon,number)
         self.stacked_widget.addWidget(self.PaymentWindow)  # PaymentWindow 페이지를 stacked widget에 추가
         self.stacked_widget.setCurrentWidget(self.PaymentWindow)  # PaymentWindow 페이지를 보여줌
 
@@ -227,7 +471,43 @@ class MainWindow(QMainWindow, from_class):
         self.ByeWindow = ByeWindow(self)
         self.stacked_widget.addWidget(self.ByeWindow)  # ByeWindow 페이지를 stacked widget에 추가
         self.stacked_widget.setCurrentWidget(self.ByeWindow)  # ByeWindow 페이지를 보여줌
+
+
+class FirstWindow(QMainWindow, from_class):
+    # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
+    update_signal = pyqtSignal(str)
     
+    def __init__(self,main_window):
+        super().__init__()
+        self.setupUi(self)
+    
+        self.load_image()
+
+        self.main_window = main_window
+    
+        self.pushButton.clicked.connect(self.next)
+        self.pushButton.clicked.connect(self.on_click)
+    
+        self.update_signal.connect(self.next)
+
+    def load_image(self):
+        pixmap = QPixmap("/home/jchj/Untitled3/src/untitled3/UI/Title.jpg")
+        self.label_2.setPixmap(pixmap)
+        self.label_2.setScaledContents(True)
+
+    def on_click(self):
+        threading.Thread(target=self.play_mp3).start()
+
+    def play_mp3(self):
+        pygame.mixer.init()
+        pygame.mixer.music.load("/home/jchj/Untitled3/src/untitled3/UI/cat_like1b.mp3")
+        pygame.mixer.music.play()
+
+    def next(self):
+
+        print("음성출력 - 안녕하세요")
+        self.main_window.open_LoadingWindow()
+
 
 class LoadingWindow(QMainWindow, from_class2):
     # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
@@ -276,21 +556,18 @@ class DirectionWindow(QMainWindow, from_class_Direction):
         print("음성출력 - 사용법 설명")
 
     def open_Title_window(self):
-        self.Title_window = MainWindow()
-        self.Title_window.show()
-        self.close()
+        self.main_window.open_FirstWindow()
 
     def open_loading_window(self):
-        self.loading_window = LoadingWindow()
-        self.loading_window.show()
-        self.close()
+        self.main_window.open_LoadingWindow()
 
     def on_click(self):
         threading.Thread(target=self.play_mp3).start()
 
     def play_mp3(self):
-        song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/cat_like1b.mp3")
-        play(song)
+        pygame.mixer.init()
+        pygame.mixer.music.load("/home/jchj/Untitled3/src/untitled3/UI/cat_like1b.mp3")
+        pygame.mixer.music.play()
 
     def next(self):
         self.main_window.open_RecommendWindow()
@@ -305,7 +582,7 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
 
         self.main_window = main_window
         
-        self.pushButton_back.clicked.connect(self.next)
+        self.pushButton_back.clicked.connect(self.open_Direction_window)
         self.pushButton_home.clicked.connect(self.open_Title_window)
         self.pushButton_back.clicked.connect(self.on_click)
         self.pushButton_home.clicked.connect(self.on_click)
@@ -398,41 +675,78 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         self.pushButton.clicked.connect(self.check_selection_and_next)
 
         print("음성출력 - 메뉴선택")
+
         # 손님 성별,연령대에 따른 맛 선호도 가져오기: 서비스 : UI -> DB_Manager
         #   테투리 - 선호도 (성별,연령대) 
         #   음성 출력 - "추천 메뉴를 선택하시겠습니까?"
         #   음성 인식: 서비스 : UI -> Voice_Input (네 or 아니요)
+        # self.main_window.voice_input()
         #       네 - 음성출력 및 다음화면 "선택한 메뉴를 제조하겠습니다"
         #       아니요 - 음성출력 : "메뉴를 선택해 주세요"
         #           음성 인식 : 서비스 : UI -> Voice_Input (아이스크림 맛, 토핑맛)
+        # self.main_window.voice_input()
         #               맛 선택 : "선택한 맛으로 제조하겠습니다."
         #               nop : 음성출력 - "메뉴가 부정확합니다 . 마우스로 클릭해 주세요"
 
         self.update_signal.connect(self.next)
+
+        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@잘 넘어옴")
+        # 맛 추천 표시 두 가지 방법 중 선택하기
+        age, gender, recommended_flavor, recommended_topping = DB_main().recommend_flavor_topping()
+        print(f"{recommended_flavor}, {recommended_topping}")
+        self.label_2.setText(f"손님께 추천드리는 맛과 토핑은 {recommended_flavor}와 {recommended_topping}입니다.")
+
+        self.Flavor, self.Topping = DB_main().YorN_response(recommended_flavor, recommended_topping)
+
+        # print(f"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@{self.Flavor} {self.Topping}")
+
+        # # 인식 못했으면 클릭 활성화 --> 손님 직접 메뉴 선택
+        # if self.Flavor is None and self.Topping is None:
+        #     # QPushButton을 토글 버튼으로 만들기
+        #     self.pushButton_1.setCheckable(True) # choco
+        #     self.pushButton_2.setCheckable(True) # vanilla
+        #     self.pushButton_3.setCheckable(True) # berry
+        #     self.pushButton_4.setCheckable(True) # topC
+        #     self.pushButton_5.setCheckable(True) # topB
+        #     self.pushButton_6.setCheckable(True) # topA
+
+        #     # 소리
+        #     self.pushButton_1.clicked.connect(self.on_click)
+        #     self.pushButton_2.clicked.connect(self.on_click)
+        #     self.pushButton_3.clicked.connect(self.on_click)
+        #     self.pushButton_4.clicked.connect(self.on_click)
+        #     self.pushButton_5.clicked.connect(self.on_click)
+        #     self.pushButton_6.clicked.connect(self.on_click)
+        #     # Next 버튼 이벤트 연결
+        #     self.pushButton.clicked.connect(self.check_selection_and_next)
+        # else:
+        #     Flavor = self.Flavor
+        #     Topping = self.Topping
+        #     print(f"check_selection_and_next ==========> global4 {Flavor}, {Topping}")
+        #     print(f"check_selection_and_next ==========> global5 self.{Flavor}, self.{Topping}")
+        #     QTimer.singleShot(30,  self.open_Preparing_window)
     
     def on_click(self):
         threading.Thread(target=self.play_mp3).start()
 
     def play_mp3(self):
-        song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/cat_like1b.mp3")
-        play(song)
+        pygame.mixer.init()
+        pygame.mixer.music.load("/home/jchj/Untitled3/src/untitled3/UI/cat_like1b.mp3")
+        pygame.mixer.music.play()
 
     def on_click_warn(self):
         threading.Thread(target=self.play_mp3_warn).start()
 
     def play_mp3_warn(self):
-        song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/blip01.mp3")
-        play(song)
+        pygame.mixer.init()
+        pygame.mixer.music.load("/home/jchj/Untitled3/src/untitled3/UI/cat_like1b.mp3")
+        pygame.mixer.music.play()
         
     def open_Title_window(self):
-        self.Title_window = MainWindow()
-        self.Title_window.show()
-        self.close()   
+        self.main_window.open_FirstWindow()
 
     def open_Direction_window(self):
-        self.Direction_window = DirectionWindow()
-        self.Direction_window.show()
-        self.close()
+        self.main_window.open_DirectionWindow()
 
     def toggle_button(self):
         button = self.sender()
@@ -447,6 +761,31 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
                 button.setStyleSheet('background-color: lightgray')  # 토핑 색상
         else:
             button.setStyleSheet('')  # 초기 상태로 되돌림
+
+    # def toggle_button(self):
+    #     global Flavor, Topping
+    #     button = self.sender()
+    #     if button.isChecked():
+    #         if button == self.pushButton_1:
+    #             button.setStyleSheet('background-color: brown')  # 초코 색
+    #             Flavor = "choco"
+    #         elif button == self.pushButton_2:
+    #             button.setStyleSheet('background-color: beige')  # 바닐라 색
+    #             Flavor = "vanilla"
+    #         elif button == self.pushButton_3:
+    #             button.setStyleSheet('background-color: red')  # 딸기 색
+    #             Flavor = "berry"
+    #         elif button == self.pushButton_4:
+    #             button.setStyleSheet('background-color: lightgray')  # 토핑 색상
+    #             Topping = "topC"
+    #         elif button == self.pushButton_5:
+    #             button.setStyleSheet('background-color: lightgray')  # 토핑 색상
+    #             Topping = "topB"
+    #         elif button == self.pushButton_6:
+    #             button.setStyleSheet('background-color: lightgray')  # 토핑 색상
+    #             Topping = "topA"
+    #     else:
+    #         button.setStyleSheet('')  # 초기 상태로 되돌림
 
     def check_selection_and_next(self):
         # 아이스크림 맛이 하나가 선택되었는지 확인
@@ -471,6 +810,51 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
 
         if ice_cream_selected and topping_selected:
             self.next()
+
+    # def check_selection_and_next(self):
+    #     global Flavor, Topping
+    #     print(f"check_selection_and_next ==========> global1 {Flavor}, {Topping}")
+    #     # 아이스크림 맛이 하나가 선택되었는지 확인
+    #     ice_cream_selected = (
+    #         (self.pushButton_1.isChecked() and not self.pushButton_2.isChecked() and not self.pushButton_3.isChecked()) or
+    #         (not self.pushButton_1.isChecked() and self.pushButton_2.isChecked() and not self.pushButton_3.isChecked()) or
+    #         (not self.pushButton_1.isChecked() and not self.pushButton_2.isChecked() and self.pushButton_3.isChecked())
+    #     )
+    #     topping_selected = (
+    #         (self.pushButton_4.isChecked() and not self.pushButton_5.isChecked() and not self.pushButton_6.isChecked()) or
+    #         (not self.pushButton_4.isChecked() and self.pushButton_5.isChecked() and not self.pushButton_6.isChecked()) or
+    #         (not self.pushButton_4.isChecked() and not self.pushButton_5.isChecked() and self.pushButton_6.isChecked())
+    #     )
+
+    #     if not ice_cream_selected:
+    #         self.on_click_warn()
+    #         QMessageBox.warning(self, 'Warning', '아이스크림 맛을 한 가지만 골라주세요.')
+
+    #     if not topping_selected:
+    #         self.on_click_warn()
+    #         QMessageBox.warning(self, 'Warning', '토핑을 한 가지만 골라주세요.')
+
+    #     if ice_cream_selected and topping_selected:
+    #         if self.pushButton_1.isChecked():
+    #             self.Flavor = "choco"
+    #         elif self.pushButton_2.isChecked():
+    #             self.Flavor = "vanilla"
+    #         else:
+    #             self.Flavor = "berry"
+
+    #         if self.pushButton_4.isChecked():
+    #             self.Topping = "topC"
+    #         elif self.pushButton_5.isChecked():
+    #             self.Topping = "topB"
+    #         else:
+    #             self.Topping = "topA"
+
+    #         Flavor = self.Flavor
+    #         Topping = self.Topping
+
+    #         print(f"check_selection_and_next ==========> self.{self.Flavor}, {self.Topping}")
+    #         print(f"check_selection_and_next ==========> global2 {Flavor}, {Topping}")
+    #         self.open_Preparing_window()
 
     def play_sound(self):
         if self.mixer_initialized:
@@ -523,17 +907,16 @@ class PreparingWindow(QMainWindow, from_class_Preparing):
             self.next()
 
 
-    def returning(self):
-        self.Recommend_window = RecommendWindow()
-        self.Recommend_window.show()
-        self.close()
-
     def on_click(self):
         threading.Thread(target=self.play_mp3).start()
 
     def play_mp3(self):
-        song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/cat_like1b.mp3")
-        play(song)
+        pygame.mixer.init()
+        pygame.mixer.music.load("/home/jchj/Untitled3/src/untitled3/UI/cat_like1b.mp3")
+        pygame.mixer.music.play()
+
+    def returning(self):
+        self.main_window.open_RecommendWindow()
 
     def next(self):
         self.main_window.open_MakingWindow()
@@ -633,8 +1016,9 @@ class CouponWindow(QMainWindow, from_class_Coupon):
         threading.Thread(target=self.play_mp3).start()
 
     def play_mp3(self):
-        song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/cat_like1b.mp3")
-        play(song)
+        pygame.mixer.init()
+        pygame.mixer.music.load("/home/jchj/Untitled3/src/untitled3/UI/cat_like1b.mp3")
+        pygame.mixer.music.play()
 
     def add_text(self, text):
         # 입력된 번호 갱신
@@ -668,20 +1052,14 @@ class CouponWindow(QMainWindow, from_class_Coupon):
 
     def open_Payment_window(self):
         self.coupon = 1
-        self.Payment_window = PaymentWindow(self.coupon, self.number)
-        self.Payment_window.show()
-        self.close()
+        self.main_window.open_PaymentWindow(self.coupon,self.number)
 
     def open_Payment_window2(self):
         self.coupon = 0
-        self.Payment_window = PaymentWindow(self.coupon, self.number)
-        self.Payment_window.show()
-        self.close()
+        self.main_window.open_PaymentWindow(self.coupon,self.number)
 
     def open_Maked_window(self):
-        self.Maked_window = MakedWindow()
-        self.Maked_window.show()
-        self.close()
+        self.main_window.MakedWindow()
 
 class PaymentWindow(QMainWindow, from_class_Payment):
     # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
@@ -689,6 +1067,9 @@ class PaymentWindow(QMainWindow, from_class_Payment):
 
     def __init__(self, main_window , coupon_value, number):
         super().__init__()
+
+        global Flavor, Topping, age, gender
+
         self.setupUi(self)
 
         self.main_window = main_window
@@ -726,42 +1107,116 @@ class PaymentWindow(QMainWindow, from_class_Payment):
         # 쿠폰 개수 : UI -> DB_Manager
         # 맛 가격 :  UI -> DB_Manager
         # 일 매출 : UI -> DB_Manager
+
+        # self.Use_coupon = 'N' # default 값
+        
+        # if self.coupon_value == 1:  # stamp 적립 Y
+        #     YorN = 'Y'
+        # if self.coupon_value == 0:
+        #     YorN = 'N'
+
+        # if self.number is not None and self.number != "":
+        #     phone = int(self.number)
+        #     self.number, self.coupon = DB_main().YorN_stamp(YorN, phone)
+        #     print(f"고객 정보 --> {self.number}, {self.coupon}")
+        # else:
+        #     phone = None
+
+
+
+        # topping_time = 5 # topping time은 토크 혹은 나오는 실제 시간으로 판단할 예정
+
+        # # 임의의 금액
+        # self.price = DB_main().show_price(Topping, topping_time)
+        # self.priceText(self.price)
+
+        # # 임의의 쿠폰 수 적용 및 텍스트 출력
+        # if self.coupon_value != 0:
+        #     self.set_coupon_text(self.coupon)
+        
+        # # 사용 버튼 시
+        # self.pushButton_6.clicked.connect(self.use_coupon)   
+        # # 결제 버튼 시
+        # self.pushButton_8.clicked.connect(self.payment)
+        # #self.pushButton_8.clicked.connect(self.no_use_coupon)
+        # # Back 버튼 추가
+        # self.pushButton_back.clicked.connect(self.open_Coupon_window)
+        
+        # ## 소리!
+        # # 사용 버튼 시
+        # self.pushButton_6.clicked.connect(self.on_click)
+        # # 결제 버튼 시
+        # self.pushButton_8.clicked.connect(self.on_click)
+        # # Back 버튼 추가
+        # self.pushButton_back.clicked.connect(self.on_click)
         
 
-    def priceText(self):
-        text = str(self.price) + ' 원'
-        self.textBrowser_2.setText(text)
+    # def priceText(self, price):
+    #     text = str(price) + ' 원'
+    #     self.textBrowser_2.setText(text)
         
-    def set_coupon_text(self):
-        message = f"회원님의 쿠폰 수는 {self.coupons}개입니다."
-        self.textBrowser.setText(message)
-        message2 = f"회원번호: 010-" + self.number[:4] + '-' + self.number[4:]
-        self.textBrowser_3.setText(message2)
+    # def set_coupon_text(self, coupon):
+    #     message = f"회원님의 쿠폰 수는 {coupon}개입니다."
+    #     self.textBrowser.setText(message)
+    #     message2 = f"회원번호: 010-" + self.number[:4] + '-' + self.number[4:]
+    #     self.textBrowser_3.setText(message2)
 
-    def use_coupon(self):
-        if self.coupons >= 10 and self.coupon_value != 0:
-            self.coupons -= 10
-            self.price = 0
-            self.priceText()
-            self.set_coupon_text()
-            message2 = f"남은 쿠폰 수는 {self.coupons}개 입니다."
-            QMessageBox.warning(self, '쿠폰 사용 완료', message2)
-        #self.open_Bye_window()
+    # def use_coupon(self):
+    #     if self.number is not None and self.number != "":
+    #         if self.coupon >= 10 and self.coupon_value == 1: #여기 coupons --> coupon
+    #             self.Use_coupon = 'Y' # 사용하면 Y로 바꿈
+    #             coupon = self.coupon
+    #             coupon -= 10
+    #             price = self.price
+    #             price = 0
+    #             phone = self.number
+    #             self.priceText(price)
+    #             self.set_coupon_text(coupon)
+    #             message2 = f"남은 쿠폰 수는 {coupon}개 입니다."
+    #             if self.Use_coupon == 'Y':
+    #                 update_info, coupon = DB_main().update_infos(Flavor, Topping, price, int(phone), age, gender, self.Use_coupon)
+    #                 print(f"update_info | coupon {update_info}, {coupon}")
+    #             QMessageBox.warning(self, '쿠폰 사용 완료', message2)
+    #         else:
+    #             message2 = f"쿠폰이 10개 미만일 경우에는 사용이 불가합니다."
+    #             QMessageBox.warning(self, '쿠폰 사용 불가', message2)
+    #         #self.open_Bye_window()
+
+    def payment(self):
+        if self.Use_coupon == 'N' and self.coupon_value == 1 and self.number is not None and self.number != "":
+            phone = self.number
+            update_info, coupon = DB_main().update_infos(Flavor, Topping, self.price, int(phone), age, gender, self.Use_coupon)
+            print(f"적립은 하지만 쿠폰 사용 x update_info | coupon {update_info}, {coupon}")
+            self.open_Bye_window()
+        
+        elif self.Use_coupon == 'Y':
+            print("쿠폰 사용한 고객은 이미 업데이트 했으니 그냥 바로 넘어감")
+            self.open_Bye_window()
+
+        elif self.coupon_value == 0:
+            phone = None
+            coupon = None
+            Use_coupon = 'N'
+            update_info, coupon = DB_main().update_infos(Flavor, Topping, self.price, phone, age, gender, Use_coupon)
+            print(f"적립 안함 update_info | coupon {update_info}, {coupon}")
+            self.open_Bye_window()
+        else:
+            print("payment Error--------------")   
 
     def on_click(self):
         threading.Thread(target=self.play_mp3).start()
 
     def play_mp3(self):
-        song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/cat_like1b.mp3")
-        play(song)
+        pygame.mixer.init()
+        pygame.mixer.music.load("/home/jchj/Untitled3/src/untitled3/UI/cat_like1b.mp3")
+        pygame.mixer.music.play()
+
+    def returning(self):
+        self.main_window.open_CouponWindow()
 
     def next(self):
         self.main_window.open_ByeWindow()
 
-    def returning(self):
-        self.Coupon_window = CouponWindow()
-        self.Coupon_window.show()
-        self.close()
 
 class ByeWindow(QMainWindow, from_class_Bye):
     # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
@@ -781,6 +1236,24 @@ class ByeWindow(QMainWindow, from_class_Bye):
 
         self.update_signal.connect(self.next)
 
+    #     self.pushButton.clicked.connect(self.showValues)
+    #     self.show()
+
+    # def showValues(self):
+    #     global Flavor, Topping
+    #     print(f"show Values ==> {Flavor}, {Topping}")
+    #     result, stock, flavor_flag, topping_flag = DB_main().update_stock(Flavor, Topping)
+
+    #     print(f"Final list ====================== {result}")
+
+    #     self.tableWidget.setItem(0,0,QTableWidgetItem(str(result[0]))) #vanilla
+    #     self.tableWidget.setItem(0,1,QTableWidgetItem(str(result[1]))) # choco
+    #     self.tableWidget.setItem(0,2,QTableWidgetItem(str(result[2]))) # berry
+    #     self.tableWidget.setItem(0,3,QTableWidgetItem(str(result[3]))) # topA
+    #     self.tableWidget.setItem(0,4,QTableWidgetItem(str(result[4]))) # topB
+    #     self.tableWidget.setItem(0,5,QTableWidgetItem(str(result[5]))) # topC
+    #     self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
     def plus_init(self, node):
         self.node = node
         self.node.Conclusion(self.stock)
@@ -798,7 +1271,7 @@ class ByeWindow(QMainWindow, from_class_Bye):
             print("음성출력 - 쓰레기가 없습니다.")
 
     def next(self):
-        self.main_window.open_MainWindow()
+        self.main_window.open_FirstWindow()
         
 class Ros2Thread(QThread):
     def __init__(self, node):
@@ -813,7 +1286,8 @@ def main(args=None):
 
     app = QApplication(sys.argv)
 
-    main_window = MainWindow()
+    main_window = MainlWindow()
+    first_window =  FirstWindow(main_window)
     loading_window = LoadingWindow(main_window)
     recommend_window = RecommendWindow(main_window)
     preparing_window = PreparingWindow(main_window)
@@ -821,11 +1295,12 @@ def main(args=None):
     maked_window = MakedWindow(main_window)
     bye_window = ByeWindow(main_window)
 
-    Node = PyQt(main_window , loading_window , recommend_window , preparing_window , making_window , maked_window , bye_window)
+    Node = PyQt(first_window , loading_window , recommend_window , preparing_window , making_window , maked_window , bye_window)
+
     preparing_window.plus_init(Node)
     bye_window.plus_init(Node)
 
-    main_window.show()
+    main_window.showMaximized()
 
     ros2_thread = Ros2Thread(Node)
     ros2_thread.start()

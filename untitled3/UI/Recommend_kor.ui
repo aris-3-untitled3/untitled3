@@ -246,6 +246,24 @@ QPushButton:hover {
     <string>초기화면</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="pushButton_rec">
+   <property name="geometry">
+    <rect>
+     <x>1500</x>
+     <y>650</y>
+     <width>160</width>
+     <height>120</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>23</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>추천</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
