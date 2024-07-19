@@ -38,20 +38,65 @@ from_class_Payment = uic.loadUiType(ui_Payment)[0]
 from_class_Bye = uic.loadUiType(ui_Bye)[0]
 from_class_Empty = uic.loadUiType(ui_Empty)[0]
 
-class MainWindow(QMainWindow, from_class):
+class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        ### slack no.2
         self.empty = 0
-        self.setupUi(self)
-        if(self.empty == 0):
+        self.setWindowTitle('Background Image Example')
+        self.resize(1920, 1080)
+
+        # 중앙 위젯 설정
+        central_widget = QWidget(self)
+        self.setCentralWidget(central_widget)
+
+        # 스타일시트를 사용하여 중앙 위젯에 배경 이미지 설정
+        central_widget.setStyleSheet("""
+            QWidget {
+                background-image: url("/home/messi/ws_amr/qt/dall.jpg"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
+
+        # 버튼 설정
+        self.pushButton = QPushButton('주문\n\nOrder Now', self)
+        self.pushButton.setGeometry(1600, 800, 180, 180)  # 버튼 위치와 크기 설정
+
+        # 버튼 스타일 설정
+        self.pushButton.setStyleSheet("""
+            QPushButton {
+                background-color: #f1c40f; /* 버튼 배경색 */
+                color: white; /* 버튼 글자색 */
+                font-size: 26px; /* 글자 크기 */
+                font-weight: bold; /* 글자 굵기 */
+                border-radius: 15px; /* 둥근 모서리 */
+                border: 2px solid #e67e22; /* 테두리 색과 굵기 */
+            }
+            QPushButton:hover {
+                background-color: #e67e22; /* 마우스 오버시 배경색 */
+            }
+            QPushButton:pressed {
+                background-color: #d35400; /* 클릭시 배경색 */
+            }
+        """)
+
+        if self.empty == 0:
             self.pushButton.clicked.connect(self.open_loading_window)
-        elif(self.empty == 1):
+        elif self.empty == 1:
             self.pushButton.clicked.connect(self.open_empty_window)
+
+    def open_loading_window(self):
+        print('Loading Window Opened')
+
+    def open_empty_window(self):
+        print('Empty Window Opened')
+
+
+       # self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")        
 
         self.pushButton.clicked.connect(self.on_click)
 
-        self.load_image()
+       # self.load_image()
     # def __init__(self):
     #     super().__init__()
     #     self.setupUi(self)
@@ -106,23 +151,97 @@ class EmptyWindow(QMainWindow, from_class_Empty):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        
+
+        self.setWindowTitle('Background Image Example')
+        self.resize(1920, 1080)
+
+        # 중앙 위젯 설정
+        central_widget = QWidget(self)
+        self.setCentralWidget(central_widget)
+
+        # 스타일시트를 사용하여 배경 이미지 설정
+        self.setStyleSheet("""
+            QMainWindow {
+                background-image: url("/home/messi/ws_amr/qt/dall.jpg"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
+
+
+
+
+class BubbleLabel(QLabel):
+    def __init__(self, *args, **kwargs):
+        super(BubbleLabel, self).__init__(*args, **kwargs)
+        self.setAlignment(Qt.AlignCenter)
+        self.setWordWrap(True)
+        self.setStyleSheet("""
+            QLabel {
+                background-color: white;
+                border: 2px solid black;
+                border-radius: 15px;
+                padding: 10px;
+                font-size: 36px;   
+            }
+        """)
+
+    def paintEvent(self, event):
+        super(BubbleLabel, self).paintEvent(event)
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setPen(QPen(QColor("black"), 2))
+        painter.setBrush(QBrush(QColor("white")))
+        # 말풍선 꼬리 부분 그리기
+        points = [
+            self.rect().bottomLeft(),
+            self.rect().bottomLeft() + QPoint(10, 10),
+            self.rect().bottomLeft() + QPoint(20, 0),
+        ]
+        polygon = QPolygon(points)
+        painter.drawPolygon(polygon)
+
+# UI 파일 경로 설정
+ui_file2 = os.path.join('/home/messi/ws_amr/qt/', "Loading.ui")
+from_class2 = uic.loadUiType(ui_file2)[0]
 
 class LoadingWindow(QMainWindow, from_class2):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        
+        self.setWindowTitle('Background Image Example')
+        self.resize(1920, 1080)
 
-        # QLabel에 GIF 설정
-        self.movie = QMovie("loading.gif")
-        if self.movie.isValid():
-            self.label_pic.setMovie(self.movie)
-            self.movie.start()
-        else:
-            print("GIF를 로드할 수 없습니다.")
+        # 중앙 위젯 설정
+        central_widget = QWidget(self)
+        self.setCentralWidget(central_widget)
+
+        # 스타일시트를 사용하여 배경 이미지 설정
+        self.setStyleSheet("""
+            QMainWindow {
+                background-image: url("/home/messi/ws_amr/qt/dall.jpg"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
+
+        # BubbleLabel로 대체
+        self.bubble_label = BubbleLabel(self.label.text(), self)
+        self.bubble_label.setGeometry(self.label.geometry())
+        self.bubble_label.setText("3초간 저를 바라봐주세요!!")  # 원하는 텍스트로 변경
+        self.label.hide()  # 기존 label 숨기기
+        
+        # # QLabel에 GIF 설정
+        # self.movie = QMovie("loading.gif")
+        # if self.movie.isValid():
+        #     self.label_pic.setMovie(self.movie)
+        #     self.movie.start()
+        # else:
+        #     print("GIF를 로드할 수 없습니다.")
 
         # 로딩 3초 후
-        QTimer.singleShot(3000, self.open_DirectionWindow)
+        QTimer.singleShot(1000, self.open_DirectionWindow)
 
         self.load_image()
 
@@ -130,7 +249,6 @@ class LoadingWindow(QMainWindow, from_class2):
         pixmap = QPixmap("/home/messi/ws_amr/qt/Title.jpg")
         self.label_2.setPixmap(pixmap)
         self.label_2.setScaledContents(True)
-
 
     def open_DirectionWindow(self):
         self.DirectionWindow = DirectionWindow()
@@ -141,6 +259,7 @@ class DirectionWindow(QMainWindow, from_class_Direction):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
         self.pushButton.clicked.connect(self.open_Recommend_window)
         self.pushButton_back.clicked.connect(self.open_loading_window)
         self.pushButton_home.clicked.connect(self.open_Title_window)
@@ -174,6 +293,7 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
         self.pushButton_back.clicked.connect(self.open_Direction_window)
         self.pushButton_home.clicked.connect(self.open_Title_window)
         self.pushButton_back.clicked.connect(self.on_click)
@@ -460,6 +580,7 @@ class PreparingWindow(QMainWindow, from_class_Preparing):
         print(self.taste)
         print(self.top)
         self.setupUi(self)
+        self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
         self.pushButton_back.clicked.connect(self.open_Recommend_window)
         self.pushButton_next.clicked.connect(self.open_Making_window)
         self.pushButton_back.clicked.connect(self.on_click)
@@ -489,6 +610,7 @@ class MakingWindow(QMainWindow, from_class_Making):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
 
         # QLabel에 GIF 설정
         self.movie = QMovie("loading.gif")
@@ -499,7 +621,7 @@ class MakingWindow(QMainWindow, from_class_Making):
             print("GIF를 로드할 수 없습니다.")
 
         # 쓰레기 처리, 아이스크림 대기 완료 과정을 3초로 임시 가정 -> 뒤로가기로 인한 버그로 인해 버튼으로 대체
-        QTimer.singleShot(3000, self.open_Maked_window)
+        QTimer.singleShot(1000, self.open_Maked_window)
 
     def open_Maked_window(self):
         self.Maked_window = MakedWindow()
@@ -510,6 +632,7 @@ class MakedWindow(QMainWindow, from_class_Maked):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
 
         # 이제 결제
         QTimer.singleShot(300, self.open_Coupon_window)
@@ -523,6 +646,7 @@ class CouponWindow(QMainWindow, from_class_Coupon):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
         self.coupon = 1
         self.number = ""
 
@@ -618,6 +742,7 @@ class PaymentWindow(QMainWindow, from_class_Payment):
     def __init__(self, coupon_value, number):
         super().__init__()
         self.setupUi(self)
+        self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
         self.coupon_value = coupon_value
         self.number = number
 
@@ -686,6 +811,7 @@ class ByeWindow(QMainWindow, from_class_Bye):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
