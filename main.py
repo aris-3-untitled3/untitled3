@@ -1,8 +1,8 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QMessageBox
+from PyQt5.QtWidgets import *
 from PyQt5 import uic
-from PyQt5.QtGui import QPixmap, QMovie
-from PyQt5.QtCore import QTimer
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from PyQt5 import QtWidgets, uic 
 from pydub import AudioSegment
 from pydub.playback import play
@@ -10,9 +10,8 @@ from playsound import playsound
 
 import os
 import threading
-
-def playSound():
-    playsound("/home/messi/Downloads/mp3/button04b.mp3")
+import time
+import urllib.request
 
 # UI 파일 경로 설정
 ui_file = os.path.join('/home/messi/ws_amr/qt/', "Title.ui")
@@ -25,6 +24,7 @@ ui_Maked = os.path.join('/home/messi/ws_amr/qt/', "Maked.ui")
 ui_Coupon = os.path.join('/home/messi/ws_amr/qt/', "Coupon.ui")
 ui_Payment = os.path.join('/home/messi/ws_amr/qt/', "Payment.ui")
 ui_Bye = os.path.join('/home/messi/ws_amr/qt/', "Bye.ui")
+ui_Empty = os.path.join('/home/messi/ws_amr/qt/', "Empty.ui")
 
 from_class = uic.loadUiType(ui_file)[0]
 from_class2 = uic.loadUiType(ui_file2)[0]
@@ -36,13 +36,43 @@ from_class_Maked = uic.loadUiType(ui_Maked)[0]
 from_class_Coupon = uic.loadUiType(ui_Coupon)[0]
 from_class_Payment = uic.loadUiType(ui_Payment)[0]
 from_class_Bye = uic.loadUiType(ui_Bye)[0]
+from_class_Empty = uic.loadUiType(ui_Empty)[0]
 
 class MainWindow(QMainWindow, from_class):
     def __init__(self):
         super().__init__()
+        ### slack no.2
+        self.empty = 0
         self.setupUi(self)
-        self.pushButton.clicked.connect(self.open_loading_window)
+        if(self.empty == 0):
+            self.pushButton.clicked.connect(self.open_loading_window)
+        elif(self.empty == 1):
+            self.pushButton.clicked.connect(self.open_empty_window)
+
         self.pushButton.clicked.connect(self.on_click)
+
+        self.load_image()
+    # def __init__(self):
+    #     super().__init__()
+    #     self.setupUi(self)
+    #     self.pushButton.clicked.connect(self.open_loading_window)
+    #     self.pushButton.clicked.connect(self.on_click)
+    #     self.play_audio()
+
+
+        # new method(load to EmptyWindow)
+    def open_empty_window(self):
+        self.empty_window = EmptyWindow()
+        self.empty_window.show()
+        self.close()
+
+    def play_audio(self):
+        # 오디오 재생을 별도의 스레드에서 실행
+        def play_sound():
+            song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/good.mp3")
+            play(song)
+
+        threading.Thread(target=play_sound).start()
 
         self.load_image()
 
@@ -58,15 +88,30 @@ class MainWindow(QMainWindow, from_class):
         song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/cat_like1b.mp3")
         play(song)
 
+    def on_click_good(self):
+        threading.Thread(target=self.play_mp3_good).start()
+
+    def play_mp3_good(self):
+        song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/good.mp3")
+        play(song)
+
     def open_loading_window(self):
         self.loading_window = LoadingWindow()
         self.loading_window.show()
         self.close()
 
+
+# new ui window
+class EmptyWindow(QMainWindow, from_class_Empty):
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
+
 class LoadingWindow(QMainWindow, from_class2):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        
 
         # QLabel에 GIF 설정
         self.movie = QMovie("loading.gif")
@@ -77,7 +122,15 @@ class LoadingWindow(QMainWindow, from_class2):
             print("GIF를 로드할 수 없습니다.")
 
         # 로딩 3초 후
-        QTimer.singleShot(300, self.open_DirectionWindow)
+        QTimer.singleShot(3000, self.open_DirectionWindow)
+
+        self.load_image()
+
+    def load_image(self):
+        pixmap = QPixmap("/home/messi/ws_amr/qt/Title.jpg")
+        self.label_2.setPixmap(pixmap)
+        self.label_2.setScaledContents(True)
+
 
     def open_DirectionWindow(self):
         self.DirectionWindow = DirectionWindow()
@@ -126,7 +179,9 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         self.pushButton_back.clicked.connect(self.on_click)
         self.pushButton_home.clicked.connect(self.on_click)
 
-
+        # 디폴트는 추천대로
+        self.taste = "초코"
+        self.top = "토핑C"
 
 
         self.setStyleSheet("""
@@ -181,7 +236,6 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
             }
         """)
 
-
         # 소리
         #uic.loadUi('your_ui_file.ui', self)
 
@@ -216,6 +270,86 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
 
         # Next 버튼 이벤트 연결
         self.pushButton.clicked.connect(self.check_selection_and_next)
+        # 추천 버튼 눌렀을 때
+        self.pushButton_rec.clicked.connect(self.open_Prepare_window_rec)
+
+
+        
+        # 초기화 메서드 끝에 음성인식 경고창을 표시하는 메서드 호출 추가
+        self.show_voice_warning()
+    
+    def show_voice_warning(self):
+        self.warning_dialog = QDialog(self)
+        self.warning_dialog.setWindowTitle('음성 인식 중')
+        self.warning_dialog.setFixedSize(1200, 800)
+
+        layout = QVBoxLayout()
+
+        label = QLabel("추천드린 메뉴로 주문하시겠습니까?\n\n음성인식 중입니다.\n\n( 예 / 아니요 )로 대답해주세요.")
+        label.setAlignment(Qt.AlignCenter)
+
+        font = QFont()
+        font.setPointSize(24)
+        label.setFont(font)
+
+        layout.addWidget(label)
+
+        self.warning_dialog.setLayout(layout)
+        self.warning_dialog.setWindowModality(Qt.ApplicationModal)
+        self.warning_dialog.show()
+
+        threading.Thread(target=self.voice_recognition_process).start()
+
+    def voice_recognition_process(self):
+        time.sleep(1)
+        QTimer.singleShot(0, self.hide_warning_dialog)
+        time.sleep(1)
+        QTimer.singleShot(0, self.start_recording)
+
+    def hide_warning_dialog(self):
+        self.warning_dialog.hide()
+
+    def start_recording(self):
+        self.recording_dialog = QDialog(self)
+        self.recording_dialog.setWindowTitle('녹음 중')
+        self.recording_dialog.setFixedSize(1200, 800)
+
+        layout = QVBoxLayout()
+
+        self.recording_label = QLabel("녹음 시작\n\n3초 남음")
+        self.recording_label.setAlignment(Qt.AlignCenter)
+
+        font = QFont()
+        font.setPointSize(24)
+        self.recording_label.setFont(font)
+
+        layout.addWidget(self.recording_label)
+
+        self.recording_dialog.setLayout(layout)
+        self.recording_dialog.setWindowModality(Qt.ApplicationModal)
+        self.recording_dialog.show()
+
+        self.countdown = 3
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_countdown)
+        self.timer.start(1000)
+
+    def update_countdown(self):
+        if self.countdown > 0:
+            self.recording_label.setText(f"녹음 시작\n\n{self.countdown}초 남음")
+            self.countdown -= 1
+        else:
+            self.recording_label.setText("녹음 시작\n\n0초 남음")
+            self.timer.stop()
+            QTimer.singleShot(1000, self.recording_dialog.hide)
+
+
+
+    def open_Prepare_window_rec(self):
+        # 맛과 토핑 변경 없음
+        self.Preparing_window = PreparingWindow(self.taste, self.top)
+        self.Preparing_window.show()
+        self.close()
     
     def on_click(self):
         threading.Thread(target=self.play_mp3).start()
@@ -255,6 +389,18 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         else:
             button.setStyleSheet('')  # 초기 상태로 되돌림
 
+    # 한 가지씩 선택하고 다음 눌렀을 때 재확인창
+    def showMessage(self):
+        message = f'선택하신 메뉴를 확인해주세요. \n아이스크림: {self.taste}\n토핑: {self.top}'
+        reply = QMessageBox.question(self, 'Message', message, 
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        
+        if reply == QMessageBox.Yes:
+            self.open_Preparing_window()
+            print('Yes selected')
+        else:
+            print('No selected')
+
     def check_selection_and_next(self):
         # 아이스크림 맛이 하나가 선택되었는지 확인
         ice_cream_selected = (
@@ -268,6 +414,23 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
             (not self.pushButton_4.isChecked() and not self.pushButton_5.isChecked() and self.pushButton_6.isChecked())
         )
 
+        # 하나씩 선택하면 DB에 넣을 거 초기화
+        if ice_cream_selected:
+            if self.pushButton_1.isChecked():
+                self.taste = "초코"
+            elif self.pushButton_2.isChecked():
+                self.taste = "바닐라"
+            elif self.pushButton_3.isChecked():
+                self.taste = "딸기"
+            
+        if topping_selected:
+            if self.pushButton_6.isChecked():
+                self.top = "토핑A"
+            elif self.pushButton_5.isChecked():
+                self.top = "토핑B"
+            elif self.pushButton_4.isChecked():
+                self.top = "토핑C"
+
         if not ice_cream_selected:
             self.on_click_warn()
             QMessageBox.warning(self, 'Warning', '아이스크림 맛을 한 가지만 골라주세요.')
@@ -277,26 +440,25 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
             QMessageBox.warning(self, 'Warning', '토핑을 한 가지만 골라주세요.')
 
         if ice_cream_selected and topping_selected:
-            self.open_Preparing_window()
+            self.showMessage()
+            self.setWindowTitle('QMessageBox.question Example')
 
-    def play_sound(self):
-        if self.mixer_initialized:
-            try:
-                pygame.mixer.music.load("sound.mp3")  # 소리 파일 로드
-                pygame.mixer.music.play()  # 소리 재생
-            except pygame.error as e:
-                print(f"Error playing sound: {e}")
-        else:
-            print("Mixer not initialized. Cannot play sound.")
+        # if ice_cream_selected and topping_selected:
+        #     self.open_Preparing_window()
 
     def open_Preparing_window(self):
-        self.Preparing_window = PreparingWindow()
+        # 맛과 토핑 전달
+        self.Preparing_window = PreparingWindow(self.taste, self.top)
         self.Preparing_window.show()
         self.close()
 
 class PreparingWindow(QMainWindow, from_class_Preparing):
-    def __init__(self):
+    def __init__(self, taste, toping):
         super().__init__()
+        self.taste = taste
+        self.top = toping
+        print(self.taste)
+        print(self.top)
         self.setupUi(self)
         self.pushButton_back.clicked.connect(self.open_Recommend_window)
         self.pushButton_next.clicked.connect(self.open_Making_window)
@@ -337,7 +499,7 @@ class MakingWindow(QMainWindow, from_class_Making):
             print("GIF를 로드할 수 없습니다.")
 
         # 쓰레기 처리, 아이스크림 대기 완료 과정을 3초로 임시 가정 -> 뒤로가기로 인한 버그로 인해 버튼으로 대체
-        QTimer.singleShot(300, self.open_Maked_window)
+        QTimer.singleShot(3000, self.open_Maked_window)
 
     def open_Maked_window(self):
         self.Maked_window = MakedWindow()
@@ -546,8 +708,16 @@ if __name__ == '__main__':
 
 ## 3,4 slide에 홈 화면 추가하기!
 
+## 추천 테두리 등 디자인
 
 ##### 완료
 
-## 추천 테두리 등 디자인
 ## Recommend_kor.ui에 음성인식과 연결할만한 라벨 추가
+## Recommend 전에 qmessage box에 예, 아니오
+## 음성 2번 인식 못하면 에러 표시 1번 -> "다시 말해주세요."
+# "중복되었습니다."
+# ui 화면 추가하기
+# 
+## Recommend와 Preparing 사이 warning box 표시
+# 제조중 박스 두개 카운트, 그리고 색깔 변화
+## gif 파일 다른 것 찾기, 자꾸 로드 오류남
