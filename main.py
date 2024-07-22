@@ -6,12 +6,12 @@ from PyQt5.QtCore import *
 from PyQt5 import QtWidgets, uic 
 from pydub import AudioSegment
 from pydub.playback import play
-from playsound import playsound
 
 import os
 import threading
 import time
 import urllib.request
+import pygame
 
 # UI 파일 경로 설정
 ui_file = os.path.join('/home/messi/ws_amr/qt/', "Title.ui")
@@ -38,9 +38,31 @@ from_class_Payment = uic.loadUiType(ui_Payment)[0]
 from_class_Bye = uic.loadUiType(ui_Bye)[0]
 from_class_Empty = uic.loadUiType(ui_Empty)[0]
 
+
+class MusicThread(QThread):
+    def __init__(self):
+        super().__init__()
+        self.playing = True
+
+    def run(self):
+        pygame.mixer.music.load("/home/messi/Downloads/mp3/good.mp3")
+        pygame.mixer.music.play(-1)  # 무한 반복 재생
+        while self.playing:
+            time.sleep(1)
+
+    def stop(self):
+        self.playing = False
+        pygame.mixer.music.stop()
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        pygame.mixer.init() # pygame 초기화
+        self.music_thread = MusicThread()
+        self.music_thread.start()
+
+
         self.empty = 0
         self.setWindowTitle('Background Image Example')
         self.resize(1920, 1080)
@@ -85,28 +107,12 @@ class MainWindow(QMainWindow):
         elif self.empty == 1:
             self.pushButton.clicked.connect(self.open_empty_window)
 
-    def open_loading_window(self):
-        print('Loading Window Opened')
 
     def open_empty_window(self):
-        print('Empty Window Opened')
+        # 노래 중지
+        self.playing = False
+        self.music_thread.join()
 
-
-       # self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")        
-
-        self.pushButton.clicked.connect(self.on_click)
-
-       # self.load_image()
-    # def __init__(self):
-    #     super().__init__()
-    #     self.setupUi(self)
-    #     self.pushButton.clicked.connect(self.open_loading_window)
-    #     self.pushButton.clicked.connect(self.on_click)
-    #     self.play_audio()
-
-
-        # new method(load to EmptyWindow)
-    def open_empty_window(self):
         self.empty_window = EmptyWindow()
         self.empty_window.show()
         self.close()
@@ -137,10 +143,16 @@ class MainWindow(QMainWindow):
         threading.Thread(target=self.play_mp3_good).start()
 
     def play_mp3_good(self):
-        song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/good.mp3")
-        play(song)
+        pygame.mixer.music.load("/home/messi/Downloads/mp3/good.mp3")
+        pygame.mixer.music.play(-1)  # 무한 반복 재생
+        while self.playing:
+            time.sleep(1)  # 음악 재생 중
 
     def open_loading_window(self):
+        # 노래 중지
+        self.music_thread.stop()
+        self.music_thread.wait()
+        
         self.loading_window = LoadingWindow()
         self.loading_window.show()
         self.close()
