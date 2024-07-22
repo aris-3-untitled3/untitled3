@@ -411,7 +411,7 @@ class MainlWindow(QMainWindow):
         super().__init__()
     
         self.stacked_widget = QStackedWidget(self)  # QStackedWidget 인스턴스 생성   
-        self.setCentralWidget(self.stacked_widget)  # MainWindow의 중앙 위젯으로 설정 
+        self.setCentralWidget(self.stacked_widget)  # MainWindow의 중앙 위젯으로 설정
     
         self.open_FirstWindow()
 

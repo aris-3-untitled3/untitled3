@@ -49,7 +49,119 @@ class GuestDetect(Node):
         self.ageList = ['(0-2)', '(3-6)', '(7-12)', '(13-18)', '(19-29)', '(30-43)', '(44-49)', '(50-100)']
         self.genderList = ['M', 'F']
 
-        # self.run()
+        self.run()
+
+    def load_model(self):
+        return torch.hub.load('ultralytics/yolov5', 'custom', path=self.model_path, force_reload=True)
+
+    def estimate_distance(self, bbox_height):
+        KNOWN_HEIGHT = 1.7  # 사람의 평균 높이(미터)
+        FOCAL_LENGTH = 50   # 계산된 카메라의 초점 거리(픽셀 단위로 추정)
+        distance = (KNOWN_HEIGHT * FOCAL_LENGTH) / bbox_height
+        return distance
+
+    def process_detections(self, detections, annotated_frame):
+        closest_distance = float('inf')
+        closest_bbox = None
+
+        for det in detections:
+            x1, y1, x2, y2, conf, cls = det
+            if int(cls) == 0:  # 클래스가 '사람'인 경우
+                bbox_height = y2 - y1
+                distance = self.estimate_distance(bbox_height)
+
+                # 가장 가까운 사람의 거리와 바운딩 박스 저장
+                if distance < closest_distance:
+                    closest_distance = distance
+                    closest_bbox = (x1, y1, x2, y2)
+
+        # 가장 가까운 사람에 대해 박스 그리기 및 메시지 전송
+        if closest_distance < float('inf'):
+            x1, y1, x2, y2 = closest_bbox
+            cv2.rectangle(annotated_frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+            cv2.putText(annotated_frame, f'Distance: {closest_distance:.2f}m', (int(x1), int(y1)-10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 0, 0), 2)
+            self.detect_human(closest_distance)
+
+    def detect_human(self, distance):
+        if distance <= 0.5 and not self.guest_detected:
+            self.guest_detect()
+            self.guest_detected = True
+            self.human_detected = False
+            self.no_human_detected = False
+            self.loop_running = False  # 루프 중지
+        elif 0.5 < distance <= 2 and not self.human_detected:
+            self.human_detect()
+            self.human_detected = True
+            self.guest_detected = False
+            self.no_human_detected = False
+        elif distance > 2 and not self.no_human_detected:
+            self.no_human_detect()
+            self.no_human_detected = True
+            self.guest_detected = False
+            self.human_detected = False
+
+    def run(self):
+        self.cap = cv2.VideoCapture(0)
+
+        while self.loop_running:
+            ret, frame = self.cap.read()
+            if not ret:
+                print("웹캠에서 프레임을 읽을 수 없습니다.")
+                break
+            
+            results = self.model(frame)
+            annotated_frame = results.render()[0]
+            annotated_frame = np.array(annotated_frame, copy=True)
+
+            self.process_detections(results.xyxy[0], annotated_frame)
+
+            cv2.imshow('Webcam', annotated_frame)
+            
+            if cv2.waitKey(1) == ord('q'):
+                break
+
+        self.cap.release()
+        cv2.destroyAllWindows()
+
+    def guest_detect(self):
+        self.get_logger().info('guest detected!')
+
+        msg = TopicString()
+        msg.command = 'guest_detect'
+
+        self.robot_server_publisher.publish(msg)
+
+    def human_detect(self):
+        self.get_logger().info('human detected!')
+
+        msg = TopicString()
+        msg.command = 'human_detect'
+
+        self.robot_server_publisher.publish(msg)
+
+    def no_human_detect(self):
+        self.get_logger().info('no human detected!')
+
+        msg = TopicString()
+        msg.command = 'no_detect'
+
+        self.robot_server_publisher.publish(msg)
+
+    def ga_callback(self, msg):
+        if msg.command == "guest_detect":
+            # 성별, 연령대 판별
+            most_common_age, most_common_gender = self.run_2()
+            
+            # 결과 메시지 작성 및 발행  
+            result_msg = TopicString()
+            result_msg.command = f"Age: {most_common_age}, Gender: {most_common_gender}"
+            self.robot_server_publisher.publish(result_msg)
+        else:
+            self.get_logger().info('Restarting detection...')
+            self.loop_running = True
+            self.run() # 다시 사람검출 시작
+
 
     def highlightFace(self, net, frame, conf_threshold=0.7):
         frameOpencvDnn = frame.copy()
