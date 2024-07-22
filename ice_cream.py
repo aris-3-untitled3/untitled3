@@ -1,26 +1,3 @@
-# S/N : XYZARIS0V3P2311N02
-# Robot IP : 192.168.1.192
-# code_version : 3.1.5.2
-
-
-#!/usr/bin/env python3
-# Software License Agreement (BSD License)
-#
-# Copyright (c) 2022, UFACTORY, Inc.
-# All rights reserved.
-#
-# Author: Vinman <vinman.wen@ufactory.cc> <vinman.cub@gmail.com>
-
-"""
-# Notice
-#   1. Changes to this file on Studio will not be preserved
-#   2. The next conversion will overwrite the file with the same name
-#
-# xArm-Python-SDK: https://github.com/xArm-Developer/xArm-Python-SDK
-#   1. git clone git@github.com:xArm-Developer/xArm-Python-SDK.git
-#   2. cd xArm-Python-SDK
-#   3. python setup.py install
-"""
 import sys
 import math
 import time
@@ -159,13 +136,11 @@ class RobotMain(object):
         return reverse_position
 
     def socket_connect(self):
-
         self.HOST = '192.168.1.192'
         self.PORT = 20002
         self.BUFSIZE = 1024
         self.ADDR = (self.HOST, self.PORT)
 
-        # self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self.clientSocket.shutdown(1)
             self.clientSocket.close()
@@ -173,9 +148,7 @@ class RobotMain(object):
             pass
 
         self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # self
         self.serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # self.serverSocket.allow_reuse_address = True
         while True:
             try:
                 self.serverSocket.bind(self.ADDR)
@@ -206,10 +179,8 @@ class RobotMain(object):
                 break
             except:
                 pass
-        # self.clientSocket.settimeout(10.0)
         print("accept")
         print("--client info--")
-        # print(self.clientSocket)
 
         self.connected = True
         self.state = 'ready'
@@ -222,21 +193,13 @@ class RobotMain(object):
                 print('waiting')
                 self.clientSocket.settimeout(10.0)
                 self.recv_msg = self.clientSocket.recv(1024).decode('utf-8')
-                # try:
-                #    self.recv_msg = self.clientSocket.recv(1024).decode('utf-8')
-                # except Exception as e:
-                #    self.pprint('MainException: {}'.format(e))
                 print('\n' + self.recv_msg)
                 if self.recv_msg == '':
                     print('here')
-                    # continue
-                    # pass
-                    # break
                     raise Exception('empty msg')
                 self.recv_msg = self.recv_msg.split('/')
 
                 if self.recv_msg[0] == 'app_ping':
-                    # print('app_ping received')
                     send_msg = 'robot_ping'
                     now_temp = arm.temperatures
                     now_cur = arm.currents
@@ -310,7 +273,6 @@ class RobotMain(object):
                         print('socket_stop')
 
                     else:
-                        # print('else')
                         try:
                             self.order_msg = json.loads(self.recv_msg[0])
                             if self.order_msg['type'] == 'ICECREAM':
@@ -318,8 +280,6 @@ class RobotMain(object):
                                     print('STATE : icecreaming')
                                     print(f'Order message : {self.order_msg}')
                                     self.state = 'icecreaming'
-                            # else:
-                            #    self.clientSocket.send('ERROR : already moving'.encode('utf-8'))
                             else:
                                 self.clientSocket.send('ERROR : wrong msg received'.encode('utf-8'))
                         except:
@@ -328,9 +288,6 @@ class RobotMain(object):
 
             except Exception as e:
                 self.pprint('MainException: {}'.format(e))
-                # if e == 'empty msg' :
-                #    pass
-                # self.connected = False
                 print('connection lost')
                 while True:
                     time.sleep(2)
@@ -393,16 +350,11 @@ class RobotMain(object):
             print('socket error')
         print('motion_home start')
         # designed home
-        # code = self._arm.set_servo_angle(angle=[179.0, -17.9, 17.7, 176.4, 61.3, 5.4], speed=self._angle_speed,
-        #                                  mvacc=self._angle_acc, wait=True, radius=10.0)
-        # if not self._check_code(code, 'set_servo_angle'):
-        #     return
         code = self._arm.set_servo_angle(angle=self.position_home, speed=self._angle_speed,
                                          mvacc=self._angle_acc, wait=True, radius=0.0)
         if not self._check_code(code, 'set_servo_angle'):
             return
         print('motion_home finish')
-        # self.clientSocket.send('motion_home_finish'.encode('utf-8'))
 
     def motion_grab_capsule(self):
 
@@ -420,16 +372,6 @@ class RobotMain(object):
         self._tcp_speed = 100
         self._tcp_acc = 1000
 
-        '''
-        code = self._arm.close_lite6_gripper()
-        if not self._check_code(code, 'close_lite6_gripper'):
-            return
-        time.sleep(1)
-        code = self._arm.open_lite6_gripper()
-        if not self._check_code(code, 'open_lite6_gripper'):
-            return
-        time.sleep(1)
-        '''
         code = self._arm.stop_lite6_gripper()
         if not self._check_code(code, 'stop_lite6_gripper'):
             return
@@ -439,17 +381,7 @@ class RobotMain(object):
             self.clientSocket.send('motion_grab_capsule_start'.encode('utf-8'))
         except:
             print('socket error')
-
-        # code = self._arm.set_servo_angle(angle=[175.4, 28.7, 23.8, 84.5, 94.7, -5.6], speed=self._angle_speed,
-        #                                 mvacc=self._angle_acc, wait=True, radius=0.0)
-        # if not self._check_code(code, 'set_servo_angle'):
-        #    return
-
         if self.order_msg['makeReq']['jigNum'] in ['A']:
-            # code = self._arm.set_servo_angle(angle=[166.1, 30.2, 25.3, 75.3, 93.9, -5.4], speed=self._angle_speed,
-            #                                  mvacc=self._angle_acc, wait=True, radius=0.0)
-            # if not self._check_code(code, 'set_servo_angle'):
-            #     return
             pass
         else:
 
@@ -457,12 +389,6 @@ class RobotMain(object):
                                              mvacc=self._angle_acc, wait=True, radius=0.0)
             if not self._check_code(code, 'set_servo_angle'):
                 return
-            # code = self._arm.set_servo_angle(angle=[166.1, 30.2, 25.3, 75.3, 93.9, -5.4], speed=self._angle_speed,
-            #                                  mvacc=self._angle_acc, wait=False, radius=20.0)
-            # if not self._check_code(code, 'set_servo_angle'):
-            #     return
-
-
         code = self._arm.open_lite6_gripper()
         if not self._check_code(code, 'open_lite6_gripper'):
             return
@@ -473,11 +399,6 @@ class RobotMain(object):
                                              mvacc=self._angle_acc, wait=False, radius=20.0)
             if not self._check_code(code, 'set_servo_angle'):
                 return
-            # code = self._arm.set_position(*[-255.4, -139.3, 193.5, -12.7, 87.2, -126.1], speed=self._tcp_speed,
-            #                              mvacc=self._tcp_acc, radius=0.0, wait=True)
-            # if not self._check_code(code, 'set_position'):
-            #    return
-
             code = self._arm.set_position(*self.position_jig_A_grab, speed=self._tcp_speed,
                                           mvacc=self._tcp_acc, radius=0.0, wait=True)
             if not self._check_code(code, 'set_position'):
@@ -495,9 +416,6 @@ class RobotMain(object):
                                              mvacc=self._angle_acc, wait=False, radius=20.0)
             if not self._check_code(code, 'set_servo_angle'):
                 return
-            # code = self._arm.set_position(*[-76.6, -144.6, 194.3, 5.7, 88.9, -50.1], speed=self._tcp_speed, mvacc=self._tcp_acc, radius=0.0, wait=True)
-            # if not self._check_code(code, 'set_position'):
-            #    return
             code = self._arm.set_position(*self.position_jig_C_grab, speed=self._tcp_speed,
                                           mvacc=self._tcp_acc, radius=0.0, wait=True)
             if not self._check_code(code, 'set_position'):
@@ -554,13 +472,6 @@ class RobotMain(object):
             return
 
     def motion_place_fail_capsule(self):
-
-        # code = self._arm.set_servo_angle(angle=[154.2, -3.3, 13.7, 101.2, 83.4, 130.4], speed=self._angle_speed,
-        #                                 mvacc=self._angle_acc, wait=True, radius=0.0)
-        # if not self._check_code(code, 'set_servo_angle'):
-        #    return
-
-
         if self.order_msg['makeReq']['jigNum'] == 'A':
             code = self._arm.set_servo_angle(angle=[177.3, 5.5, 12.9, 133.6, 81.3, 183.5], speed=self._angle_speed,
                                              mvacc=self._angle_acc, wait=False, radius=20.0)
@@ -618,38 +529,14 @@ class RobotMain(object):
                                          mvacc=self._angle_acc, wait=False, radius=50.0)
         if not self._check_code(code, 'set_servo_angle'):
             return
-        # code = self._arm.set_servo_angle(angle=[27.0, -24.9, 7.2, 108.0, 76.4, 32.7], speed=self._angle_speed,
-        #                                 mvacc=self._angle_acc, wait=False, radius=40.0)
-        # if not self._check_code(code, 'set_servo_angle'):
-        #    return
-        # code = self._arm.set_servo_angle(angle=[-0.9, -24.9, 10.4, 138.3, 66.0, 19.1], speed=self._angle_speed,
-        #                                 mvacc=self._angle_acc, wait=False, radius=40.0)
-        # if not self._check_code(code, 'set_servo_angle'):
-        #    return
         code = self._arm.set_servo_angle(angle=[8.4, -42.7, 23.7, 177.4, 31.6, 3.6], speed=self._angle_speed,
                                          mvacc=self._angle_acc, wait=False, radius=40.0)
         if not self._check_code(code, 'set_servo_angle'):
             return
-        # code = self._arm.set_servo_angle(angle=[8.4, -33.1, 51.8, 100.6, 29.8, 77.3], speed=self._angle_speed,
-        #                                 mvacc=self._angle_acc, wait=True, radius=0.0)
-        # if not self._check_code(code, 'set_servo_angle'):
-        #    return
         code = self._arm.set_servo_angle(angle=[8.4, -32.1, 55.1, 96.6, 29.5, 81.9], speed=self._angle_speed,
                                          mvacc=self._angle_acc, wait=True, radius=0.0)
         if not self._check_code(code, 'set_servo_angle'):
             return
-        # code = self._arm.set_position(*[241.7, 122.5, 487.8, -140, 86.1, -52.4], speed=self._tcp_speed,
-        #                              mvacc=self._tcp_acc, radius=0.0, wait=True)
-        # if not self._check_code(code, 'set_position'):
-        #    return
-        # code = self._arm.set_position(*[241.7, 122.5, 467.8, -140, 86.1, -52.4], speed=self._tcp_speed,
-        #                              mvacc=self._tcp_acc, radius=0.0, wait=True)
-        # if not self._check_code(code, 'set_position'):
-        #    return
-        # code = self._arm.set_position(*[234.9, 135.9, 486.5, 133.6, 87.2, -142.1], speed=self._tcp_speed,
-        #                              mvacc=self._tcp_acc, radius=0.0, wait=True)
-        # if not self._check_code(code, 'set_position'):
-        #    return
         code = self._arm.set_position(*self.position_before_capsule_place, speed=self._tcp_speed,
                                       mvacc=self._tcp_acc, radius=0.0, wait=True)
         if not self._check_code(code, 'set_position'):
@@ -698,24 +585,10 @@ class RobotMain(object):
                                              mvacc=self._angle_acc, wait=False, radius=30.0)
             if not self._check_code(code, 'set_servo_angle'):
                 return
-            # code = self._arm.set_position(*[193.8, -100.2, 146.6, 135.9, -86.0, -55.3], speed=self._tcp_speed, mvacc=self._tcp_acc, radius=0.0, wait=True)
-            # if not self._check_code(code, 'set_position'):
-            #    return
             code = self._arm.set_position(*[195.0, -96.5, 200.8, -168.0, -87.1, -110.5], speed=self._tcp_speed,
                                           mvacc=self._tcp_acc, radius=10.0, wait=False)
             if not self._check_code(code, 'set_position'):
                 return
-            # code = self._arm.set_position(*[195.0, -96.5, 145.8, -168.0, -87.1, -110.5], speed=self._tcp_speed,
-            #                              mvacc=self._tcp_acc, radius=0.0, wait=True)
-            # if not self._check_code(code, 'set_position'):
-            #    return
-            # code = self._arm.set_position(*[195.5, -96.6, 145.6, 179.0, -87.0, -97.1], speed=self._tcp_speed,
-            #                              mvacc=self._tcp_acc, radius=0.0, wait=True)
-            # if not self._check_code(code, 'set_position'):
-            #    return
-            # code = self._arm.set_position(*[214.0, -100.2, 145.0, -25.6, -88.5, 95.8], speed=self._tcp_speed, mvacc=self._tcp_acc, radius=0.0, wait=True)
-            # if not self._check_code(code, 'set_position'):
-            #    return
             code = self._arm.set_position(*self.position_cup_grab, speed=self._tcp_speed,
                                           mvacc=self._tcp_acc, radius=0.0, wait=True)
             if not self._check_code(code, 'set_position'):
@@ -796,10 +669,6 @@ class RobotMain(object):
                                                  mvacc=self._angle_acc, wait=False, radius=20.0)
                 if not self._check_code(code, 'set_servo_angle'):
                     return
-                # code = self._arm.set_servo_angle(angle=[87.5, -48.2, 13.5, 125.1, 44.5, 46.2], speed=self._angle_speed,
-                #                                 mvacc=self._angle_acc, wait=True, radius=0.0)
-                # if not self._check_code(code, 'set_servo_angle'):
-                #    return
                 code = self._arm.set_servo_angle(angle=self.position_topping_B, speed=self._angle_speed,
                                                  mvacc=self._angle_acc, wait=True, radius=0.0)
                 if not self._check_code(code, 'set_servo_angle'):
@@ -868,19 +737,11 @@ class RobotMain(object):
                                               mvacc=self._tcp_acc, radius=10.0, wait=False)
                 if not self._check_code(code, 'set_position'):
                     return
-            # code = self._arm.set_position(*[165.1, 162.9, 362.5, -31.7, 86.6, 9.5], speed=self._tcp_speed,
-            #                              mvacc=self._tcp_acc, radius=0.0, wait=True)
-            # if not self._check_code(code, 'set_position'):
-            #    return
             code = self._arm.set_position(*self.position_icecream_with_topping, speed=self._tcp_speed,
                                           mvacc=self._tcp_acc, radius=0.0, wait=True)
             if not self._check_code(code, 'set_position'):
                 return
         else:
-            # code = self._arm.set_servo_angle(angle=[45.8, -17.9, 33.5, 186.9, 41.8, -7.2], speed=self._angle_speed,
-            #                                 mvacc=self._angle_acc, wait=True, radius=0.0)
-            # if not self._check_code(code, 'set_servo_angle'):
-            #    return
             code = self._arm.set_cgpio_digital(3, 1, delay_sec=0)
             if not self._check_code(code, 'set_cgpio_digital'):
                 return
@@ -960,14 +821,6 @@ class RobotMain(object):
         self._tcp_acc = 1000
 
         if self.order_msg['makeReq']['jigNum'] == 'A':
-            # code = self._arm.set_position(*[-251.2, -142.1, 213.7, -28.1, 88.8, -146.0], speed=self._tcp_speed,
-            #                              mvacc=self._tcp_acc, radius=0.0, wait=True)
-            # if not self._check_code(code, 'set_position'):
-            #    return
-            # code = self._arm.set_position(*[-250.3, -138.3, 213.7, 68.3, 86.1, -47.0], speed=self._tcp_speed,
-            #                              mvacc=self._tcp_acc, radius=0.0, wait=True)
-            # if not self._check_code(code, 'set_position'):
-            #    return
             code = self._arm.set_position(*self.position_jig_A_serve, speed=self._tcp_speed,
                                           mvacc=self._tcp_acc, radius=0.0, wait=True)
             if not self._check_code(code, 'set_position'):
@@ -993,9 +846,6 @@ class RobotMain(object):
                                           mvacc=self._tcp_acc, radius=0.0, wait=True)
             if not self._check_code(code, 'set_position'):
                 return
-            # code = self._arm.set_tool_position(*[0.0, 0.0, -30, 0.0, 0.0, 0.0], speed=self._tcp_speed, mvacc=self._tcp_acc, wait=True)
-            # if not self._check_code(code, 'set_position'):
-            #    return
             code = self._arm.set_position(*[-189.7, -26.0, 193.3, -28.1, 88.8, -146.0], speed=self._tcp_speed,
                                           mvacc=self._tcp_acc, radius=0.0, wait=True)
             if not self._check_code(code, 'set_position'):
@@ -1027,18 +877,11 @@ class RobotMain(object):
                                           mvacc=self._tcp_acc, radius=0.0, wait=True)
             if not self._check_code(code, 'set_position'):
                 return
-            # code = self._arm.set_tool_position(*[0.0, 0.0, -30, 0.0, 0.0, 0.0], speed=self._tcp_speed, mvacc=self._tcp_acc, wait=True)
-            # if not self._check_code(code, 'set_position'):
-            #    return
             code = self._arm.set_position(*[-168.5, -33.2, 192.8, -92.9, 86.8, -179.3], speed=self._tcp_speed,
                                           mvacc=self._tcp_acc, radius=0.0, wait=True)
             if not self._check_code(code, 'set_position'):
                 return
         elif self.order_msg['makeReq']['jigNum'] == 'C':
-            # code = self._arm.set_servo_angle(angle=[171.0, 13.7, 13.5, 73.9, 92.3, -2.9], speed=self._angle_speed,
-            #                                 mvacc=self._angle_acc, wait=True, radius=0.0)
-            # if not self._check_code(code, 'set_servo_angle'):
-            #    return
             code = self._arm.set_servo_angle(angle=[177.6, 0.2, 13.5, 70.0, 94.9, 13.8], speed=self._angle_speed,
                                              mvacc=self._angle_acc, wait=True, radius=0.0)
             if not self._check_code(code, 'set_servo_angle'):
@@ -1067,9 +910,6 @@ class RobotMain(object):
                                           mvacc=self._tcp_acc, radius=0.0, wait=True)
             if not self._check_code(code, 'set_position'):
                 return
-            # code = self._arm.set_tool_position(*[0.0, 0.0, -30, 0.0, 0.0, 0.0], speed=self._tcp_speed, mvacc=self._tcp_acc, wait=True)
-            # if not self._check_code(code, 'set_position'):
-            #    return
             code = self._arm.set_position(*[-98.1, -52.1, 191.4, -68.4, 86.4, -135.0], speed=self._tcp_speed,
                                           mvacc=self._tcp_acc, radius=0.0, wait=True)
             if not self._check_code(code, 'set_position'):
@@ -1113,10 +953,6 @@ class RobotMain(object):
                                       mvacc=self._tcp_acc, radius=0.0, wait=True)
         if not self._check_code(code, 'set_position'):
             return
-        # code = self._arm.set_position(*[234.2, 129.8, 464.5, -153.7, 87.3, -68.7], speed=self._tcp_speed,
-        #                              mvacc=self._tcp_acc, radius=0.0, wait=True)
-        # if not self._check_code(code, 'set_position'):
-        #    return
         code = self._arm.set_position(*self.position_capsule_grab, speed=self._tcp_speed,
                                       mvacc=self._tcp_acc, radius=0.0, wait=True)
         if not self._check_code(code, 'set_position'):
@@ -1141,10 +977,6 @@ class RobotMain(object):
                                          mvacc=self._angle_acc, wait=False, radius=10.0)
         if not self._check_code(code, 'set_servo_angle'):
             return
-        # code = self._arm.set_position(*[217.1, 125.8, 250.1, 170.8, 50.2, -99.2], speed=self._tcp_speed,
-        #                              mvacc=self._tcp_acc, radius=0.0, wait=True)
-        # if not self._check_code(code, 'set_position'):
-        #    return
         self._angle_speed = 160
         self._angle_acc = 1000
         code = self._arm.set_servo_angle(angle=[18.0, 11.2, 40.4, 90.4, 58.7, -148.8], speed=self._angle_speed,
@@ -1154,7 +986,6 @@ class RobotMain(object):
         code = self._arm.open_lite6_gripper()
         if not self._check_code(code, 'open_lite6_gripper'):
             return
-        # time.sleep(2)
         code = self._arm.set_servo_angle(angle=[25.2, 15.2, 42.7, 83.2, 35.0, -139.8], speed=self._angle_speed,
                                          mvacc=self._angle_acc, wait=False, radius=0.0)
         if not self._check_code(code, 'set_servo_angle'):
@@ -1176,18 +1007,10 @@ class RobotMain(object):
                                          mvacc=self._angle_acc, wait=False, radius=30.0)
         if not self._check_code(code, 'set_servo_angle'):
             return
-        # code = self._arm.set_servo_angle(angle=[116.8, -9.0, 10.0, 107.1, 78.3, 20.0], speed=self._angle_speed,
-        #                                mvacc=self._angle_acc, wait=False, radius=30.0)
-        # if not self._check_code(code, 'set_servo_angle'):
-        #    return
         code = self._arm.set_servo_angle(angle=[149.3, -9.4, 10.9, 114.7, 69.1, 26.1], speed=self._angle_speed,
                                          mvacc=self._angle_acc, wait=False, radius=50.0)
         if not self._check_code(code, 'set_servo_angle'):
             return
-        # code = self._arm.set_servo_angle(angle=[179.0, -17.9, 17.7, 176.4, 61.3, 0.0], speed=self._angle_speed,
-        #                                 mvacc=self._angle_acc, wait=True, radius=0.0)
-        # if not self._check_code(code, 'set_servo_angle'):
-        #    return
         code = self._arm.set_servo_angle(angle=[179.2, -42.1, 7.4, 186.7, 41.5, -1.6], speed=self._angle_speed,
                                          mvacc=self._angle_acc, wait=True, radius=0.0)
         if not self._check_code(code, 'set_servo_angle'):
@@ -1197,81 +1020,6 @@ class RobotMain(object):
         except:
             print('socket error')
         time.sleep(0.5)
-
-    def motion_dance_a(self):  # designed 'poke'
-        try:
-            self.clientSocket.send('dance_a_start'.encode('utf-8'))
-        except:
-            print('socket error')
-
-        self._angle_speed = 60
-        self._angle_acc = 300
-        code = self._arm.set_servo_angle(angle=[179.2, -42.1, 7.4, 186.7, 41.5, -1.6], speed=self._angle_speed,
-                                         mvacc=self._angle_acc, wait=True, radius=0.0)
-        if not self._check_code(code, 'set_servo_angle'):
-            return
-        for i in range(int(3)):
-            if not self.is_alive:
-                break
-            code = self._arm.set_servo_angle(angle=[212.0, -21.0, 112.0, 207.0, -0.8, 7.3], speed=self._angle_speed,
-                                             mvacc=self._angle_acc, wait=True, radius=0.0)
-            if not self._check_code(code, 'set_servo_angle'):
-                return
-            code = self._arm.set_servo_angle(angle=[212.0, -38.0, 100.3, 180.4, -6.4, 6.0], speed=self._angle_speed,
-                                             mvacc=self._angle_acc, wait=True, radius=0.0)
-            if not self._check_code(code, 'set_servo_angle'):
-                return
-        '''
-        code = self._arm.set_servo_angle(angle=[329.0, -42.1, 7.4, 186.7, 41.5, -1.6], speed=self._angle_speed,
-                                         mvacc=self._angle_acc, wait=False, radius=0.0)
-        if not self._check_code(code, 'set_servo_angle'):
-            return
-        for i in range(int(3)):
-            if not self.is_alive:
-                break
-            code = self._arm.set_servo_angle(angle=[329.0, -21.0, 112.0, 207.0, -0.8, 7.3], speed=self._angle_speed,
-                                             mvacc=self._angle_acc, wait=False, radius=0.0)
-            if not self._check_code(code, 'set_servo_angle'):
-                return
-            code = self._arm.set_servo_angle(angle=[329.0, -38.0, 100.3, 180.4, -6.4, 6.0], speed=self._angle_speed,
-                                             mvacc=self._angle_acc, wait=False, radius=0.0)
-            if not self._check_code(code, 'set_servo_angle'):
-                return
-        '''
-        self._angle_speed = 60
-        self._angle_acc = 200
-        code = self._arm.set_servo_angle(angle=[179.2, -42.1, 7.4, 186.7, 41.5, -1.6], speed=self._angle_speed,
-                                         mvacc=self._angle_acc, wait=True, radius=0.0)
-        if not self._check_code(code, 'set_servo_angle'):
-            return
-
-    def motion_dance_b(self):  # designed 'shake'
-        try:
-            self.clientSocket.send('dance_b_start'.encode('utf-8'))
-        except:
-            print('socket error')
-
-        self._angle_speed = 70
-        self._angle_acc = 200
-        code = self._arm.set_servo_angle(angle=[179.2, -42.1, 7.4, 186.7, 41.5, -1.6], speed=self._angle_speed,
-                                         mvacc=self._angle_acc, wait=True, radius=0.0)
-        if not self._check_code(code, 'set_servo_angle'):
-            return
-        for i in range(int(4)):
-            if not self.is_alive:
-                break
-            code = self._arm.set_servo_angle(angle=[220.7, -39.1, 67.0, 268.3, -40.0, -91.8], speed=self._angle_speed,
-                                             mvacc=self._angle_acc, wait=True, radius=0.0)
-            if not self._check_code(code, 'set_servo_angle'):
-                return
-            code = self._arm.set_servo_angle(angle=[183.0, -39.1, 102.7, 220.0, -11.6, -140.0], speed=self._angle_speed,
-                                             mvacc=self._angle_acc, wait=True, radius=0.0)
-            if not self._check_code(code, 'set_servo_angle'):
-                return
-        code = self._arm.set_servo_angle(angle=[179.2, -42.1, 7.4, 186.7, 41.5, -1.6], speed=self._angle_speed,
-                                         mvacc=self._angle_acc, wait=True, radius=0.0)
-        if not self._check_code(code, 'set_servo_angle'):
-            return
 
     def motion_dance_c(self):  # designed '빙글빙글'
         try:
@@ -1468,71 +1216,6 @@ class RobotMain(object):
                 break
             except:
                 print('socket error')
-
-    def motion_breath(self):
-        pass
-
-    def motion_sleep(self):  # designed 'sleep'
-        try:
-            self.clientSocket.send('sleep_start'.encode('utf-8'))
-        except:
-            print('socket error')
-
-        for i in range(int(1)):
-            if not self.is_alive:
-                break
-            for i in range(int(2)):
-                if not self.is_alive:
-                    break
-                self._angle_speed = 20
-                self._angle_acc = 200
-                code = self._arm.set_servo_angle(angle=[179.0, -17.7, 29.0, 177.8, 43.8, -1.4], speed=self._angle_speed,
-                                                 mvacc=self._angle_acc, wait=True, radius=0.0)
-                if not self._check_code(code, 'set_servo_angle'):
-                    return
-                self._angle_speed = 5
-                self._angle_acc = 5
-                code = self._arm.set_servo_angle(angle=[179.0, -10.2, 24.0, 178.2, 39.2, -2.0], speed=self._angle_speed,
-                                                 mvacc=self._angle_acc, wait=True, radius=0.0)
-                if not self._check_code(code, 'set_servo_angle'):
-                    return
-            self._angle_speed = 30
-            self._angle_acc = 300
-            code = self._arm.set_servo_angle(angle=[179.0, -17.7, 29.0, 177.8, 43.8, -1.4], speed=self._angle_speed,
-                                             mvacc=self._angle_acc, wait=True, radius=0.0)
-            if not self._check_code(code, 'set_servo_angle'):
-                return
-            for i in range(int(3)):
-                if not self.is_alive:
-                    break
-                self._angle_speed = 180
-                self._angle_acc = 1000
-                code = self._arm.set_servo_angle(angle=[179.0, -17.7, 29.0, 199.8, 43.4, -11.0],
-                                                 speed=self._angle_speed, mvacc=self._angle_acc, wait=True, radius=0.0)
-                if not self._check_code(code, 'set_servo_angle'):
-                    return
-                code = self._arm.set_servo_angle(angle=[179.0, -17.7, 29.0, 157.3, 43.2, 12.7], speed=self._angle_speed,
-                                                 mvacc=self._angle_acc, wait=True, radius=0.0)
-                if not self._check_code(code, 'set_servo_angle'):
-                    return
-            self._angle_speed = 20
-            self._angle_acc = 200
-            code = self._arm.set_servo_angle(angle=[179.0, -17.7, 29.0, 177.8, 43.8, -1.4], speed=self._angle_speed,
-                                             mvacc=self._angle_acc, wait=True, radius=0.0)
-            if not self._check_code(code, 'set_servo_angle'):
-                return
-            code = self._arm.set_pause_time(2)
-            if not self._check_code(code, 'set_pause_time'):
-                return
-        while True:
-            try:
-                self.clientSocket.send('sleep_finish'.encode('utf-8'))
-                break
-            except:
-                print('socket error')
-
-    def motion_clean_mode(self):
-        pass
 
     def pin_off(self):
         self.clientSocket.send('pin_off_start'.encode('utf-8'))
