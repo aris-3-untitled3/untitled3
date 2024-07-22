@@ -1269,7 +1269,8 @@ class RobotMain(object):
     def run(self):
         try:
             while self.is_alive:
-                # Joint Motion
+                # come on & greet & dance & sleep
+                self.hello()
                 if ids is not None and 1 in ids:    #ArUCo Marker 1번이 검출되면
                     self.trash()
 
@@ -1599,6 +1600,19 @@ class RobotMain(object):
         code = self._arm.set_position(-170, 18.6, 281.9, -52.1, 89.1, 126.1, speed=200, mvacc=100, wait=True, relative=False)    # gripper 180도 원상복구(문제 발생시 angle로 수정)
         if not self._check_code(code, 'set_position'):
             return
+        
+    def hello(self):
+        if person_distance > 5000:   # 거리가 5m 이상이면 pass
+            pass
+        elif person_distance > 3000:    # 거리가 3m 이상이면 come on
+            self.motion_come_on()
+        elif person_distance > 2000:    # 거리가 2m 이상이면 greet
+            self.motion_greet()
+        elif person_distance > 500:     
+            if age < 15:                # 나이가 15세 미만이면 dance_c
+                self.motion_dance_c()
+            else:
+                self.motion_greet()    # 그 외에는 greet
 
 if __name__ == '__main__':
     RobotMain.pprint('xArm-Python-SDK Version:{}'.format(version.__version__))
