@@ -1341,9 +1341,6 @@ class RobotMain(object):
                         self.clientSocket.send('test_start'.encode('utf-8'))
                     except:
                         print('socket error')
-                    # self.motion_home()
-                    # self.motion_grab_cup()
-                    # self.motion_serve()
 
                 elif self.state == 'greet':
                     self.motion_greet()
@@ -1601,7 +1598,7 @@ class RobotMain(object):
         if not self._check_code(code, 'set_position'):
             return
         
-    def hello(self):
+    def hello(self, person_distance, age):
         if person_distance > 5000:   # 거리가 5m 이상이면 pass
             pass
         elif person_distance > 3000:    # 거리가 3m 이상이면 come on
