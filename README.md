@@ -5,6 +5,6 @@
 
 ## 라이브러리 설치
 
-##pip install PyQt5
-##pip install pydub
-##pip install playsound
+## pip install PyQt5
+## pip install pydub
+## pip install playsound
