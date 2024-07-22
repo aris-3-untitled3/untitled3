@@ -4,6 +4,7 @@
 # dall.jpg 추가하였습니다.
 
 ## 라이브러리 설치
-pip install PyQt5\n
-pip install pydub\n
-pip install playsound
+
+##pip install PyQt5
+##pip install pydub
+##pip install playsound
