@@ -1271,8 +1271,11 @@ class RobotMain(object):
             while self.is_alive:
                 # come on & greet & dance & sleep
                 self.hello()
-                if ids is not None and 1 in ids:    #ArUCo Marker 1번이 검출되면
+                # trash path planning
+                if ids is not None and 1 in ids:    #ArUCo Marker ids 1번이 검출되면
                     self.trash()
+                else:
+                    pass
 
                 if self.state == 'icecreaming':
                     # --------------icecream start--------------------
@@ -1335,91 +1338,9 @@ class RobotMain(object):
                         self.order_msg['makeReq']['latency'] = 0
                     print('sendsendsendsnedasdhfaenbeijakwlbrsvz;ikbanwzis;fklnairskjf')
                     self.state = 'ready'
-
-                elif self.state == 'test':
-                    try:
-                        self.clientSocket.send('test_start'.encode('utf-8'))
-                    except:
-                        print('socket error')
-
-                elif self.state == 'greet':
-                    self.motion_greet()
-                    self.motion_home()
-                    while True:
-                        try:
-                            self.clientSocket.send('greet_finish'.encode('utf-8'))
-                            break
-                        except:
-                            print('socket error')
-                            time.sleep(0.2)
-                    print('greet finish')
-                    self.state = 'ready'
-
-                elif self.state == 'dance_random' or 'dance_c':
-                    self.motion_dance_c()
-                    while True:
-                        try:
-                            self.clientSocket.send('dance_random_finish'.encode('utf-8'))
-                            break
-                        except:
-                            print('socket error')
-                            time.sleep(0.2)
-                    self.state = 'ready'
-
-                elif self.state == 'breath':
-                    try:
-                        self.clientSocket.send('breath_start'.encode('utf-8'))
-                        time.sleep(5)
-                        self.clientSocket.send('breath_finish'.encode('utf-8'))
-                    except:
-                        print('socket error')
-
-                elif self.state == 'sleep':
-                    self.motion_sleep()
-                    self.motion_home()
-                    while True:
-                        try:
-                            self.clientSocket.send('sleep_finish'.encode('utf-8'))
-                            break
-                        except:
-                            print('socket error')
-                            time.sleep(0.2)
-                    self.state = 'ready'
-
-                elif self.state == 'comeon':
-                    print('come_on start')
-                    self.motion_come_on()
-                    # self.motion_home()
-                    self.state = 'ready'
-
-                elif self.state == 'clean_mode':
-                    try:
-                        self.clientSocket.send('clean_mode_start'.encode('utf-8'))
-                    except:
-                        print('socket error')
-                    self.state = 'ready'
-
-                    code = self._arm.set_cgpio_digital(1, 1, delay_sec=0)
-                    if not self._check_code(code, 'set_cgpio_digital'):
-                        return
-                    self.state = 'ready'
-
-                elif self.state == 'clean_mode_end':
-                    code = self._arm.set_cgpio_digital(1, 0, delay_sec=0)
-                    if not self._check_code(code, 'set_cgpio_digital'):
-                        return
-                    self.state = 'ready'
-
-
-                elif self.state == 'ping':
-                    print('ping checked')
-                    # self.motion_home()
-                    self.state = 'ready'
-
                 else:
                     pass
 
-                # self.state = 'ready'
         except Exception as e:
             self.pprint('MainException: {}'.format(e))
         self.alive = False
