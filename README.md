@@ -8,3 +8,4 @@
 ## pip install PyQt5
 ## pip install pydub
 ## pip install playsound
+## pip install pygame
