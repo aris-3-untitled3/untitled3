@@ -6,6 +6,5 @@
 ## 라이브러리 설치
 
 ## pip install PyQt5
-## pip install pydub
-## pip install playsound
-## pip install pygame
+## pip install pydub  -> 버튼 소리
+## pip install pygame -> 배경 소리
