@@ -61,17 +61,27 @@
     <string>구매하기</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2">
+  <widget class="QFrame" name="frame">
    <property name="geometry">
     <rect>
-     <x>-160</x>
-     <y>-50</y>
-     <width>771</width>
-     <height>611</height>
+     <x>-40</x>
+     <y>-40</y>
+     <width>1920</width>
+     <height>1080</height>
     </rect>
    </property>
-   <property name="text">
-    <string>TextLabel</string>
+   <property name="styleSheet">
+    <string notr="true">QFrame {
+    background-image: url(/home/messi/ws_amr/qt/dall.jpg); /* 배경 이미지 설정 */
+    background-position: center; /* 이미지 중앙 정렬 */
+    background-repeat: no-repeat; /* 이미지 반복 안함 */
+}</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
    </property>
   </widget>
  </widget>

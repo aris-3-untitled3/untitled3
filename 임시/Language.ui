@@ -6,72 +6,57 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1080</height>
+    <width>400</width>
+    <height>378</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QDialog {
-    background-color: #ADD8E6; /* 밝은 파란색 배경 */
-}
-</string>
-  </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>620</x>
-     <y>750</y>
-     <width>881</width>
-     <height>131</height>
+     <x>70</x>
+     <y>20</y>
+     <width>301</width>
+     <height>81</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>32</pointsize>
+     <pointsize>14</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
    <property name="text">
-    <string>온 가족이 함께 즐기는 무제 아이스크림</string>
+    <string>안녕하세요!   언어를 선택해 주세요</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>1610</x>
-     <y>710</y>
-     <width>181</width>
-     <height>171</height>
+     <x>50</x>
+     <y>140</y>
+     <width>131</width>
+     <height>131</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Carlito</family>
-     <pointsize>24</pointsize>
-     <weight>50</weight>
-     <italic>false</italic>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="text">
-    <string>구매하기</string>
+    <string>한국어</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2">
+  <widget class="QPushButton" name="pushButton_2">
    <property name="geometry">
     <rect>
-     <x>-160</x>
-     <y>-50</y>
-     <width>771</width>
-     <height>611</height>
+     <x>220</x>
+     <y>140</y>
+     <width>131</width>
+     <height>131</height>
     </rect>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string>English</string>
    </property>
   </widget>
  </widget>

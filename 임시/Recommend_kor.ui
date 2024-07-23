@@ -30,9 +30,15 @@ QPushButton:hover {
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
+<<<<<<< HEAD
      <x>550</x>
      <y>120</y>
      <width>1211</width>
+=======
+     <x>700</x>
+     <y>60</y>
+     <width>531</width>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
      <height>161</height>
     </rect>
    </property>
@@ -44,7 +50,12 @@ QPushButton:hover {
     </font>
    </property>
    <property name="text">
+<<<<<<< HEAD
     <string>아이스크림과 토핑을  하나씩 선택해주세요.</string>
+=======
+    <string>아이스크림과 토핑 조합을
+    하나씩 선택해주세요.</string>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_1">
@@ -184,6 +195,7 @@ QPushButton:hover {
    </property>
    <property name="font">
     <font>
+<<<<<<< HEAD
      <pointsize>-1</pointsize>
     </font>
    </property>
@@ -197,6 +209,11 @@ QPushButton:hover {
     padding: 10px;
 }</string>
    </property>
+=======
+     <pointsize>23</pointsize>
+    </font>
+   </property>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
    <property name="text">
     <string>다음</string>
    </property>
@@ -230,6 +247,7 @@ QPushButton:hover {
    </property>
    <property name="font">
     <font>
+<<<<<<< HEAD
      <pointsize>-1</pointsize>
     </font>
    </property>
@@ -243,6 +261,11 @@ QPushButton:hover {
     padding: 10px;
 }</string>
    </property>
+=======
+     <pointsize>23</pointsize>
+    </font>
+   </property>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
    <property name="text">
     <string>뒤로가기</string>
    </property>
@@ -258,6 +281,7 @@ QPushButton:hover {
    </property>
    <property name="font">
     <font>
+<<<<<<< HEAD
      <pointsize>-1</pointsize>
     </font>
    </property>
@@ -271,6 +295,11 @@ QPushButton:hover {
     padding: 10px;
 }</string>
    </property>
+=======
+     <pointsize>23</pointsize>
+    </font>
+   </property>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
    <property name="text">
     <string>초기화면</string>
    </property>
@@ -286,6 +315,7 @@ QPushButton:hover {
    </property>
    <property name="font">
     <font>
+<<<<<<< HEAD
      <pointsize>-1</pointsize>
     </font>
    </property>
@@ -299,10 +329,16 @@ QPushButton:hover {
     padding: 10px;
 }</string>
    </property>
+=======
+     <pointsize>23</pointsize>
+    </font>
+   </property>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
    <property name="text">
     <string>추천</string>
    </property>
   </widget>
+<<<<<<< HEAD
   <widget class="QFrame" name="frame">
    <property name="geometry">
     <rect>
@@ -339,6 +375,8 @@ QPushButton:hover {
   <zorder>pushButton_back</zorder>
   <zorder>pushButton_home</zorder>
   <zorder>pushButton_rec</zorder>
+=======
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
  </widget>
  <resources/>
  <connections/>

@@ -31,7 +31,11 @@ QPushButton:hover {
    <property name="geometry">
     <rect>
      <x>660</x>
-     <y>120</y>
+<<<<<<< HEAD
+     <y>110</y>
+=======
+     <y>50</y>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
      <width>581</width>
      <height>121</height>
     </rect>
@@ -47,6 +51,7 @@ QPushButton:hover {
     <string>아이스크림이 완성되었습니다!</string>
    </property>
   </widget>
+<<<<<<< HEAD
   <widget class="QFrame" name="frame">
    <property name="geometry">
     <rect>
@@ -72,6 +77,8 @@ QPushButton:hover {
   </widget>
   <zorder>frame</zorder>
   <zorder>label</zorder>
+=======
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
  </widget>
  <resources/>
  <connections/>
