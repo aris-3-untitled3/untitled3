@@ -1,11 +1,36 @@
+import rclpy as rp
+from rclpy.node import Node
+from untitled_msgs.srv import ServiceString
 import speech_recognition as sr
 from playsound import playsound
 
-class Record_API:
-    def __init__(self, file_name, save_path, respone_time):
-        self.file_name = file_name
-        self.save_path = save_path
-        self.respone_time = respone_time
+class Record_API(Node):
+    def __init__(self):
+        super().__init__('Record_API')
+
+        self.file_name="/home/jchj/Untitled3/src/untitled3/resource/output.wav"
+        self.save_path="/home/jchj/Untitled3/src/untitled3/resource/response.txt"
+        self.respone_time=5
+
+        # /Signal_Voice_out 서비스
+        self.voice_in_server = self.create_service(
+            ServiceString,
+            '/Call_to_Voice_in',
+            self.voice_in_callback,
+        )
+
+    def voice_in_callback(self, request, response):
+        if request.command == "hear":
+            self.get_logger().info(f'Received : {request.command}')
+            text = self.run()
+        else:
+            self.get_logger().error(f'ERROR')
+            text = "error"
+
+        response.success = True
+        response.result = f'response : {text}'
+        return response
+
 
     # 음성 녹음 함수
     def record_audio(self):
@@ -69,8 +94,17 @@ class Record_API:
             print("녹음 실패. 오디오 파일이 생성되지 않았습니다.")
             return None
 
+def main(args=None):
+    rp.init(args=args)
 
-# 사용 예제
-if __name__ == "__main__":
-    VtoT = Record_API(file_name="/home/jchj/Untitled3/src/untitled3/resource/output.wav", save_path="/home/jchj/Untitled3/src/untitled3/resource/response.txt", respone_time=5)
-    VtoT.run()
+    Record_node = Record_API()
+
+    try:
+        rp.spin(Record_node)
+    finally:
+        Record_node.destroy_node()
+        rp.shutdown()
+
+
+if __name__ == '__main__':
+    main()

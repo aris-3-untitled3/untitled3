@@ -1,5 +1,7 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.executors import MultiThreadedExecutor
 from sensor_msgs.msg import Image
 from untitled_msgs.msg import TopicString
 from cv_bridge import CvBridge
@@ -12,13 +14,20 @@ class HumanDetect(Node):
     def __init__(self):
         super().__init__('HumanDetect')
 
+        # Define callback groups
+        self.image_callback_group = ReentrantCallbackGroup()
+        self.server_callback_group = ReentrantCallbackGroup()
+
+        # WebCam Topic subscribe
         self.FrontCam_subscription = self.create_subscription(
             Image,
             '/FrontCam',
             self.Webcam_callback,
-            10
+            10,
+            callback_group=self.image_callback_group
         )
 
+        # ROS2 image chage
         self.bridge = CvBridge()
 
         # Topic publish to Robot_Server
@@ -29,7 +38,8 @@ class HumanDetect(Node):
             TopicString,
             '/Server_to_Human',
             self.robot_server_callback,
-            10
+            10,
+            callback_group=self.server_callback_group
         )
 
         self.model_path = '/home/jchj/Untitled3/src/models/Best.pt'
@@ -37,9 +47,10 @@ class HumanDetect(Node):
 
         self.guest_detected = False
         self.human_detected = False
+        self.far_human_detected = False
         self.no_human_detected = False
         self.loop_running = False  # Detecting motion
-        self.frame = None  # Initialize frame variable
+        self.frame = None
 
     # Load YOLOv5 model
     def load_model(self):
@@ -73,35 +84,52 @@ class HumanDetect(Node):
             cv2.putText(annotated_frame, f'Distance: {closest_distance:.2f}m', (int(x1), int(y1)-10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 0, 0), 2)
             self.detect_human(closest_distance)
+        else:
+            # No human detected in the frame
+            if not self.no_human_detected:
+                self.no_human_detect()
+                self.no_human_detected = True
+                self.guest_detected = False
+                self.human_detected = False
+                self.far_human_detected = False
 
     def detect_human(self, distance):
         if distance <= 0.5 and not self.guest_detected:
             self.guest_detect()
             self.guest_detected = True
             self.human_detected = False
+            self.far_human_detected = False
             self.no_human_detected = False
             self.loop_running = False  # Stop loop
-        elif 0.5 < distance <= 2 and not self.human_detected:
+        elif 0.5 < distance <= 1.5 and not self.human_detected:
             self.human_detect()
             self.human_detected = True
             self.guest_detected = False
+            self.far_human_detected = False
             self.no_human_detected = False
-        elif distance > 2 and not self.no_human_detected:
-            self.no_human_detect()
-            self.no_human_detected = True
+        elif distance > 1.5 and not self.far_human_detected:
+            self.far_human_detect()
+            self.far_human_detected = True
             self.guest_detected = False
             self.human_detected = False
+            self.no_human_detected = False
 
     def guest_detect(self):
         self.get_logger().info('Guest detected!')
         msg = TopicString()
-        msg.command = 'guest_detect'
+        msg.command = f'guest_detect'
         self.human_detect_publisher.publish(msg)
 
     def human_detect(self):
         self.get_logger().info('Human detected!')
         msg = TopicString()
-        msg.command = 'human_detect'
+        msg.command = f'human_detect'
+        self.human_detect_publisher.publish(msg)
+
+    def far_human_detect(self):
+        self.get_logger().info('far_human detected!')
+        msg = TopicString()
+        msg.command = f'far_human'
         self.human_detect_publisher.publish(msg)
 
     def no_human_detect(self):
@@ -119,39 +147,39 @@ class HumanDetect(Node):
 
                 self.process_detections(results.xyxy[0], annotated_frame)
 
-                # Display image for debugging
-                # cv2.imshow('Webcam', annotated_frame)
-                # if cv2.waitKey(1) == ord('q'):
-                #     self.loop_running = False
-                #     break
-
-        # cv2.destroyAllWindows()
-
     def robot_server_callback(self, msg):
         if msg.command == "start":
             self.get_logger().info('Starting detection!')
-            self.loop_running = True  # Restart loop
+            self.loop_running = True  # start loop
             self.thread = threading.Thread(target=self.run)
             self.thread.start()
-        else:
+        elif msg.command == "stop":
             self.get_logger().info('Stopping detection!')
             self.loop_running = False  # Stop loop
             if self.thread.is_alive():
-                self.thread.join()
+                self.thread.join()  # Wait for the thread to finish
+        else:
+            self.get_logger().error("ERROR")
 
     def Webcam_callback(self, msg):
-        np_arr = np.frombuffer(msg.data, np.uint8)
-        self.frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+        try:
+            self.frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        except Exception as e:
+            self.get_logger().error(f'Error in Webcam_callback: {str(e)}')
 
 def main(args=None):
     rclpy.init(args=args)
 
-    human_detect_node = HumanDetect()
+    Human_detect = HumanDetect()
+
+    # MultiThreadedExecutor 사용
+    executor = MultiThreadedExecutor()
+    executor.add_node(Human_detect)
 
     try:
-        rclpy.spin(human_detect_node)
+        executor.spin()
     finally:
-        human_detect_node.destroy_node()
+        Human_detect.destroy_node()
         rclpy.shutdown()
 
 if __name__ == '__main__':

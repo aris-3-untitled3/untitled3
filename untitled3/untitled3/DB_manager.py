@@ -66,7 +66,6 @@ class DB_Manager:
         self.cur.execute(query)
         self.conn.commit()
 
-
         #sales
         query = "INSERT INTO customer_info (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('berry', 'topA', 3650, 12341234, '19-29', 'F', 'N');"
         self.cur.execute(query)
@@ -82,8 +81,6 @@ class DB_Manager:
         self.cur.execute(query)
         self.conn.commit()
 
-
-
         #price
         query = "INSERT INTO price (topC) VALUES (20);"
         self.cur.execute(query)
@@ -93,7 +90,6 @@ class DB_Manager:
         query = "INSERT INTO stock (topC) VALUES (500);"
         self.cur.execute(query)
         self.conn.commit()
-
 
     def execute_table(self, file_path):
         with open(file_path, 'r') as f:
@@ -163,7 +159,6 @@ class DB_Manager:
         
         return user_id, coupon
     
-
     #매출 저장 함수 // 매출 저장 -> 손님 정보 저장 or 업데이트
     def save_sales(self, Flavor, Topping, Price, Phone, Age, Gender, Use_coupon):
         query = "INSERT INTO sales (flavor, topping, price, phone, age, gender, use_coupon) VALUES (%s, %s, %s, %s, %s, %s, %s);"
@@ -178,7 +173,6 @@ class DB_Manager:
         else:
             return None
 
-
     '''
     맛 추천을 위해 연령별&성별 ice cream, topping max 값을 불러옴
     return값은 가장 많은 flavor, topping 인데, 만약 한 번도 구매하지 않은 조합이면 None으로 반환
@@ -187,6 +181,7 @@ class DB_Manager:
 
     선호도 추천시에 정보가 없거나 중복이면 팀원과 정한 데이터를 기반으로 추천해준다.
     '''
+
     def load_sales(self, Age, Gender):
         query = "SELECT flavor, COUNT(*) as count FROM sales WHERE age = %s and gender = %s GROUP BY flavor;"
         self.cur.execute(query, (Age, Gender))

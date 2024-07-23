@@ -1,37 +1,44 @@
 import rclpy as rp
 from rclpy.node import Node
+from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
 from untitled_msgs.msg import TopicString
+from cv_bridge import CvBridge
 import cv2
-import torch
-import numpy as np
 import argparse
 import time
-import threading
+from sensor_msgs.msg import Image
 
 class GuestDetect(Node):
     def __init__(self):
         super().__init__('GuestDetect')
 
-        # Robot_Server로 토픽 퍼블리셔
-        self.robot_server_publisher = self.create_publisher(TopicString, '/Guest_Info', 10)
+        # 콜백 그룹 정의
+        self.image_callback_group = ReentrantCallbackGroup()
+        self.guest_callback_group = ReentrantCallbackGroup()
 
-        self.model_path = '/home/jchj/Untitled3/src/models/Best.pt'
-        self.model = self.load_model()
-
-        # 상태 변수 초기화
-        self.guest_detected = False
-        self.human_detected = False
-        self.no_human_detected = False
-        self.loop_running = True  # 루프 실행 상태 변수 추가
+        # WebCam Topic subscribe
+        self.FrontCam_subscription = self.create_subscription(
+            Image,
+            '/FrontCam',
+            self.Webcam_callback,
+            10,
+            callback_group=self.image_callback_group
+        )
 
         # Server에서 토픽 받기 (guest_detect)
-        self.ui = self.create_subscription(
+        self.guest = self.create_subscription(
             TopicString,
-            '/Server_to_GA',
-            self.ga_callback,
-            10
+            '/Server_to_Guest',
+            self.guest_detect_callback,
+            10,
+            callback_group=self.guest_callback_group
         )
+
+        self.guest
+
+        # Robot_Server로 토픽 퍼블리셔
+        self.guest_publisher = self.create_publisher(TopicString, '/Guest_to_Server', 10)
 
         self.parser = argparse.ArgumentParser()
         self.parser.add_argument('--image')
@@ -49,7 +56,27 @@ class GuestDetect(Node):
         self.ageList = ['(0-2)', '(3-6)', '(7-12)', '(13-18)', '(19-29)', '(30-43)', '(44-49)', '(50-100)']
         self.genderList = ['M', 'F']
 
-        # self.run()
+        # ROS2 image chage
+        self.bridge = CvBridge()
+        self.frame = None  # 초기 프레임을 None으로 설정
+
+    def guest_detect_callback(self,msg):
+        if msg.command == "guest_detect":
+            self.get_logger().info(f'Received : {msg.command}')
+            most_common_age, most_common_gender = self.run()
+            result = f"Age : {most_common_age}, Gender : {most_common_gender}"
+
+            response_msg = TopicString()
+            response_msg.command = result
+            self.guest_publisher.publish(response_msg)
+        else:
+            self.get_logger().error('ERROR')
+
+    def Webcam_callback(self, msg):
+        try:
+            self.frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        except Exception as e:
+            self.get_logger().error(f'Error in Webcam_callback: {str(e)}')
 
     def highlightFace(self, net, frame, conf_threshold=0.7):
         frameOpencvDnn = frame.copy()
@@ -71,21 +98,23 @@ class GuestDetect(Node):
                 cv2.rectangle(frameOpencvDnn, (x1, y1), (x2, y2), (0, 255, 0), int(round(frameHeight / 150)), 8)
         return frameOpencvDnn, faceBoxes
 
-    def run_2(self):
+    def run(self):
         self.faceNet = cv2.dnn.readNet(self.faceModel, self.faceProto)
         self.ageNet = cv2.dnn.readNet(self.ageModel, self.ageProto)
         self.genderNet = cv2.dnn.readNet(self.genderModel, self.genderProto)
 
-        video = cv2.VideoCapture(self.args.image if self.args.image else 0)
-        
         Most_Gender = {gender: 0 for gender in self.genderList}
         Most_Age = {age: 0 for age in ['0-6', '7-18', '19-29', '30-49', '50-']}
 
         retry_limit = 5
         retry_count = 0
 
+        # 프레임이 준비될 때까지 대기
+        while self.frame is None:
+            time.sleep(0.1)
+
         while retry_count < retry_limit:
-            Most_Gender, Most_Age = self.loop(video, self.faceNet, self.ageNet, self.genderNet, Most_Gender, Most_Age)
+            Most_Gender, Most_Age = self.loop(self.frame, self.faceNet, self.ageNet, self.genderNet, Most_Gender, Most_Age)
             most_common_gender = max(Most_Gender, key=Most_Gender.get)
             most_common_age = max(Most_Age, key=Most_Age.get)
 
@@ -107,30 +136,26 @@ class GuestDetect(Node):
         print(f'----------------------------------------- 최종 데이터 값 | Age is {most_common_age} , Gender is {most_common_gender} | -----------------------------------------')
 
         if most_common_age and most_common_gender:
-            with open('/home/jchj/Untitled3/src/models/age_gender/latest_age_gender.txt', 'w') as save_custom:
+            with open('/home/jchj/Untitled3/src/untitled3/resource/latest_age_gender.txt', 'w') as save_custom:
                 save_custom.write(f'{most_common_age}\t')
                 save_custom.write(f'{most_common_gender}')
             print('Success saved\n')
         else:
             print('Failed')
 
-        video.release()
         cv2.destroyAllWindows()
 
         return most_common_age, most_common_gender
 
-    def loop(self, video, faceNet, ageNet, genderNet, Most_Gender, Most_Age):
+    def loop(self, frame, faceNet, ageNet, genderNet, Most_Gender, Most_Age):
         INFO_UPDATE_DURATION = 3  # 업데이트 시간
         face_detected_time = None 
         padding = 20
 
         while True:
-            hasFrame, frame = video.read()
-            frame = cv2.flip(frame, 1)
-            if not hasFrame:
-                print("NO webcam")
-                break
-            
+
+            frame = self.frame
+
             resultImg, faceBoxes = self.highlightFace(faceNet, frame)
 
             if not faceBoxes:
@@ -181,16 +206,16 @@ class GuestDetect(Node):
                         print(f'Most Gender --> {Most_Gender} | Most Age --> {Most_Age}')
                         print(f'Age: {age_group} Gender: {gender}')
 
-                        cv2.putText(resultImg, f'{gender}, {age_group}',
-                                    (faceBox[0], faceBox[1] - 10),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2, cv2.LINE_AA)
+                        # cv2.putText(resultImg, f'{gender}, {age_group}',
+                        #             (faceBox[0], faceBox[1] - 10),
+                        #             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2, cv2.LINE_AA)
                         
-                        cv2.imshow("Detecting age and gender", resultImg)
+                        # cv2.imshow("Detecting age and gender", resultImg)
                 else:
                     break
 
-            if cv2.waitKey(33) == ord('q'):
-                break
+            # if cv2.waitKey(33) == ord('q'):
+            #     break
 
         return Most_Gender, Most_Age
 
@@ -198,12 +223,16 @@ class GuestDetect(Node):
 def main(args=None):
     rp.init(args=args)
 
-    guest_detect_node = GuestDetect()
+    Guest_detect = GuestDetect()
+
+    # MultiThreadedExecutor 사용
+    executor = MultiThreadedExecutor()
+    executor.add_node(Guest_detect)
 
     try:
-        rp.spin(guest_detect_node)
+        executor.spin()
     finally:
-        guest_detect_node.destroy_node()
+        Guest_detect.destroy_node()
         rp.shutdown()
 
 

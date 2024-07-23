@@ -19,9 +19,12 @@ class FrontCam(Node):
 
     def send_webcam_image(self):
         ret, frame = self.cap.read()
+        
         if ret:
             frame = cv2.resize(frame, (640, 480))
-            frame = cv2.rotate(frame, cv2.ROTATE_180)
+
+            # Flip image horizontally
+            frame = cv2.flip(frame, 1)
 
             # Convert OpenCV image to ROS Image message
             ros_image = self.bridge.cv2_to_imgmsg(frame, encoding='bgr8')
