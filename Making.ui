@@ -65,6 +65,7 @@ QPushButton:hover {
     <string/>
    </property>
   </widget>
+<<<<<<< HEAD
   <widget class="QFrame" name="frame">
    <property name="geometry">
     <rect>
@@ -91,6 +92,8 @@ QPushButton:hover {
   <zorder>frame</zorder>
   <zorder>label</zorder>
   <zorder>label_pic</zorder>
+=======
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
  </widget>
  <resources/>
  <connections/>

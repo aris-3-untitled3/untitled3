@@ -27,6 +27,7 @@ QPushButton:hover {
 }
 </string>
   </property>
+<<<<<<< HEAD
   <widget class="QWidget" name="widget" native="true">
    <property name="geometry">
     <rect>
@@ -65,6 +66,40 @@ QPushButton:hover {
 </string>
     </property>
    </widget>
+=======
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>750</x>
+     <y>0</y>
+     <width>651</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>32</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>3초간 바라봐주세요</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_pic">
+   <property name="geometry">
+    <rect>
+     <x>810</x>
+     <y>150</y>
+     <width>680</width>
+     <height>680</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
   </widget>
  </widget>
  <resources/>

@@ -99,6 +99,7 @@ QPushButton:hover {
     <string>다음</string>
    </property>
   </widget>
+<<<<<<< HEAD
   <widget class="QFrame" name="frame">
    <property name="geometry">
     <rect>
@@ -128,6 +129,8 @@ QPushButton:hover {
   <zorder>label</zorder>
   <zorder>pushButton_back</zorder>
   <zorder>pushButton_next</zorder>
+=======
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
  </widget>
  <resources/>
  <connections/>

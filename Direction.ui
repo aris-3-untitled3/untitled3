@@ -7,20 +7,43 @@
     <x>0</x>
     <y>0</y>
     <width>1920</width>
+<<<<<<< HEAD
     <height>1080</height>
+=======
+    <height>1280</height>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <property name="styleSheet">
+<<<<<<< HEAD
    <string notr="true"/>
+=======
+   <string notr="true">QPushButton {
+    border: 2px solid #1E90FF;  /* 테두리 색상: DodgerBlue */
+    border-radius: 10px;        /* 둥근 테두리 */
+    padding: 5px;               /* 버튼 내부 여백 */
+    background-color: #F0F8FF;  /* 배경 색상: AliceBlue */
+}
+
+QPushButton:hover {
+    border: 2px solid #00BFFF;  /* 마우스 올렸을 때 테두리 색상: DeepSkyBlue */
+    background-color: #E6F2FF;  /* 마우스 올렸을 때 배경 색상 */
+}
+</string>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
      <x>840</x>
+<<<<<<< HEAD
      <y>90</y>
+=======
+     <y>10</y>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
      <width>281</width>
      <height>141</height>
     </rect>
@@ -47,6 +70,7 @@
    </property>
    <property name="font">
     <font>
+<<<<<<< HEAD
      <pointsize>-1</pointsize>
     </font>
    </property>
@@ -60,14 +84,26 @@
     padding: 10px;
 }</string>
    </property>
+=======
+     <pointsize>24</pointsize>
+    </font>
+   </property>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
    <property name="html">
     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
+<<<<<<< HEAD
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:20px; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:24pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;아이스크림을&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;가져온다랑&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+=======
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:24pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;아이스크림을&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;가져온다&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton">
@@ -84,6 +120,7 @@ p, li { white-space: pre-wrap; }
      <pointsize>24</pointsize>
     </font>
    </property>
+<<<<<<< HEAD
    <property name="styleSheet">
     <string notr="true">QPushButton#nextButton {
     background-color: #32CD32; /* 초록색 배경 */
@@ -93,6 +130,8 @@ p, li { white-space: pre-wrap; }
     padding: 10px;
 }</string>
    </property>
+=======
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
    <property name="text">
     <string>다음</string>
    </property>
@@ -108,6 +147,7 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="font">
     <font>
+<<<<<<< HEAD
      <pointsize>-1</pointsize>
     </font>
    </property>
@@ -121,12 +161,22 @@ p, li { white-space: pre-wrap; }
     padding: 10px;
 }</string>
    </property>
+=======
+     <pointsize>24</pointsize>
+    </font>
+   </property>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
    <property name="html">
     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
+<<<<<<< HEAD
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:20px; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:24pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+=======
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:24pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;종이를&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;제거한다&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
@@ -142,6 +192,7 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="font">
     <font>
+<<<<<<< HEAD
      <pointsize>-1</pointsize>
     </font>
    </property>
@@ -155,12 +206,22 @@ p, li { white-space: pre-wrap; }
     padding: 10px;
 }</string>
    </property>
+=======
+     <pointsize>24</pointsize>
+    </font>
+   </property>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
    <property name="html">
     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
+<<<<<<< HEAD
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:20px; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:24pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+=======
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:24pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;위치에&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;놓는다&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
@@ -169,11 +230,16 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>80</x>
+<<<<<<< HEAD
      <y>770</y>
+=======
+     <y>700</y>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
      <width>270</width>
      <height>75</height>
     </rect>
    </property>
+<<<<<<< HEAD
    <property name="styleSheet">
     <string notr="true">QPushButton#cancelButton {
     background-color: #A9A9A9; /* 다크 그레이 배경 */
@@ -188,6 +254,8 @@ QPushButton#cancelButton:hover {
     background-color: #808080; /* 호버 시 더 진한 다크 그레이 배경 */
 }</string>
    </property>
+=======
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
    <property name="text">
     <string>뒤로가기</string>
    </property>
@@ -196,11 +264,16 @@ QPushButton#cancelButton:hover {
    <property name="geometry">
     <rect>
      <x>80</x>
+<<<<<<< HEAD
      <y>860</y>
+=======
+     <y>790</y>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
      <width>270</width>
      <height>75</height>
     </rect>
    </property>
+<<<<<<< HEAD
    <property name="styleSheet">
     <string notr="true">QPushButton#cancelButton {
     background-color: #D3D3D3; /* 회색 배경 */
@@ -210,10 +283,13 @@ QPushButton#cancelButton:hover {
     padding: 10px;
 }</string>
    </property>
+=======
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
    <property name="text">
     <string>초기화면</string>
    </property>
   </widget>
+<<<<<<< HEAD
   <widget class="QWidget" name="widget" native="true">
    <property name="geometry">
     <rect>
@@ -239,6 +315,8 @@ QPushButton#cancelButton:hover {
   <zorder>textBrowser_5</zorder>
   <zorder>pushButton_back</zorder>
   <zorder>pushButton_home</zorder>
+=======
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
  </widget>
  <resources/>
  <connections/>

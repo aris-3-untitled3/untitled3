@@ -6,7 +6,10 @@ from PyQt5.QtCore import *
 from PyQt5 import QtWidgets, uic 
 from pydub import AudioSegment
 from pydub.playback import play
+<<<<<<< HEAD
 from mediapipe_thread import MediaPipeThread
+=======
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
 
 import os
 import threading
@@ -14,7 +17,10 @@ import time
 import urllib.request
 import pygame
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
 # UI 파일 경로 설정
 ui_file = os.path.join('/home/messi/ws_amr/qt/', "Title.ui")
 ui_file2 = os.path.join('/home/messi/ws_amr/qt/', "Loading.ui")
@@ -40,8 +46,11 @@ from_class_Payment = uic.loadUiType(ui_Payment)[0]
 from_class_Bye = uic.loadUiType(ui_Bye)[0]
 from_class_Empty = uic.loadUiType(ui_Empty)[0]
 
+<<<<<<< HEAD
 class MediaPipeThread(QThread):
     hand_wave_signal = pyqtSignal()
+=======
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
 
 class MusicThread(QThread):
     def __init__(self):

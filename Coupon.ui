@@ -30,15 +30,24 @@ QPushButton:hover {
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
+<<<<<<< HEAD
      <x>870</x>
      <y>160</y>
+=======
+     <x>920</x>
+     <y>50</y>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
      <width>161</width>
      <height>51</height>
     </rect>
    </property>
    <property name="font">
     <font>
+<<<<<<< HEAD
      <pointsize>28</pointsize>
+=======
+     <pointsize>14</pointsize>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -51,7 +60,11 @@ QPushButton:hover {
    <property name="geometry">
     <rect>
      <x>700</x>
+<<<<<<< HEAD
      <y>280</y>
+=======
+     <y>210</y>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
      <width>521</width>
      <height>71</height>
     </rect>
@@ -242,7 +255,11 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>700</x>
+<<<<<<< HEAD
      <y>380</y>
+=======
+     <y>310</y>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
      <width>161</width>
      <height>60</height>
     </rect>
@@ -264,7 +281,11 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>880</x>
+<<<<<<< HEAD
      <y>380</y>
+=======
+     <y>310</y>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
      <width>161</width>
      <height>60</height>
     </rect>
@@ -286,7 +307,11 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>1060</x>
+<<<<<<< HEAD
      <y>380</y>
+=======
+     <y>310</y>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
      <width>161</width>
      <height>60</height>
     </rect>
@@ -304,6 +329,7 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
+<<<<<<< HEAD
   <widget class="QFrame" name="frame">
    <property name="geometry">
     <rect>
@@ -346,6 +372,8 @@ p, li { white-space: pre-wrap; }
   <zorder>textEdit_2</zorder>
   <zorder>textEdit_3</zorder>
   <zorder>textEdit_4</zorder>
+=======
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
  </widget>
  <resources/>
  <connections/>

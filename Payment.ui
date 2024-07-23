@@ -31,7 +31,11 @@ QPushButton:hover {
    <property name="geometry">
     <rect>
      <x>910</x>
+<<<<<<< HEAD
      <y>110</y>
+=======
+     <y>50</y>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
      <width>311</width>
      <height>161</height>
     </rect>
@@ -109,7 +113,11 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>630</x>
+<<<<<<< HEAD
      <y>650</y>
+=======
+     <y>580</y>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
      <width>311</width>
      <height>161</height>
     </rect>
@@ -129,7 +137,11 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>750</x>
+<<<<<<< HEAD
      <y>690</y>
+=======
+     <y>620</y>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
      <width>501</width>
      <height>91</height>
     </rect>
@@ -172,16 +184,24 @@ p, li { white-space: pre-wrap; }
   <widget class="QPushButton" name="pushButton_back">
    <property name="geometry">
     <rect>
+<<<<<<< HEAD
      <x>120</x>
      <y>870</y>
      <width>270</width>
      <height>75</height>
+=======
+     <x>110</x>
+     <y>1090</y>
+     <width>89</width>
+     <height>25</height>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
     </rect>
    </property>
    <property name="text">
     <string>뒤로가기</string>
    </property>
   </widget>
+<<<<<<< HEAD
   <widget class="QFrame" name="frame">
    <property name="geometry">
     <rect>
@@ -214,6 +234,21 @@ p, li { white-space: pre-wrap; }
   <zorder>textBrowser_2</zorder>
   <zorder>textBrowser_3</zorder>
   <zorder>pushButton_back</zorder>
+=======
+  <widget class="QPushButton" name="pushButton_home">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>1130</y>
+     <width>89</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>초기화면</string>
+   </property>
+  </widget>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
  </widget>
  <resources/>
  <connections/>
