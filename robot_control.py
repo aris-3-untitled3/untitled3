@@ -31,7 +31,7 @@ class RobotMain(object):
         self.state = 'stopped'
 
         self.position_home = [173.7, -25.9, 7.1, 179.8, 59, -1.6] #angle
-        # home_position = [-170, 18.6, 281.9, -52.1, 89.1, 126.1] # linear
+        self.position_home_linear = [-170, 18.6, 281.9, -52.1, 89.1, 126.1] # linear
         self.position_jig_A_grab = [-257.3, -138.3, 198, 68.3, 86.1, -47.0] #linear
         self.position_jig_B_grab = [-152.3, -129.0, 198, 4.8, 89.0, -90.7] #linear
         self.position_jig_C_grab = [-76.6, -144.6, 198, 5.7, 88.9, -50.1] #linear
