@@ -1217,54 +1217,6 @@ class RobotMain(object):
             except:
                 print('socket error')
 
-    def pin_off(self):
-        self.clientSocket.send('pin_off_start'.encode('utf-8'))
-        # cup_dispenser_up
-        code = self._arm.set_cgpio_analog(0, 0)
-        if not self._check_code(code, 'set_cgpio_analog'):
-            return
-        code = self._arm.set_cgpio_analog(1, 0)
-        if not self._check_code(code, 'set_cgpio_analog'):
-            return
-        # press_up
-        code = self._arm.set_cgpio_digital(1, 0, delay_sec=0)
-        if not self._check_code(code, 'set_cgpio_digital'):
-            return
-        self.clientSocket.send('pin_off_finish'.encode('utf-8'))
-
-    def pin_test(self): 
-        time.sleep(3) # 조인트 각도 , 프레스 , 컵 디스펜서
-        code = self._arm.set_servo_angle(angle=[179.0, -17.7, 29.0, 177.8, 43.8, -1.4], speed=self._angle_speed,
-                                         mvacc=self._angle_acc, wait=True, radius=0.0)
-        if not self._check_code(code, 'set_servo_angle'):
-            return
-        code = self._arm.set_cgpio_digital(0, 1, delay_sec=0)
-        if not self._check_code(code, 'set_cgpio_digital'):
-            return
-        time.sleep(2)
-        code = self._arm.set_servo_angle(angle=[179.0, -17.7, 83.3, 177.8, 43.8, -1.4], speed=self._angle_speed,
-                                         mvacc=self._angle_acc, wait=True, radius=0.0)
-        if not self._check_code(code, 'set_servo_angle'):
-            return
-        time.sleep(1)
-        code = self._arm.set_cgpio_digital(0, 0, delay_sec=0)
-        if not self._check_code(code, 'set_cgpio_digital'):
-            return
-        code = self._arm.set_cgpio_analog(0, 5)
-        if not self._check_code(code, 'set_cgpio_analog'):
-            return
-        code = self._arm.set_cgpio_analog(1, 5)
-        if not self._check_code(code, 'set_cgpio_analog'):
-            return
-        time.sleep(3)
-        code = self._arm.set_cgpio_analog(0, 0)
-        if not self._check_code(code, 'set_cgpio_analog'):
-            return
-        time.sleep(3)
-        code = self._arm.set_cgpio_analog(1, 0)
-        if not self._check_code(code, 'set_cgpio_analog'):
-            return
-
     # Robot Main Run
     def run(self):
         try:
