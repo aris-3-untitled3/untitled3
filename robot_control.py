@@ -1536,18 +1536,17 @@ class RobotMain(object):
             return
         
     def hello(self, person_distance, age):
-        if person_distance > 5000:   # 거리가 5m 이상이면 pass
-            pass
-        elif person_distance > 3000:    # 거리가 3m 이상이면 come on
+        if person_distance < 5000:   # 거리가 5m 미만이면 pass
             self.motion_come_on()
-        elif person_distance > 2000:    # 거리가 2m 이상이면 greet
+        elif person_distance < 2500:    # 거리가 2.5m 미만이면 greet
             self.motion_greet()
-        elif person_distance > 500:     
+        elif person_distance < 800:     # 거리가 0.8m 미만이면
             if age < 15:                # 나이가 15세 미만이면 dance_c
                 self.motion_dance_c()
             else:
                 self.motion_greet()    # 그 외에는 greet
-
+        else:
+            pass
 if __name__ == '__main__':
     RobotMain.pprint('xArm-Python-SDK Version:{}'.format(version.__version__))
     arm = XArmAPI('192.168.1.192', baud_checkset=False)
