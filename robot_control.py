@@ -1390,11 +1390,19 @@ class RobotMain(object):
                 return
             time.sleep(2.5)
             if aruco_y > 0:
+                code = self._arm.set_position(*[aruco_x, aruco_y, 350, 43.8, -88.5, -133.9], speed=self._tcp_speed,   # 컵이랑 충돌 방지 way point, z1 & gripper 방향 동시 이동
+                                            mvacc=self._tcp_acc, radius=20.0, wait=True)
+                if not self._check_code(code, 'set_position'):
+                    return
                 code = self._arm.set_position(*[aruco_x, aruco_y, 153, 43.8, -88.5, -133.9], speed=self._tcp_speed,   # z1 & gripper 방향 동시 이동
                                             mvacc=self._tcp_acc, radius=20.0, wait=True)
                 if not self._check_code(code, 'set_position'):
                     return
             elif aruco_y < 0:
+                code = self._arm.set_position(*[aruco_x, aruco_y, 353, 43.8, -88.5, 46.2], speed=self._tcp_speed,  # 컵이랑 충돌 방지 way point, z1 & gripper 방향 동시 이동
+                                            mvacc=self._tcp_acc, radius=20.0, wait=True)
+                if not self._check_code(code, 'set_position'):
+                    return
                 code = self._arm.set_position(*[aruco_x, aruco_y, 153, 43.8, -88.5, 46.2], speed=self._tcp_speed,  # z1 & gripper 방향 동시 이동
                                             mvacc=self._tcp_acc, radius=20.0, wait=True)
                 if not self._check_code(code, 'set_position'):
@@ -1442,11 +1450,19 @@ class RobotMain(object):
                 return
             time.sleep(1)
             if aruco_y > 0:
+                code = self._arm.set_position(*[aruco_x, aruco_y, 359.1, 43.8, -88.5, -133.9], speed=self._tcp_speed,   # 컵과 충돌 방지를 위한 way point, z1 & gripper 방향 동시 이동
+                                            mvacc=self._tcp_acc, radius=20.0, wait=True)
+                if not self._check_code(code, 'set_position'):
+                    return                
                 code = self._arm.set_position(*[aruco_x, aruco_y, 153, 43.8, -88.5, -133.9], speed=self._tcp_speed,   # z1 & gripper 방향 동시 이동
                                             mvacc=self._tcp_acc, radius=20.0, wait=True)
                 if not self._check_code(code, 'set_position'):
                     return
             elif aruco_y < 0:
+                code = self._arm.set_position(*[aruco_x, aruco_y, 359.1, 43.8, -88.5, 46.2], speed=self._tcp_speed,     # 컵과 충돌 방지를 위한 way point, z1 & gripper 방향 동시 이동
+                                            mvacc=self._tcp_acc, radius=20.0, wait=True)
+                if not self._check_code(code, 'set_position'):
+                    return                
                 code = self._arm.set_position(*[aruco_x, aruco_y, 153, 43.8, -88.5, 46.2], speed=self._tcp_speed,     # z1 & gripper 방향 동시 이동
                                             mvacc=self._tcp_acc, radius=20.0, wait=True)
                 if not self._check_code(code, 'set_position'):
