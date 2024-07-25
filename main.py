@@ -1,4 +1,4 @@
-# git push test
+# git push test 
 
 import sys
 from PyQt5.QtWidgets import *
@@ -15,18 +15,20 @@ import time
 import urllib.request
 import pygame
 
+uipath = '/home/messi/ws_amr/qt/'
+
 # UI 파일 경로 설정
-ui_file = os.path.join('/home/messi/ws_amr/qt/', "Title.ui")
-ui_file2 = os.path.join('/home/messi/ws_amr/qt/', "Loading.ui")
-ui_Direction = os.path.join('/home/messi/ws_amr/qt/', "Direction.ui")
-ui_Recommend = os.path.join('/home/messi/ws_amr/qt/', "Recommend_kor.ui")
-ui_Preparing = os.path.join('/home/messi/ws_amr/qt/', "Preparing.ui")
-ui_Making = os.path.join('/home/messi/ws_amr/qt/', "Making.ui")
-ui_Maked = os.path.join('/home/messi/ws_amr/qt/', "Maked.ui")
-ui_Coupon = os.path.join('/home/messi/ws_amr/qt/', "Coupon.ui")
-ui_Payment = os.path.join('/home/messi/ws_amr/qt/', "Payment.ui")
-ui_Bye = os.path.join('/home/messi/ws_amr/qt/', "Bye.ui")
-ui_Empty = os.path.join('/home/messi/ws_amr/qt/', "Empty.ui")
+ui_file = os.path.join(uipath, "Title.ui")
+ui_file2 = os.path.join(uipath, "Loading.ui")
+ui_Direction = os.path.join(uipath, "Direction.ui")
+ui_Recommend = os.path.join(uipath, "Recommend_kor.ui")
+ui_Preparing = os.path.join(uipath, "Preparing.ui")
+ui_Making = os.path.join(uipath, "Making.ui")
+ui_Maked = os.path.join(uipath, "Maked.ui")
+ui_Coupon = os.path.join(uipath, "Coupon.ui")
+ui_Payment = os.path.join(uipath, "Payment.ui")
+ui_Bye = os.path.join(uipath, "Bye.ui")
+ui_Empty = os.path.join(uipath, "Empty.ui")
 
 from_class = uic.loadUiType(ui_file)[0]
 from_class2 = uic.loadUiType(ui_file2)[0]
@@ -84,7 +86,7 @@ class MainWindow(QMainWindow):
 
         # 버튼 설정
         self.pushButton = QPushButton('주문\n\nOrder Now', self)
-        self.pushButton.setGeometry(1600, 800, 180, 180)  # 버튼 위치와 크기 설정
+        self.pushButton.setGeometry(1400, 600, 360, 360)  # 버튼 위치와 크기 설정
 
         # 버튼 스타일 설정
         self.pushButton.setStyleSheet("""
@@ -327,8 +329,8 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         self.pushButton_rec.clicked.connect(self.open_Prepare_window_rec)
 
 
-            ## 챗지피티 시작
-        self.yesno = 1
+        
+        self.yesno = 0
         
         
         self.initUI()
@@ -436,7 +438,7 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         self.speechorder_dialog.show()
 
 
-        self.recognize = 1 # 음성인식 유무
+        self.recognize = 0 # 음성인식 유무 ## 인식 창 안꺼짐
 
         ## 인식 기회 1번
         if self.recognize == 1:
@@ -905,3 +907,4 @@ if __name__ == '__main__':
 ## Recommend와 Preparing 사이 warning box 표시
 # 제조중 박스 두개 카운트, 그리고 색깔 변화
 ## gif 파일 다른 것 찾기, 자꾸 로드 오류남
+
