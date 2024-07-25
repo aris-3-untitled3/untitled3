@@ -14,20 +14,13 @@
    <string>Dialog</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QPushButton {
-    color: #3E2723; /* 다크 브라운 글씨 색 */
-    background-color: #FFEBEE; /* 라이트 핑크 배경 */
-    font-size: 20px; /* 글씨 크기 */
-    border: 2px solid #F48FB1; /* 핑크 테두리 */
-    border-radius: 45px; /* 둥근 모서리 */
-    padding: 10px;
-}</string>
+   <string notr="true"/>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
      <x>840</x>
-     <y>90</y>
+     <y>100</y>
      <width>281</width>
      <height>141</height>
     </rect>
@@ -47,7 +40,7 @@
    <property name="geometry">
     <rect>
      <x>250</x>
-     <y>310</y>
+     <y>260</y>
      <width>321</width>
      <height>211</height>
     </rect>
@@ -73,17 +66,17 @@
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:20px; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:24pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;아이스크림을&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;가져온다랑&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;1. 아이스크림을&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;가져온다&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>1500</x>
-     <y>800</y>
-     <width>160</width>
-     <height>120</height>
+     <x>1430</x>
+     <y>630</y>
+     <width>360</width>
+     <height>360</height>
     </rect>
    </property>
    <property name="font">
@@ -92,12 +85,16 @@ p, li { white-space: pre-wrap; }
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">QPushButton#nextButton {
-    background-color: #32CD32; /* 초록색 배경 */
-    color: white; /* 흰색 글씨 */
-    border: 2px solid #32CD32;
-    border-radius: 10px; /* 둥근 모서리 */
+    <string notr="true">QPushButton {
+    color: #3E2723; /* 다크 브라운 글씨 색 */
+    background-color: #FFEBEE; /* 라이트 핑크 배경 */
+    font-size: 32px; /* 글씨 크기 */
+    border: 2px solid #F48FB1; /* 핑크 테두리 */
+    border-radius: 45px; /* 둥근 모서리 */
     padding: 10px;
+}
+QPushButton:hover{
+	background-color: #FFC0CB
 }</string>
    </property>
    <property name="text">
@@ -108,7 +105,7 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>760</x>
-     <y>310</y>
+     <y>260</y>
      <width>321</width>
      <height>211</height>
     </rect>
@@ -134,15 +131,15 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:20px; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:24pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;종이를&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;2. 아래 종이를&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;제거한다&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <widget class="QTextBrowser" name="textBrowser_5">
    <property name="geometry">
     <rect>
-     <x>1260</x>
-     <y>310</y>
+     <x>1300</x>
+     <y>260</y>
      <width>321</width>
      <height>211</height>
     </rect>
@@ -168,7 +165,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:20px; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:24pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;위치에&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;3. 원하는 위치에&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt;&quot;&gt;놓는다&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
@@ -176,23 +173,22 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>770</y>
-     <width>270</width>
-     <height>75</height>
+     <y>520</y>
+     <width>360</width>
+     <height>210</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">QPushButton#cancelButton {
-    background-color: #A9A9A9; /* 다크 그레이 배경 */
-    color: white; /* 흰색 글씨 */
-    border: 2px solid #696969;
-    border-radius: 15px; /* 둥근 모서리 */
+    <string notr="true">QPushButton {
+    color: #3E2723; /* 다크 브라운 글씨 색 */
+    background-color: #FFEBEE; /* 라이트 핑크 배경 */
+    font-size: 32px; /* 글씨 크기 */
+    border: 2px solid #F48FB1; /* 핑크 테두리 */
+    border-radius: 45px; /* 둥근 모서리 */
     padding: 10px;
-    font-size: 18px; /* 글씨 크기 */
 }
-
-QPushButton#cancelButton:hover {
-    background-color: #808080; /* 호버 시 더 진한 다크 그레이 배경 */
+QPushButton:hover{
+	background-color: #FFC0CB
 }</string>
    </property>
    <property name="text">
@@ -203,18 +199,22 @@ QPushButton#cancelButton:hover {
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>860</y>
-     <width>270</width>
-     <height>75</height>
+     <y>790</y>
+     <width>360</width>
+     <height>210</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">QPushButton#cancelButton {
-    background-color: #D3D3D3; /* 회색 배경 */
-    color: black; /* 검정 글씨 */
-    border: 2px solid #D3D3D3;
-    border-radius: 10px; /* 둥근 모서리 */
+    <string notr="true">QPushButton {
+    color: #3E2723; /* 다크 브라운 글씨 색 */
+    background-color: #FFEBEE; /* 라이트 핑크 배경 */
+    font-size: 32px; /* 글씨 크기 */
+    border: 2px solid #F48FB1; /* 핑크 테두리 */
+    border-radius: 45px; /* 둥근 모서리 */
     padding: 10px;
+}
+QPushButton:hover{
+	background-color: #FFC0CB
 }</string>
    </property>
    <property name="text">
