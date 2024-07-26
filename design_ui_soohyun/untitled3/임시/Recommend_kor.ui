@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1920</width>
+    <height>1280</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QPushButton {
+    border: 2px solid #1E90FF;  /* 테두리 색상: DodgerBlue */
+    border-radius: 10px;        /* 둥근 테두리 */
+    padding: 5px;               /* 버튼 내부 여백 */
+    background-color: #F0F8FF;  /* 배경 색상: AliceBlue */
+}
+
+QPushButton:hover {
+    border: 2px solid #00BFFF;  /* 마우스 올렸을 때 테두리 색상: DeepSkyBlue */
+    background-color: #E6F2FF;  /* 마우스 올렸을 때 배경 색상 */
+}
+</string>
+  </property>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+<<<<<<< HEAD
+     <x>550</x>
+     <y>120</y>
+     <width>1211</width>
+=======
+     <x>700</x>
+     <y>60</y>
+     <width>531</width>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
+     <height>161</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>32</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+<<<<<<< HEAD
+    <string>아이스크림과 토핑을  하나씩 선택해주세요.</string>
+=======
+    <string>아이스크림과 토핑 조합을
+    하나씩 선택해주세요.</string>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_1">
+   <property name="geometry">
+    <rect>
+     <x>540</x>
+     <y>290</y>
+     <width>200</width>
+     <height>200</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>23</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="text">
+    <string>초코</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_2">
+   <property name="geometry">
+    <rect>
+     <x>820</x>
+     <y>290</y>
+     <width>200</width>
+     <height>200</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>23</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="text">
+    <string>바닐라</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_3">
+   <property name="geometry">
+    <rect>
+     <x>1100</x>
+     <y>290</y>
+     <width>200</width>
+     <height>200</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>23</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="text">
+    <string>딸기</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_4">
+   <property name="geometry">
+    <rect>
+     <x>1100</x>
+     <y>520</y>
+     <width>200</width>
+     <height>200</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>23</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="text">
+    <string>토핑3</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_5">
+   <property name="geometry">
+    <rect>
+     <x>820</x>
+     <y>520</y>
+     <width>200</width>
+     <height>200</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>23</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="text">
+    <string>토핑B</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_6">
+   <property name="geometry">
+    <rect>
+     <x>540</x>
+     <y>530</y>
+     <width>200</width>
+     <height>200</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>23</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="text">
+    <string>토핑A</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>1500</x>
+     <y>800</y>
+     <width>160</width>
+     <height>120</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+<<<<<<< HEAD
+     <pointsize>-1</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    color: #3E2723; /* 다크 브라운 글씨 색 */
+    background-color: #FFEBEE; /* 라이트 핑크 배경 */
+    font-size: 28px; /* 글씨 크기 */
+    border: 2px solid #F48FB1; /* 핑크 테두리 */
+    border-radius: 15px; /* 둥근 모서리 */
+    padding: 10px;
+}</string>
+   </property>
+=======
+     <pointsize>23</pointsize>
+    </font>
+   </property>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
+   <property name="text">
+    <string>다음</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>610</x>
+     <y>770</y>
+     <width>821</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>24</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_back">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>740</y>
+     <width>270</width>
+     <height>75</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+<<<<<<< HEAD
+     <pointsize>-1</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    color: #3E2723; /* 다크 브라운 글씨 색 */
+    background-color: #FFEBEE; /* 라이트 핑크 배경 */
+    font-size: 28px; /* 글씨 크기 */
+    border: 2px solid #F48FB1; /* 핑크 테두리 */
+    border-radius: 15px; /* 둥근 모서리 */
+    padding: 10px;
+}</string>
+   </property>
+=======
+     <pointsize>23</pointsize>
+    </font>
+   </property>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
+   <property name="text">
+    <string>뒤로가기</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_home">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>850</y>
+     <width>270</width>
+     <height>75</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+<<<<<<< HEAD
+     <pointsize>-1</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    color: #3E2723; /* 다크 브라운 글씨 색 */
+    background-color: #FFEBEE; /* 라이트 핑크 배경 */
+    font-size: 28px; /* 글씨 크기 */
+    border: 2px solid #F48FB1; /* 핑크 테두리 */
+    border-radius: 15px; /* 둥근 모서리 */
+    padding: 10px;
+}</string>
+   </property>
+=======
+     <pointsize>23</pointsize>
+    </font>
+   </property>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
+   <property name="text">
+    <string>초기화면</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_rec">
+   <property name="geometry">
+    <rect>
+     <x>1500</x>
+     <y>650</y>
+     <width>160</width>
+     <height>120</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+<<<<<<< HEAD
+     <pointsize>-1</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    color: #3E2723; /* 다크 브라운 글씨 색 */
+    background-color: #FFEBEE; /* 라이트 핑크 배경 */
+    font-size: 28px; /* 글씨 크기 */
+    border: 2px solid #F48FB1; /* 핑크 테두리 */
+    border-radius: 15px; /* 둥근 모서리 */
+    padding: 10px;
+}</string>
+   </property>
+=======
+     <pointsize>23</pointsize>
+    </font>
+   </property>
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
+   <property name="text">
+    <string>추천</string>
+   </property>
+  </widget>
+<<<<<<< HEAD
+  <widget class="QFrame" name="frame">
+   <property name="geometry">
+    <rect>
+     <x>-40</x>
+     <y>-40</y>
+     <width>1920</width>
+     <height>1080</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QFrame {
+    background-image: url(/home/messi/ws_amr/qt/dall.jpg); /* 배경 이미지 설정 */
+    background-position: center; /* 이미지 중앙 정렬 */
+    background-repeat: no-repeat; /* 이미지 반복 안함 */
+}</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <zorder>frame</zorder>
+  <zorder>label</zorder>
+  <zorder>pushButton_1</zorder>
+  <zorder>pushButton_2</zorder>
+  <zorder>pushButton_3</zorder>
+  <zorder>pushButton_4</zorder>
+  <zorder>pushButton_5</zorder>
+  <zorder>pushButton_6</zorder>
+  <zorder>pushButton</zorder>
+  <zorder>label_2</zorder>
+  <zorder>pushButton_back</zorder>
+  <zorder>pushButton_home</zorder>
+  <zorder>pushButton_rec</zorder>
+=======
+>>>>>>> e2d22b578d05ffa555fb18abfd472a9ab518aac9
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
