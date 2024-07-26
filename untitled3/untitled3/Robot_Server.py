@@ -5,57 +5,222 @@ from untitled_msgs.srv import ServiceString
 import time
 import threading
 
+# 0. Human_detect  -(토픽)> Server : No_Human (사람없음) / UI -(토픽)>Server : back_to_home (버튼클릭) 
+# 	(- Server -(토픽)> Robot_Control , Voice_out , Hand_Input , Cup_detect , Container_detect : STOP!)
+# Server -(토픽)> Human_detect :  사람 감지 시작
+# Server -(토픽)> Hand_Input : 손인식 시작
+# Server -(토픽)> Voice_out : "잔잔한 bgm"
 
-### 대기 상태
-    # 사람감지 여부 (사람 or not) : 토픽 : Guest_detect -> Robot_Server 
-        # 호객행위 여부 (호객 or stop) : 토픽 : Robot_Server -> Robot_Control
+# ---------------------------------------------------------------------------------------------------------------------
+# 1.Human_detect  -(토픽)> Server : human_detect (사람 감지)
+# 	(- Server -(토픽)> Robot_Control , Voice_out , Hand_Input , Cup_detect , Container_detect : STOP!)
+# Server -(토픽)> Robot_Control : 호객행위
+# Server -(토픽)> Voice_out :  "어서오세요 맛있는 아이스크림이 기다려요!" + "밝은 bgm" (multithread)
 
-    # 손님 감지 : 토픽 : Guest_detect -> Robot_Server   
-        # 3초 정면 대기 : 토픽 : Robot_Server -> UI
-        # 호객행위 중지 : 토픽 : Robot_Server -> Robot_Control
+# ---------------------------------------------------------------------------------------------------------------------
+# 2. Human_detect(stop) -(토픽)> Server : guest_detect (손님 감지) / Hand_Input -(토픽)> Server : guest_detect (손인사)
+# Server -(토픽)> Voice_out,  Human_detect : STOP 
+# Server -(토픽)> Robot_Control : 호객행위 정지 (set_state(3)) (대기상태 복귀)
+# Server -(토픽)> UI : 로딩화면
+# Server -(서비스)> Voice_out : "안녕하세요 아이스크림가게에 오신걸 환영합니다 ! 3초만 대기해주세요"
+# Server -(토픽)> Guest_detect : 성별,연령대 판별 (응답 - 성별,연령대) (변수 저장)
 
-### 손님인지 상태
-    # 손님 인지 여부 (성별,연령대 or not) : 토픽 : Guest_detect -> Robot_Server 
-        # 인사문구 (or 복귀): 토픽 : Robot_Server -> UI
-        # 환영인사 : 서비스 : Robot_Server -> Robot_Control
-        # 메뉴얼 시작: 토픽 : Robot_Server -> UI
-            # 손님 성별,연령대: 서비스 : UI -> DB_Manager
-            # 음성 받기: 서비스 : UI -> Voice_Input (or 마우스 클릭)
+# ------------------------------------------------------------------------------------------------------------------------
+# 3. Guest_detect(stop) -(토픽)> Server : guest_confirm (손님 맞이) (성별,연령대) / UI -(토픽)> Server : back_to_manual (버튼클릭)
+# 	(- Server -(토픽)> Robot_Control , Voice_out , Cup_detect : STOP!)
+# Server  -(토픽)-> UI : 사용법 설명 화면
+# Server  -(서비스)-> Voice_out : "사용법은~ , 다음으로 넘어가겠습니까?" + "성별,연령대에 맞는 bgm" (multithread)
+# Server -(서비스)> Voice_input : 음성인식 (응답 : 네 or 아니)
+# 			if "네" : Server -(서비스)> Voice_out  "다음 페이지로 넘어가겠습니다"
+# 				    (next_to_recommend)
+# 			else : Server -(토픽)> Voice_out  "마우스를 클릭해주세요"			
+# 				  (반복) Server -(서비스)> Human_detect :  (reamain) 20초동안 사람감지 
+# 					if "있음" : Server -(토픽)> Voice_out  "마우스를 클리개해주세요!" + return
+# 					else : "없음" : No_Human (사람없음)
+# --------------------------------------------------------------------------------------------------------
+# 4. UI -(토픽)> Server : next_to_recommend (버튼클릭) / UI -(토픽)> Server : back_to_recommend (버튼클릭)  
+# 	(- Server -(토픽)> Robot_Control , Voice_out , Cup_detect , Container_detect : STOP!)
+#   DB_Manager : 성별,연령대에 따른 맛 선호도 (아이스크림맛,토핑맛)
+#   Server -(토픽)> UI : 메뉴 화면 (+맛 선호도)
+#   Server -(서비스)> Voice_out : "추천메뉴는 ~ 선택하시겠습니까?"(+ 맛 선호도) 
+#    Server -(서비스)> Voice_input : 음성인식 (응답 : 네 or 아니요)
+# 			if "네"
+#   Server -(토픽)> UI  : 추천메뉴 색깔 진하게
+#   Server -(토픽)> Voice_out  "~맛,~맛으로 선택하셨습니다"
+#   (next_to_preproduction)
+#   else
+#   Server -(서비스)> Voice_out : "어떤 메뉴를 선택하겠습니까?"
+#   Server -(서비스)> Voice_input : 음성인식 (응답 : 아이스크림맛,토핑맛)
+# 		if "맛"
+# 		Server -(토픽)> Voice_out  "~맛,~맛으로 선택하셨습니다"
+# 		(next_to_preproduction)
+# 		else 
+# 		Server -(토픽)> Voice_out  "마우스를 클릭하셔서 선택하여 주세요"
+# 		(반복) Server -(서비스)> Human_detect :  (reamain) 20초동안 사람감지 
+# 				if "있음" : Server -(토픽)> Voice_out  "마우스를 클리개해주세요!" + return
+# 				else : "없음" : No_Human (사람없음)
+# ----------------------------------------------------------------------------------
+# 5. UI -(토픽)> Server : next_to_preproduction (버튼클릭) 
+# 	(- Server -(토픽)> Voice_out : STOP!)
+# Server -(토픽)> UI : 제조 준비 화면
+# Server -(서비스)> Voice_out : "쓰레기를 확인하겠습니다"
+# Server -(서비스)> Cup_detect : "쓰레기 감지" (감지 , 좌표 / 노감지)
+# 	if "감지" : Server -(서비스)> Voice_out : "쓰레기를 처리하겠습니다."
+# 			Server -(서비스?)> Robot_Control : 쓰레기 처리 (x,y 좌표로 이동 , 그리퍼 180도 회전 , z축 내리기 , 집기 , 쓰레기통이동 , 버리기 , 원래상태 복귀) 
+# 	else :
+# 			Server -(서비스)> Voice_out : "쓰레기가 없습니다."
+# Server -(서비스)> Voice_out : "아이스크림을 제조하기 전 아이스크림 통을 가져오기 바랍니다" 
+# Server -(서비스)> Container_Sealing_detect : 1분간 아이스크림 통 감지 시작 (감지 or 노감지)
+# 	if "감지" : next_to_making
+# 	else : No_Human (사람없음)
+# --------------------------------------------------------------------------------------
+# 6. Container_Sealing_detect -(토픽)> Server : next_to_making (통 감지)
+# 	(- Server -(토픽)> Voice_out , Hand_Input , Container_Sealing_detect : STOP!)
+# Server -(토픽)> UI : 제조 시작 화면
+# Server -(서비스)> Voice_out : "제조를 시작하겠습니다"
+# Server -(토픽)> UI : 제조 중 화면
+# Server -(서비스)> Robot_Control : 실링 확인
+# Server -(서비스)> Voice_out : "실링을 확인하겠습니다"
+# Server -(서비스)> Container_Sealing_detect : 3초간 실링 확인 
+# 	if "없음" : Server -(서비스)> Voice_out : "실링이 제거 되었습니다"			
+# 			Server -(토픽)> Hand_Interrupt : 손감지
+# 			Server -(서비스?)> Robot_Control : 아이스크림 제조 (통 놓기 , 컵 올리기 , 컵 가져오기 , 토핑위치에 놓기 , 토핑 뿌리기 , 아이스크림 내리기 , 컵 원위치)
+# 			Server -(토픽)> UI : 제조 완료 화면
+# 			Server -(서비스)> Voice_out : "아이스크림이 제조완료 되었습니다 , 다음으로 넘어가겠습니까?"
+# 			Server -(서비스)> Voice_input : 음성인식 (응답 : 네 or 아니)
+# 				if "네"
+# 					Server -(서비스)> Voice_out : "다음으로 넘어가겠습니다"
+# 					(next_to_Coupon)
+# 				else :
+# 					Server -(서비스)> Voice_out : "마우스를 클릭해 주세요"
+# 	(반복) Server -(서비스)> Human_detect :  (reamain) 20초동안 사람감지 
+# 							if "있음" :  Server -(토픽)> Voice_out  "마우스를 클리개해주세요!" + return
+# 							else : "없음" : ALART (도둑)
+# 	else:
+# 		Server -(서비스)> Voice_out : "실링을 제거해주세요"
+# 		Server -(서비스)> Robot_Control : 원위치 전달 (다시 반복)
+# 6.1 Hand_Interrupt -(토픽)>  Server : 손감지 O
+# Server -(토픽)> Robot_Control : set_state(3)
+# Server -(서비스)> Voice_out : "방해하지 마라!"
+# 6.2 Hand_Interrupt -(토픽)>  Server : 손감지 X (방해 후)
+# Server -(토픽)> Robot_Control : set_state(0)
+# Server -(서비스)> Voice_out : "다시 시작하겠습니다!"
+# --------------------------------------------------------------------------------------
+# 7.Robot_Control -(토픽)> Server :  next_to_coupon (아이스크림 제조 후) , UI -(토픽)> Server : back_to_coupon (버튼클릭)
+# 	(- Server -(토픽)> Robot_Control , Voice_out , Cup_detect , Container_detect : STOP!)
+# Server -(토픽)> UI : 쿠폰 화면
+# Server - (서비스) >  Guest_detect ; 3초간 사용자 판단
+# 		if "사용자" :
+# 			Server -(서비스)> Voice_out : "안녕하세요 00시 , 자동으로 쿠폰 적립하겠습니다."
+# 			(next_to_payment)
+# 		else : 
+# 	Server -(토픽)> Hand_Input : 손인식 시작 (전 화면 , 결제 , 등록X)
+# 	Server -(서비스)> Voice_out : "쿠폰을 등록하셔서 10개가 모이면 아이스크림 1개가 공짜입니다 . 사용자 등록 하시겠습니까?"
+# 	Server -(서비스)> Voice_input : 음성인식 (응답 : 네 or 아니)
+# if "네" : 
+# 	Server -(서비스)> Voice_out : "사용자를 등록하겠습니다 , 번호를 등록해 주세요"
+# 	(반복) Server -(서비스)> Human_detect :  (reamain) 20초동안 사람감지 
+# if "있음" :  Server -(토픽)> Voice_out  "마우스를 클리개해주세요!" + return
+# else : "없음" : ALART (도둑)
+# else :
+# Server -(서비스)> Voice_out : "마우스를 이용해 쿠폰 등록 여부를 설정해주세요"
+# (반복) Server -(서비스)> Human_detect :  (reamain) 20초동안 사람감지 
+# if "있음" :  Server -(토픽)> Voice_out  "마우스를 클리개해주세요!" + return
+# else : "없음" : ALART (도둑)
+# ---------------------------------------------------------------------------------------------------------
+# 8. UI -(토픽)> Server : next_to_payment (버튼클릭)
+# 	(- Server -(토픽)> Robot_Control , Voice_out , Cup_detect , Container_detect : STOP!)
+# Server -(토픽) > Guest_registration (사용자에 따라서)
+# Server -(토픽)> UI : 결제 화면
+# Server -(서비스)> Voice_out : "가위바위보를 해서 이기면 쿠폰 +2 , 비기면 +1 지면 +0 , 하시겠습니까?"
+# Server -(서비스)> Voice_input : 음성인식 (응답 : 네 or 아니)
+# if "네"
+# Server -(토픽)> Hand_Input : stop
+# Server -(토픽)> UI : 가위 바위 보 화면
+# Server -(서비스)> Voice_out : "가위바위보!!"
+#  Server -(서비스)> Hand_Input : 가위바위보 3초간 감지
+# if "이김"
+# Server -(토픽)> UI : 쿠폰+2 , "환호장면"
+# Server -(서비스)> Voice_out : "가위바위보 못하시네요?"
+# Server -(토픽)> UI : 원상태 복귀
+# elif "비김"
+# Server -(토픽)> UI : 쿠폰 +1 , "아쉬움"
+# Server -(서비스)> Voice_out : "비기다니 아쉽네요"
+# Server -(토픽)> UI : 원상태 복귀
+# else "짐"
+# Server -(토픽)> ui : ""우울"
+# Server -(서비스)> Voice_out : "내가 지다니..."
+# Server -(토픽)> UI : 원상태 복귀
+# else:
+# Server -(서비스)> Voice_out : "재미없어!!!"
+# if "쿠폰 10개이상"
+# Server -(서비스)> Voice_out : 쿠폰을 사용하시겠습니까?"
+# Server -(서비스)> Voice_input : 음성인식 (응답 : 네 or 아니)
+# if "네"
+# Server -(토픽)> UI : 쿠폰사용
+# Server -(서비스)> Voice_out : "쿠폰을 사용하셨습니다. 결제하시겠습니까?
+# Server -(서비스)> Voice_input : 음성인식 (응답 : 네 or 아니)
+# if "네"
+# Server -(토픽)> UI : 결제 장면
+# DB_manager : 가격 (아이스크림,토핑)
+# Server -(서비스)> Voice_out : 결제를 완료해 주세요"
+# else
+# Server -(서비스)> Voice_out : 마우스를 클릭해주세요"
+# (반복) Server -(서비스)> Human_detect :  (reamain) 20초동안 사람감지 
+# if "있음" :  Server -(토픽)> Voice_out  "마우스를 클리개해주세요!" + return
+# else : "없음" : ALART (도둑)
+# elif "아니요"
+# Server -(토픽)> UI : 쿠폰 사용X
+# Server -(서비스)> Voice_out : "쿠폰을 사용하지 않으셨습니다. 결제하시겠습니까?
+# Server -(서비스)> Voice_input : 음성인식 (응답 : 네 or 아니)
+# if "네"
+# Server -(토픽)> UI : 결제 장면
+# DB_manager : 가격 (아이스크림,토핑)
+# Server -(서비스)> Voice_out : 결제를 완료해 주세요"
+# else
+# Server -(서비스)> Voice_out : 마우스를 클릭해주세요"
+# (반복) Server -(서비스)> Human_detect :  (reamain) 20초동안 사람감지 
+# if "있음" :  Server -(토픽)> Voice_out  "마우스를 클리개해주세요!" + return
+# else : "없음" : ALART (도둑)
+# 8.1 UI -(토픽)> Server : next_to_payment2 (버튼클릭) / Hand_Input -(토픽)> Server : next_to_payment2 (손)
+# 	(- Server -(토픽)> Robot_Control , Voice_out , Cup_detect , Container_detect : STOP!)
+# Server -(서비스)> Voice_out : "결제하시겠습니까?
+# Server -(서비스)> Voice_input : 음성인식 (응답 : 네 or 아니)
+# if "네"
+# Server -(토픽)> UI : 결제 장면
+# DB_manager : 가격 (아이스크림,토핑)
+# Server -(서비스)> Voice_out : 결제를 완료해 주세요"
+# else
+# Server -(서비스)> Voice_out : 마우스를 클릭해주세요"
+# (반복) Server -(서비스)> Human_detect :  (reamain) 20초동안 사람감지 
+# if "있음" :  Server -(토픽)> Voice_out  "마우스를 클리개해주세요!" + return
+# else : "없음" : ALART (도둑)
+# -------------------------------------------------------------------------------------------------
+# DB_Manager : 손님정보 , 일 매출 , 재고량
+# Server -(토픽)> UI : 마지막 장면
+# Server -(토픽)> Robot_Control : 작별 인사
+# Server -(서비스)> Voice_out : "안녕히 가십시오!"
+# Server -(토픽)> Robot_Control : 중지
+# Server -(서비스)> Voice_out : "마무리 작업을 하겠습니다. 쓰레기를 확인하겠습니다"
+# Server -(서비스)> Cup_detect : "쓰레기 감지" (감지 , 좌표 / 노감지)
+# 	if "감지" : Server -(서비스)> Voice_out : "쓰레기를 처리하겠습니다."
+# 			Server -(서비스?)> Robot_Control : 쓰레기 처리 (x,y 좌표로 이동 , 그리퍼 180도 회전 , z축 내리기 , 집기 , 쓰레기통이동 , 버리기 , 원래상태 복귀) 
 
-    # 제조 준비 : 토픽 : UI -> Robot_Server
-        # 쓰레기 감지 (ArCUoMarker 좌표) : 서비스 : Robot_Server -> Cup_detect
-        # 쓰레기 전달 : 서비스 : Robot_Server -> UI (음성대기)
-        # 쓰레기 청소 : 서비스 : Robot_Server -> Robot_Control 
-        # 쓰레기 청소 끝 및 아이스크림 대기 : 토픽 : Robot_Server -> UI
-
-### 제조 상태
-    # 아이스크림 감지 (무게?) : 토픽 : Robot_Control -> Robot_Server  
-        # 아이스크림 준비 : 서비스 : Robot_Server -> UI (음성대기)
-        # 아이스크림 제조 시작 : 토픽 : Robot_Server -> Robot_Control
-
-### 완료 상태
-    # 아이스크림 제조 완료 : 토픽 : Robot_Control -> Robot_Server
-        # 제조 완료 : 토픽 : Robot_Server -> UI 
-            # 쿠폰 개수 : 서비스 : UI -> DB_Manager
-            # 맛 가격 : 서비스 : UI -> DB_Manager
-            # 일 매출 : 서비스 : UI -> DB_Manager
-
-    # 마무리 상황 : 토픽 : UI -> Robot_Server
-        # 작별 문구 : 토픽 : Robot_Server -> UI
-        # 작별 인사 : 서비스 : Robot_Server -> Robot_Control
-        # 쓰레기 감지 (ArCUoMarker 좌표) : 서비스 : Robot_Server -> Cup_detect
-        # 쓰레기 전달 : 서비스 : Robot_Server -> UI (음성대기)
-        # 쓰레기 청소 및 토핑 무게 확인 : 서비스 : Robot_Server -> Robot_Control  
-        # 토핑 무게 전달 및 쓰레기 청소 완료 : 토픽 : Robot_Server -> UI
-            # 토핑 재고량 전달 : 서비스 : UI -> DB_Manager
-
-### 통신 정리
-    # Robot_Server <(토픽)- Guest_detect (사람감지 , 손님감지 , 손님인지)
-    #                      Robot_Control (아이스크림 감지 , 아이스크림 제조 완료)
-    #                      UI (제조 준비 , 마무리 상황)
-    # Robot_Server -(토픽)> Robot_Control , UI 
-    # Robot_Server -(서비스)> - Robot_Control , UI , Cup_detect
-    # UI -(서비스)> DB_Manager , Voice_Input
+# 	else :
+# 			Server -(서비스)> Voice_out : "쓰레기가 없습니다."
+# DB_Manager : 재고량 확인
+# if "있음"
+# (back_to_home)
+# else:
+# Server -(토픽)> UI : 재고량 없는거 알림
+# Server -(서비스)> Voice_out : "재고량이 부족합니다. 관리자에게 문의하십시오"
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 10. UI -(토픽)> Server : ALART (도둑)
+# Server -(토픽)> UI : 마지막 장면 (+ 도둑놈 얼굴 표시)
+# Server -(서비스)> Voice_out : "도둑놈 잡아라!!!" + bgm "알림"
+# 2번 반복 후 
+# DB_Manager : 손님정보 , 일 매출 , 재고량 
+# (back_to_home)
 
 
 class RobotServer(Node):

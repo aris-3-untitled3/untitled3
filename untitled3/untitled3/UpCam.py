@@ -8,7 +8,11 @@ class UpCam(Node):
     def __init__(self):
         super().__init__('UpCam')
 
-        self.cap = cv2.VideoCapture(0)
+        self.cap = self.find_video_capture_device()
+
+        if self.cap is None:
+            self.get_logger().error('No video capture device found.')
+            return
 
         # Publisher to /UpCam
         self.publisher = self.create_publisher(Image, '/UpCam', 10)
@@ -16,6 +20,15 @@ class UpCam(Node):
         self.bridge = CvBridge()
 
         self.timer = self.create_timer(0.1, self.send_webcam_image)
+
+    def find_video_capture_device(self):
+        for i in range(10):  # Check the first 10 video devices
+            cap = cv2.VideoCapture(i)
+            if cap.isOpened():
+                self.get_logger().info(f'Video capture device found at index {i}')
+                return cap
+            cap.release()
+        return None
 
     def send_webcam_image(self):
         ret, frame = self.cap.read()

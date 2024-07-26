@@ -49,8 +49,11 @@ class HumanDetect(Node):
         self.human_detected = False
         self.far_human_detected = False
         self.no_human_detected = False
-        self.loop_running = False  # Detecting motion
+        self.loop_running = False  
         self.frame = None
+        self.annotated_frame = None
+
+        threading.Thread(target=self.display_frames).start()
 
     # Load YOLOv5 model
     def load_model(self):
@@ -142,24 +145,40 @@ class HumanDetect(Node):
         while self.loop_running:
             if self.frame is not None:
                 results = self.model(self.frame)
-                annotated_frame = results.render()[0]
-                annotated_frame = np.array(annotated_frame, copy=True)
+                self.annotated_frame = results.render()[0]
+                self.annotated_frame = np.array(self.annotated_frame, copy=True)
 
-                self.process_detections(results.xyxy[0], annotated_frame)
+                self.process_detections(results.xyxy[0], self.annotated_frame)
+            else:
+                self.get_logger().warning("No frame!")
 
     def robot_server_callback(self, msg):
         if msg.command == "start":
             self.get_logger().info('Starting detection!')
             self.loop_running = True  # start loop
-            self.thread = threading.Thread(target=self.run)
-            self.thread.start()
+            self.run()
+            
         elif msg.command == "stop":
             self.get_logger().info('Stopping detection!')
             self.loop_running = False  # Stop loop
-            if self.thread.is_alive():
-                self.thread.join()  # Wait for the thread to finish
         else:
             self.get_logger().error("ERROR")
+
+    def display_frames(self):
+        while True:
+            if self.annotated_frame is not None:  
+                cv2.imshow("Frame", self.annotated_frame)
+
+            else:
+                if self.frame is not None:
+                    cv2.imshow("Frame", self.frame)
+                else:
+                    self.get_logger().info("No frame available") 
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                cv2.destroyAllWindows()
+                self.loop_running = False # Stop loop
+                break
 
     def Webcam_callback(self, msg):
         try:

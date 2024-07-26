@@ -8,7 +8,7 @@ class FrontCam(Node):
     def __init__(self):
         super().__init__('FrontCam')
 
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(1)
 
         # Publisher to /FrontCam
         self.publisher = self.create_publisher(Image, '/FrontCam', 10)

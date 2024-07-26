@@ -1,67 +1,174 @@
-import cv2
-import torch
-from ultralytics import YOLO
+import rclpy as rp
+from rclpy.node import Node
+from untitled_msgs.msg import TopicString
+import time
+import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QStackedWidget
+from PyQt5 import uic
+from PyQt5.QtGui import QPixmap, QMovie
+from PyQt5.QtCore import pyqtSignal, QThread
+from PyQt5 import uic 
+import pygame
+import os
+import threading
+from untitled3.DB_manager import DB_Manager
 
-# YOLOv8 모델 파일의 경로 지정
-model_path = '/home/jchj/Untitled3/src/models/container_sealing.pt'
+# UI 파일 경로 설정
+ui_file = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Title.ui")
+ui_file2 = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Loading.ui")
+ui_Direction = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Direction.ui")
+ui_Recommend = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Recommend_kor.ui")
+ui_Preparing = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Preparing.ui")
+ui_Making = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Making.ui")
+ui_Maked = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Maked.ui")
+ui_Coupon = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Coupon.ui")
+ui_Payment = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Payment.ui")
+ui_Bye = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Bye.ui")
 
-# YOLOv8 모델 로드
-model = YOLO(model_path)
+from_class = uic.loadUiType(ui_file)[0]
+from_class2 = uic.loadUiType(ui_file2)[0]
+from_class_Direction = uic.loadUiType(ui_Direction)[0]
+from_class_Recommend = uic.loadUiType(ui_Recommend)[0]
+from_class_Preparing = uic.loadUiType(ui_Preparing)[0]
+from_class_Making = uic.loadUiType(ui_Making)[0]
+from_class_Maked = uic.loadUiType(ui_Maked)[0]
+from_class_Coupon = uic.loadUiType(ui_Coupon)[0]
+from_class_Payment = uic.loadUiType(ui_Payment)[0]
+from_class_Bye = uic.loadUiType(ui_Bye)[0]
 
-# 웹캠 캡처 초기화 (노트북 내장 웹캠 사용)
-cap = cv2.VideoCapture(0)
+class PyQt(Node):
+    # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
+    ui_update_signal = pyqtSignal(str)
 
-# 채도 및 명도 조절 함수
-def adjust_saturation_and_brightness(image, saturation_scale=1.0, brightness_offset=0):
-    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    h, s, v = cv2.split(hsv)
+    def __init__(self):
+        super().__init__('PyQt')
+
+        # Robot_Server에서 토픽 받기 (손님감지 / 성별,연령대 판별 / 아이스크림 제조 시작 / 아이스크림 제조 완료)
+        self.Robot_server_subscriber = self.create_subscription(
+            TopicString,
+            '/Server_to_UI',
+            self.Robot_Server_callback,
+            10
+        )
+
+        # prevent unused variable warning
+        self.Robot_server_subscriber
+
+        # Robot_Server로 토픽 퍼블리셔 (화면 전환)
+        self.robot_server_publisher = self.create_publisher(TopicString, '/UI_to_Server', 10)
+
+    def Robot_Server_callback(self, msg):
+        self.get_logger().info(f'Received command: {msg.command}')
+
+        if msg.command == "guest_detect":
+            self.main_window.open_LoadingWindow()
+        else:
+            return
+
+    def publish_message(self,msg):
+        self.get_logger().info('UI to Server!')
+
+        msg = TopicString()
+        msg.command = msg
+        self.robot_server_publisher.publish(msg)
+
+# 전체 UI 관리  
+class MainWindow(QMainWindow):
+    def __init__(self , node):
+        super().__init__(self)
+
+        self.stacked_widget = QStackedWidget(self)  # QStackedWidget 인스턴스 생성   
+        self.setCentralWidget(self.stacked_widget)  # MainWindow의 중앙 위젯으로 설정
+
+        self.node = node
+
+        self.open_FirstWindow()
+
+    def open_FirstWindow(self):
+        self.FirstWindow = FirstWindow(self)
+        self.stacked_widget.addWidget(self.FirstWindow)  # MainWindow 페이지를 stacked widget에 추가
+        self.stacked_widget.setCurrentWidget(self.FirstWindow)  # MainWindow 페이지를 보여줌
+        self.node.publish_message("open_First")
+
+    def open_LoadingWindow(self):
+        self.LoadingWindow = LoadingWindow(self)
+        self.stacked_widget.addWidget(self.LoadingWindow)  # LoadingWindow 페이지를 stacked widget에 추가
+        self.stacked_widget.setCurrentWidget(self.LoadingWindow)  # LoadingWindow 페이지를 보여줌
+        self.node.publish_message("open_Loading")
+
+
+class FirstWindow(QMainWindow, from_class):
+    # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
     
-    # 채도 조절
-    s = cv2.multiply(s, saturation_scale / 100.0)
-    s = cv2.min(s, 255)
+    def __init__(self,main_window):
+        super().__init__()
+        self.setupUi(self)
     
-    # 명도 조절
-    v = cv2.add(v, brightness_offset - 100)
-    v = cv2.min(v, 255)
-    v = cv2.max(v, 0)
+        self.load_image()
+
+        self.main_window = main_window
     
-    adjusted_hsv = cv2.merge([h, s, v])
-    adjusted_image = cv2.cvtColor(adjusted_hsv, cv2.COLOR_HSV2BGR)
-    return adjusted_image
+        self.pushButton.clicked.connect(self.next)
+        self.pushButton.clicked.connect(self.on_click)
 
-# 슬라이더 콜백 함수 (필요 없지만, OpenCV 슬라이더 생성을 위해 필요)
-def nothing(x):
-    pass
+    def load_image(self):
+        pixmap = QPixmap("/home/jchj/Untitled3/src/untitled3/UI/Title.jpg")
+        self.label_2.setPixmap(pixmap)
+        self.label_2.setScaledContents(True)
 
-# 윈도우 생성 및 슬라이더 추가
-cv2.namedWindow('Webcam')
-cv2.createTrackbar('Saturation', 'Webcam', 100, 200, nothing)  # 초기값 100, 범위 0-200
-cv2.createTrackbar('Brightness', 'Webcam', 100, 200, nothing)  # 초기값 100, 범위 0-200
+    def on_click(self):
+        threading.Thread(target=self.play_mp3).start()
 
-while True:
-    ret, img = cap.read()  # 웹캠에서 프레임 읽기
-    if not ret:
-        print("웹캠에서 프레임을 읽을 수 없습니다.")
-        break  # 프레임 읽기 실패 시 루프 종료
+    def play_mp3(self):
+        pygame.mixer.init()
+        pygame.mixer.music.load("/home/jchj/Untitled3/src/untitled3/UI/cat_like1b.mp3")
+        pygame.mixer.music.play()
 
-    # 슬라이더 값 읽기
-    saturation = cv2.getTrackbarPos('Saturation', 'Webcam')
-    brightness = cv2.getTrackbarPos('Brightness', 'Webcam')
+    def next(self):
+        self.main_window.open_LoadingWindow()
 
-    # 채도 및 명도 조절
-    adjusted_img = adjust_saturation_and_brightness(img, saturation_scale=saturation, brightness_offset=brightness)
-    
-    # YOLOv8 모델로 객체 감지
-    results = model(adjusted_img)
+class LoadingWindow(QMainWindow, from_class2):
+    # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
 
-    # 감지된 객체 주석 추가
-    for result in results:
-        adjusted_img = result.plot()  # YOLOv8은 plot 메서드를 제공하여 이미지를 주석 처리함
+    def __init__(self,main_window):
+        super().__init__()
+        self.setupUi(self)
 
-    cv2.imshow('Webcam', adjusted_img)  # 화면에 주석이 달린 프레임 표시
+        self.main_window = main_window
 
-    if cv2.waitKey(1) == ord('q'):  # 'q' 키를 누르면 루프 종료
-        break
+        # QLabel에 GIF 설정
+        self.movie = QMovie("/home/jchj/Untitled3/src/untitled3/UI/loading.gif")
+        if self.movie.isValid():
+            self.label_pic.setMovie(self.movie)
+            self.movie.start()
 
-cap.release()  # 웹캠 자원 해제
-cv2.destroyAllWindows()  # 모든 OpenCV 창 닫기
+    # def next(self):
+    #     self.main_window.open_DirectionWindow()
+
+class Ros2Thread(QThread):
+    def __init__(self, node):
+        super().__init__()
+        self.node = node
+
+    def run(self):
+        rp.spin(self.node)
+
+def main(args=None):
+    rp.init(args=args)
+
+    app = QApplication(sys.argv)
+
+    Node = PyQt()
+
+    main_window = MainWindow(Node)
+    first_window =  FirstWindow(main_window)
+
+    main_window.showMaximized()
+
+    ros2_thread = Ros2Thread(Node)
+    ros2_thread.start()
+
+    sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    main()

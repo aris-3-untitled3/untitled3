@@ -8,6 +8,7 @@ import cv2
 import argparse
 import time
 from sensor_msgs.msg import Image
+import threading
 
 class GuestDetect(Node):
     def __init__(self):
@@ -59,6 +60,10 @@ class GuestDetect(Node):
         # ROS2 image chage
         self.bridge = CvBridge()
         self.frame = None  # 초기 프레임을 None으로 설정
+        self.resultImg = None
+        
+        threading.Thread(target=self.display_frames).start()
+
 
     def guest_detect_callback(self,msg):
         if msg.command == "guest_detect":
@@ -77,6 +82,21 @@ class GuestDetect(Node):
             self.frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
         except Exception as e:
             self.get_logger().error(f'Error in Webcam_callback: {str(e)}')
+
+    def display_frames(self):
+        while True:
+            if self.resultImg is not None:  
+                cv2.imshow("Frame", self.resultImg)
+
+            else:
+                if self.frame is not None:
+                    cv2.imshow("Frame", self.frame)
+                else:
+                    self.get_logger().info("No frame available") 
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                cv2.destroyAllWindows()
+                break
 
     def highlightFace(self, net, frame, conf_threshold=0.7):
         frameOpencvDnn = frame.copy()
@@ -156,7 +176,7 @@ class GuestDetect(Node):
 
             frame = self.frame
 
-            resultImg, faceBoxes = self.highlightFace(faceNet, frame)
+            self.resultImg, faceBoxes = self.highlightFace(faceNet, frame)
 
             if not faceBoxes:
                 print("No face detected")
@@ -206,16 +226,13 @@ class GuestDetect(Node):
                         print(f'Most Gender --> {Most_Gender} | Most Age --> {Most_Age}')
                         print(f'Age: {age_group} Gender: {gender}')
 
-                        # cv2.putText(resultImg, f'{gender}, {age_group}',
-                        #             (faceBox[0], faceBox[1] - 10),
-                        #             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2, cv2.LINE_AA)
+                        cv2.putText(self.resultImg, f'{gender}, {age_group}',
+                                    (faceBox[0], faceBox[1] - 10),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2, cv2.LINE_AA)
                         
-                        # cv2.imshow("Detecting age and gender", resultImg)
+                        
                 else:
                     break
-
-            # if cv2.waitKey(33) == ord('q'):
-            #     break
 
         return Most_Gender, Most_Age
 
