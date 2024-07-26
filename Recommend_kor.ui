@@ -173,25 +173,6 @@ QPushButton:hover {
     <string>토핑A</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>1440</x>
-     <y>760</y>
-     <width>360</width>
-     <height>240</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font/>
-   </property>
-   <property name="styleSheet">
-    <string notr="true"/>
-   </property>
-   <property name="text">
-    <string>다음</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
@@ -208,44 +189,6 @@ QPushButton:hover {
    </property>
    <property name="text">
     <string>TextLabel</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton_back">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>710</y>
-     <width>360</width>
-     <height>120</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font/>
-   </property>
-   <property name="styleSheet">
-    <string notr="true"/>
-   </property>
-   <property name="text">
-    <string>뒤로가기</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton_home">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>850</y>
-     <width>360</width>
-     <height>120</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font/>
-   </property>
-   <property name="styleSheet">
-    <string notr="true"/>
-   </property>
-   <property name="text">
-    <string>초기화면</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_rec">
@@ -278,7 +221,7 @@ QPushButton:hover {
    </property>
    <property name="styleSheet">
     <string notr="true">QFrame {
-    background-image: url(/home/messi/ws_amr/qt/dall.jpg); /* 배경 이미지 설정 */
+    background-image: url(/home/messi/Downloads/background.jpg); /* 배경 이미지 설정 */
     background-position: center; /* 이미지 중앙 정렬 */
     background-repeat: no-repeat; /* 이미지 반복 안함 */
 }</string>
@@ -289,6 +232,80 @@ QPushButton:hover {
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
+   <widget class="QPushButton" name="pushButton_home">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>650</y>
+      <width>151</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font/>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+	background-image: url(/home/messi/Downloads/home.png);
+}
+QPushButton:hover{
+	background-color: #FFC0CB
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_back">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>820</y>
+      <width>221</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font/>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+
+	background-image: url(/home/messi/Downloads/before.png);
+
+}
+QPushButton:hover{
+	background-color: #FFC0CB
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>1570</x>
+      <y>830</y>
+      <width>241</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font/>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+	background-image: url(/home/messi/Downloads/after.png);
+}
+QPushButton:hover{
+	background-color: #FFC0CB
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
   </widget>
   <zorder>frame</zorder>
   <zorder>label</zorder>
@@ -298,10 +315,7 @@ QPushButton:hover {
   <zorder>pushButton_4</zorder>
   <zorder>pushButton_5</zorder>
   <zorder>pushButton_6</zorder>
-  <zorder>pushButton</zorder>
   <zorder>label_2</zorder>
-  <zorder>pushButton_back</zorder>
-  <zorder>pushButton_home</zorder>
   <zorder>pushButton_rec</zorder>
  </widget>
  <resources/>

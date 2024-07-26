@@ -5,8 +5,6 @@
 
 ## 라이브러리 설치
 
-## pip install PyQt5 -> UI 동작
+## pip install PyQt5
 ## pip install pydub  -> 버튼 소리
 ## pip install pygame -> 배경 소리
-## pip install mediapipe -> 미디어파이프
-## pip install pyautogui -> 마우스 이동

@@ -27,44 +27,38 @@ QPushButton:hover {
 }
 </string>
   </property>
-  <widget class="QWidget" name="widget" native="true">
+  <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>-40</x>
+     <x>-50</x>
      <y>-40</y>
      <width>1920</width>
      <height>1080</height>
     </rect>
    </property>
-   <property name="styleSheet">
-    <string notr="true">QWidget {
-    background-image: url(/home/messi/ws_amr/qt/dall.jpg); /* 배경 이미지 설정 */
-    background-position: center; /* 이미지 중앙 정렬 */
-    background-repeat: no-repeat; /* 이미지 반복 안함 */
-}
-</string>
+   <property name="text">
+    <string>TextLabel</string>
    </property>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>660</x>
-      <y>440</y>
-      <width>601</width>
-      <height>211</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>32</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>         3초간 앞을 바라봐주세요 !
-</string>
-    </property>
-   </widget>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>350</y>
+     <width>571</width>
+     <height>201</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>32</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>3초간 앞에 바라봐주세요 !</string>
+   </property>
   </widget>
  </widget>
  <resources/>

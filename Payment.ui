@@ -19,8 +19,8 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>910</x>
-     <y>110</y>
+     <x>1010</x>
+     <y>-30</y>
      <width>311</width>
      <height>161</height>
     </rect>
@@ -39,10 +39,10 @@
   <widget class="QPushButton" name="pushButton_6">
    <property name="geometry">
     <rect>
-     <x>1280</x>
-     <y>220</y>
-     <width>480</width>
-     <height>240</height>
+     <x>1380</x>
+     <y>170</y>
+     <width>360</width>
+     <height>210</height>
     </rect>
    </property>
    <property name="font">
@@ -70,10 +70,10 @@ QPushButton:hover{
   <widget class="QPushButton" name="pushButton_8">
    <property name="geometry">
     <rect>
-     <x>1280</x>
-     <y>470</y>
-     <width>480</width>
-     <height>240</height>
+     <x>1380</x>
+     <y>400</y>
+     <width>360</width>
+     <height>210</height>
     </rect>
    </property>
    <property name="font">
@@ -101,8 +101,8 @@ QPushButton:hover{
   <widget class="QTextBrowser" name="textBrowser">
    <property name="geometry">
     <rect>
-     <x>760</x>
-     <y>490</y>
+     <x>850</x>
+     <y>410</y>
      <width>420</width>
      <height>180</height>
     </rect>
@@ -123,8 +123,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>630</x>
-     <y>720</y>
+     <x>730</x>
+     <y>590</y>
      <width>311</width>
      <height>161</height>
     </rect>
@@ -143,8 +143,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QTextBrowser" name="textBrowser_2">
    <property name="geometry">
     <rect>
-     <x>750</x>
-     <y>760</y>
+     <x>850</x>
+     <y>630</y>
      <width>501</width>
      <height>91</height>
     </rect>
@@ -165,8 +165,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QTextBrowser" name="textBrowser_3">
    <property name="geometry">
     <rect>
-     <x>760</x>
-     <y>260</y>
+     <x>850</x>
+     <y>190</y>
      <width>420</width>
      <height>180</height>
     </rect>
@@ -230,6 +230,19 @@ QPushButton:hover{
     </property>
     <property name="text">
      <string>뒤로가기</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>-40</x>
+      <y>-40</y>
+      <width>1920</width>
+      <height>1080</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
     </property>
    </widget>
   </widget>
