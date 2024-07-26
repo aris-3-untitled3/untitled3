@@ -1,5 +1,3 @@
-# git push test 
-
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5 import uic
@@ -78,7 +76,7 @@ class MainWindow(QMainWindow):
         # 스타일시트를 사용하여 중앙 위젯에 배경 이미지 설정
         central_widget.setStyleSheet("""
             QWidget {
-                background-image: url("/home/messi/ws_amr/qt/dall.jpg"); /* 배경 이미지 설정 */
+                background-image: url("/home/messi/Downloads/background.png"); /* 배경 이미지 설정 */
                 background-position: center; /* 이미지 중앙 정렬 */
                 background-repeat: no-repeat; /* 이미지 반복 안함 */
             }
@@ -115,7 +113,7 @@ class MainWindow(QMainWindow):
     def open_empty_window(self):
         # 노래 중지
         self.playing = False
-        self.music_thread.join()
+#        self.music_thread.join()
 
         self.empty_window = EmptyWindow()
         self.empty_window.show()
@@ -193,6 +191,18 @@ class LoadingWindow(QMainWindow, from_class2):
         self.setWindowTitle('Background Image Example')
         self.resize(1920, 1080)
 
+        # QLabel 객체 접근
+        self.label = self.findChild(QtWidgets.QLabel, 'label')
+
+        # QLabel에 배경 이미지 설정
+        self.label.setStyleSheet("""
+            QLabel {
+                background-image: url("/home/messi/Downloads/background.png"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
+
         # # 중앙 위젯 설정
         # central_widget = QWidget(self)
         # self.setCentralWidget(central_widget)
@@ -216,7 +226,7 @@ class LoadingWindow(QMainWindow, from_class2):
         #     print("GIF를 로드할 수 없습니다.")
 
         # 로딩 3초 후
-        QTimer.singleShot(1000, self.open_DirectionWindow)
+        QTimer.singleShot(100, self.open_DirectionWindow)
 
 
     def open_DirectionWindow(self):
@@ -228,13 +238,40 @@ class DirectionWindow(QMainWindow, from_class_Direction):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
-        self.pushButton.clicked.connect(self.open_Recommend_window)
+        self.pushButton_front.clicked.connect(self.open_Recommend_window)
         self.pushButton_back.clicked.connect(self.open_loading_window)
         self.pushButton_home.clicked.connect(self.open_Title_window)
-        self.pushButton.clicked.connect(self.on_click)
+        self.pushButton_front.clicked.connect(self.on_click)
         self.pushButton_back.clicked.connect(self.on_click)
         self.pushButton_home.clicked.connect(self.on_click)
+
+        # QLabel 객체 접근s
+        self.widget = self.findChild(QtWidgets.QWidget, 'widget')
+        self.pushButton_front = self.findChild(QtWidgets.QPushButton, 'pushButton_front')
+
+        # QLabel에 배경 이미지 설정
+        self.widget.setStyleSheet("""
+            QWidget {
+                background-image: url("/home/messi/Downloads/background.png"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
+        # self.pushButton.setStyleSheet("""
+        #     QPushButton {
+        #         color: #3E2723; /* 다크 브라운 글씨 색 */
+        #         background-color: rgba(100, 0, 0, 20);  /* 배경색을 투명하게 설정 */
+        #         font-size: 32px; /* 글씨 크기 */
+        #         border: 2px solid #F48FB1; /* 핑크 테두리 */
+        #         border-radius: 45px; /* 둥근 모서리 */
+        #         padding: 10px;
+        #     }
+        #     QPushButton:hover{
+        #         background-color: #FFC0CB
+        #     }
+        # """)
+
+        
 
     def open_Title_window(self):
         self.Title_window = MainWindow()
@@ -277,16 +314,9 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         self.setStyleSheet("""
             QPushButton {
                 color: #3E2723; /* 다크 브라운 글씨 색 */
-                background-color: #FFEBEE; /* 라이트 핑크 배경 */
                 font-size: 28px; /* 글씨 크기 */
-                border: 4px solid #E91E63; /* 더 굵은 핑크 테두리 */
                 border-radius: 15px; /* 둥근 모서리 */
                 padding: 10px;
-            }
-
-            QPushButton:hover {
-                background-color: #FFCDD2; /* 호버 시 라이트 레드 배경 */
-                border: 4px solid #E91E63; /* 더 굵고 진한 핑크 테두리 */
             }
         """)
 
@@ -344,10 +374,10 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
     def show_recommendation_dialog(self):
         self.recommendation_dialog = QDialog(self)
         self.recommendation_dialog.setWindowTitle('추천 메뉴')
-        self.recommendation_dialog.setGeometry(0, 0, 1920, 1080)
+        self.recommendation_dialog.setGeometry(0, 0, 700, 700)
         self.recommendation_dialog.setStyleSheet("""
             QDialog {
-                background-image: url(/home/messi/ws_amr/qt/dall.jpg); /* 배경 이미지 설정 */
+                background-image: url(/home/messi/Downloads/blue.png); /* 배경 이미지 설정 */
                 background-position: center; /* 이미지 중앙 정렬 */
                 background-repeat: no-repeat; /* 이미지 반복 안함 */
             }
@@ -375,10 +405,10 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
 
         self.buffering_dialog = QDialog(self)
         self.buffering_dialog.setWindowTitle('음성 인식 중')
-        self.buffering_dialog.setGeometry(0, 0, 1920, 1080)
+        self.buffering_dialog.setGeometry(0, 0, 700, 700)
         self.buffering_dialog.setStyleSheet("""
             QDialog {
-                background-image: url(/home/messi/ws_amr/qt/dall.jpg); /* 배경 이미지 설정 */
+                background-image: url(/home/messi/Downloads/microphone.png); /* 배경 이미지 설정 */
                 background-position: center; /* 이미지 중앙 정렬 */
                 background-repeat: no-repeat; /* 이미지 반복 안함 */
             }
@@ -386,7 +416,7 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
 
         layout = QVBoxLayout()
 
-        label = QLabel("음성 인식 중")
+        label = QLabel("\n\n\n\n\n\n\n\n\n\n음성 인식 중")
         label.setAlignment(Qt.AlignCenter)
 
         font = QFont()
@@ -413,15 +443,14 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
 
         self.speechorder_dialog = QDialog(self)
         self.speechorder_dialog.setWindowTitle('음성인식 주문 창')
-        self.speechorder_dialog.setGeometry(0, 0, 1920, 1080)
+        self.speechorder_dialog.setGeometry(0, 0, 700, 700)
         self.speechorder_dialog.setStyleSheet("""
             QDialog {
-                background-image: url(/home/messi/ws_amr/qt/dall.jpg); /* 배경 이미지 설정 */
+                background-image: url(/home/messi/Downloads/blue.png); /* 배경 이미지 설정 */
                 background-position: center; /* 이미지 중앙 정렬 */
                 background-repeat: no-repeat; /* 이미지 반복 안함 */
             }
         """)
-
         layout = QVBoxLayout()
 
         label = QLabel("음성 인식 중입니다.\n원하시는 메뉴를 말씀해주세요.\n예시문장 (**맛과 **토핑 주세요.)")
@@ -654,6 +683,18 @@ class PreparingWindow(QMainWindow, from_class_Preparing):
         self.pushButton_back.clicked.connect(self.on_click)
         self.pushButton_next.clicked.connect(self.on_click)
 
+        # QLabel 객체 접근
+        self.label_3 = self.findChild(QtWidgets.QLabel, 'label_3')
+
+        # QLabel에 배경 이미지 설정
+        self.label_3.setStyleSheet("""
+            QLabel {
+                background-image: url("/home/messi/Downloads/background.png"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
+
         # 쓰레기 처리, 아이스크림 대기 완료 과정을 3초로 임시 가정 -> 이것도 버그땜에 일단 없앰
         # QTimer.singleShot(3000, self.open_Making_window)
 
@@ -680,6 +721,22 @@ class MakingWindow(QMainWindow, from_class_Making):
         self.setupUi(self)
         self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
 
+        # QLabel 객체 접근
+        self.label_3 = self.findChild(QtWidgets.QLabel, 'label_3')
+
+        # 디버깅 정보 출력
+        if self.label_3 is None:
+            print("Error: QLabel 'label_3' not found.")
+        else:
+            # QLabel에 배경 이미지 설정
+            self.label_3.setStyleSheet("""
+                QLabel {
+                    background-image: url("/home/messi/Downloads/background.png"); /* 배경 이미지 설정 */
+                    background-position: center; /* 이미지 중앙 정렬 */
+                    background-repeat: no-repeat; /* 이미지 반복 안함 */
+                }
+            """)
+
         # QLabel에 GIF 설정
         self.movie = QMovie("loading.gif")
         if self.movie.isValid():
@@ -702,6 +759,18 @@ class MakedWindow(QMainWindow, from_class_Maked):
         self.setupUi(self)
         self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
 
+        # QLabel 객체 접근
+        self.label_3 = self.findChild(QtWidgets.QLabel, 'label_3')
+
+        # QLabel에 배경 이미지 설정
+        self.label_3.setStyleSheet("""
+            QLabel {
+                background-image: url("/home/messi/Downloads/background.png"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
+
         # 이제 결제
         QTimer.singleShot(300, self.open_Coupon_window)
 
@@ -717,6 +786,18 @@ class CouponWindow(QMainWindow, from_class_Coupon):
         self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
         self.coupon = 1
         self.number = ""
+
+        # QLabel 객체 접근
+        self.label_3 = self.findChild(QtWidgets.QLabel, 'label_3')
+
+        # QLabel에 배경 이미지 설정
+        self.label_3.setStyleSheet("""
+            QLabel {
+                background-image: url("/home/messi/Downloads/background.png"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
 
         # 번호 누르기
         self.pushButton0.clicked.connect(lambda: self.add_text("0"))
@@ -814,6 +895,18 @@ class PaymentWindow(QMainWindow, from_class_Payment):
         self.coupon_value = coupon_value
         self.number = number
 
+        # QLabel 객체 접근
+        self.label_3 = self.findChild(QtWidgets.QLabel, 'label_3')
+
+        # QLabel에 배경 이미지 설정
+        self.label_3.setStyleSheet("""
+            QLabel {
+                background-image: url("/home/messi/Downloads/background.png"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
+
         # 임의의 금액
         self.price = 3500
         self.priceText()
@@ -881,6 +974,18 @@ class ByeWindow(QMainWindow, from_class_Bye):
         self.setupUi(self)
         self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
 
+        # QLabel 객체 접근
+        self.label_3 = self.findChild(QtWidgets.QLabel, 'label_3')
+
+        # QLabel에 배경 이미지 설정
+        self.label_3.setStyleSheet("""
+            QLabel {
+                background-image: url("/home/messi/Downloads/background.png"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     main_window = MainWindow()
@@ -908,3 +1013,30 @@ if __name__ == '__main__':
 # 제조중 박스 두개 카운트, 그리고 색깔 변화
 ## gif 파일 다른 것 찾기, 자꾸 로드 오류남
 
+
+
+
+'''
+QPushButton {
+    color: #3E2723; /* 다크 브라운 글씨 색 */
+    font-size: 32px; /* 글씨 크기 */
+	background-image: url(/home/messi/Downloads/before.png);  
+    border-radius: 45px; /* 둥근 모서리 */
+    padding: 10px;
+}
+QPushButton:hover{
+	background-color: #FFC0CB
+}
+
+
+QPushButton {
+    color: #3E2723; /* 다크 브라운 글씨 색 */
+    font-size: 32px; /* 글씨 크기 */
+	background-image: url(/home/messi/Downloads/after.png);
+    border-radius: 45px; /* 둥근 모서리 */
+    padding: 10px;
+}
+QPushButton:hover{
+	background-color: #FFC0CB
+}
+'''
