@@ -19,8 +19,8 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>810</x>
-     <y>160</y>
+     <x>260</x>
+     <y>80</y>
      <width>161</width>
      <height>51</height>
     </rect>
@@ -39,8 +39,8 @@
   <widget class="QTextEdit" name="textEdit">
    <property name="geometry">
     <rect>
-     <x>640</x>
-     <y>280</y>
+     <x>90</x>
+     <y>200</y>
      <width>521</width>
      <height>71</height>
     </rect>
@@ -61,8 +61,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QTextEdit" name="textEdit_2">
    <property name="geometry">
     <rect>
-     <x>640</x>
-     <y>380</y>
+     <x>90</x>
+     <y>300</y>
      <width>161</width>
      <height>60</height>
     </rect>
@@ -83,8 +83,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QTextEdit" name="textEdit_3">
    <property name="geometry">
     <rect>
-     <x>820</x>
-     <y>380</y>
+     <x>270</x>
+     <y>300</y>
      <width>161</width>
      <height>60</height>
     </rect>
@@ -105,8 +105,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QTextEdit" name="textEdit_4">
    <property name="geometry">
     <rect>
-     <x>1000</x>
-     <y>380</y>
+     <x>450</x>
+     <y>300</y>
      <width>161</width>
      <height>60</height>
     </rect>
@@ -149,10 +149,10 @@ p, li { white-space: pre-wrap; }
    <widget class="QPushButton" name="pushButton_2">
     <property name="geometry">
      <rect>
-      <x>960</x>
-      <y>530</y>
-      <width>160</width>
-      <height>160</height>
+      <x>210</x>
+      <y>710</y>
+      <width>420</width>
+      <height>240</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -175,10 +175,10 @@ QPushButton:hover{
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>770</x>
-      <y>530</y>
-      <width>160</width>
-      <height>160</height>
+      <x>210</x>
+      <y>450</y>
+      <width>420</width>
+      <height>240</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -201,10 +201,10 @@ QPushButton:hover{
    <widget class="QPushButton" name="pushButton3">
     <property name="geometry">
      <rect>
-      <x>1670</x>
+      <x>1470</x>
       <y>190</y>
-      <width>160</width>
-      <height>160</height>
+      <width>200</width>
+      <height>200</height>
      </rect>
     </property>
     <property name="font">
@@ -232,10 +232,10 @@ QPushButton:hover{
    <widget class="QPushButton" name="pushButton2">
     <property name="geometry">
      <rect>
-      <x>1500</x>
+      <x>1260</x>
       <y>190</y>
-      <width>160</width>
-      <height>160</height>
+      <width>200</width>
+      <height>200</height>
      </rect>
     </property>
     <property name="font">
@@ -263,10 +263,10 @@ QPushButton:hover{
    <widget class="QPushButton" name="pushButton7">
     <property name="geometry">
      <rect>
-      <x>1330</x>
-      <y>550</y>
-      <width>160</width>
-      <height>160</height>
+      <x>1050</x>
+      <y>610</y>
+      <width>200</width>
+      <height>200</height>
      </rect>
     </property>
     <property name="font">
@@ -294,10 +294,10 @@ QPushButton:hover{
    <widget class="QPushButton" name="pushButton5">
     <property name="geometry">
      <rect>
-      <x>1500</x>
-      <y>370</y>
-      <width>160</width>
-      <height>160</height>
+      <x>1260</x>
+      <y>400</y>
+      <width>200</width>
+      <height>200</height>
      </rect>
     </property>
     <property name="font">
@@ -325,10 +325,10 @@ QPushButton:hover{
    <widget class="QPushButton" name="pushButton0">
     <property name="geometry">
      <rect>
-      <x>1500</x>
-      <y>730</y>
-      <width>160</width>
-      <height>160</height>
+      <x>1260</x>
+      <y>820</y>
+      <width>200</width>
+      <height>200</height>
      </rect>
     </property>
     <property name="font">
@@ -356,10 +356,10 @@ QPushButton:hover{
    <widget class="QPushButton" name="pushButton8">
     <property name="geometry">
      <rect>
-      <x>1500</x>
-      <y>550</y>
-      <width>160</width>
-      <height>160</height>
+      <x>1260</x>
+      <y>610</y>
+      <width>200</width>
+      <height>200</height>
      </rect>
     </property>
     <property name="font">
@@ -387,10 +387,10 @@ QPushButton:hover{
    <widget class="QPushButton" name="pushButton_Back">
     <property name="geometry">
      <rect>
-      <x>1670</x>
-      <y>730</y>
-      <width>160</width>
-      <height>160</height>
+      <x>1470</x>
+      <y>820</y>
+      <width>200</width>
+      <height>200</height>
      </rect>
     </property>
     <property name="font">
@@ -418,10 +418,10 @@ QPushButton:hover{
    <widget class="QPushButton" name="pushButton9">
     <property name="geometry">
      <rect>
-      <x>1670</x>
-      <y>550</y>
-      <width>160</width>
-      <height>160</height>
+      <x>1470</x>
+      <y>610</y>
+      <width>200</width>
+      <height>200</height>
      </rect>
     </property>
     <property name="font">
@@ -449,10 +449,10 @@ QPushButton:hover{
    <widget class="QPushButton" name="pushButton6">
     <property name="geometry">
      <rect>
-      <x>1670</x>
-      <y>370</y>
-      <width>160</width>
-      <height>160</height>
+      <x>1470</x>
+      <y>400</y>
+      <width>200</width>
+      <height>200</height>
      </rect>
     </property>
     <property name="font">
@@ -480,10 +480,10 @@ QPushButton:hover{
    <widget class="QPushButton" name="pushButton1">
     <property name="geometry">
      <rect>
-      <x>1330</x>
+      <x>1050</x>
       <y>190</y>
-      <width>160</width>
-      <height>160</height>
+      <width>200</width>
+      <height>200</height>
      </rect>
     </property>
     <property name="font">
@@ -511,10 +511,10 @@ QPushButton:hover{
    <widget class="QPushButton" name="pushButton4">
     <property name="geometry">
      <rect>
-      <x>1330</x>
-      <y>370</y>
-      <width>160</width>
-      <height>160</height>
+      <x>1050</x>
+      <y>400</y>
+      <width>200</width>
+      <height>200</height>
      </rect>
     </property>
     <property name="font">

@@ -1,3 +1,6 @@
+# git push test 
+# 이미지 출처 <a href="https://kr.freepik.com/free-photo/flat-lay-of-raspberries-ice-cream-with-copy-space_5336545.htm#page=4&query=%EC%95%84%EC%9D%B4%EC%8A%A4%ED%81%AC%EB%A6%BC%20%EB%B0%B0%EA%B2%BD&position=1&from_view=keyword&track=ais_user&uuid=79b46e5b-7b1a-4939-963d-12bd4e15b4ee">Freepik</a>
+
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5 import uic
@@ -13,7 +16,7 @@ import time
 import urllib.request
 import pygame
 
-uipath = '/home/messi/ws_amr/qt/'
+uipath = '/home/messi/soo'
 
 # UI 파일 경로 설정
 ui_file = os.path.join(uipath, "Title.ui")
@@ -47,7 +50,7 @@ class MusicThread(QThread):
         self.playing = True
 
     def run(self):
-        pygame.mixer.music.load("/home/messi/Downloads/mp3/good.mp3")
+        pygame.mixer.music.load(f"{uipath}/good.mp3")
         pygame.mixer.music.play(-1)  # 무한 반복 재생
         while self.playing:
             time.sleep(1)
@@ -74,12 +77,12 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
         # 스타일시트를 사용하여 중앙 위젯에 배경 이미지 설정
-        central_widget.setStyleSheet("""
-            QWidget {
-                background-image: url("/home/messi/Downloads/background.png"); /* 배경 이미지 설정 */
+        central_widget.setStyleSheet(f"""
+            QWidget {{
+                background-image: url("{uipath}/background.png"); /* 배경 이미지 설정 */
                 background-position: center; /* 이미지 중앙 정렬 */
                 background-repeat: no-repeat; /* 이미지 반복 안함 */
-            }
+            }}
         """)
 
         # 버튼 설정
@@ -122,7 +125,7 @@ class MainWindow(QMainWindow):
     def play_audio(self):
         # 오디오 재생을 별도의 스레드에서 실행
         def play_sound():
-            song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/good.mp3")
+            song = AudioSegment.from_mp3(f"{uipath}/good.mp3")
             play(song)
 
         threading.Thread(target=play_sound).start()
@@ -130,7 +133,7 @@ class MainWindow(QMainWindow):
         self.load_image()
 
     def load_image(self):
-        pixmap = QPixmap("/home/messi/ws_amr/qt/Title.jpg")
+        pixmap = QPixmap(f"{uipath}/Title.jpg")
         self.label_2.setPixmap(pixmap)
         self.label_2.setScaledContents(True)
 
@@ -138,14 +141,14 @@ class MainWindow(QMainWindow):
         threading.Thread(target=self.play_mp3).start()
 
     def play_mp3(self):
-        song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/cat_like1b.mp3")
+        song = AudioSegment.from_mp3(f"{uipath}/cat_like1b.mp3")
         play(song)
 
     def on_click_good(self):
         threading.Thread(target=self.play_mp3_good).start()
 
     def play_mp3_good(self):
-        pygame.mixer.music.load("/home/messi/Downloads/mp3/good.mp3")
+        pygame.mixer.music.load(f"{uipath}/good.mp3")
         pygame.mixer.music.play(-1)  # 무한 반복 재생
         while self.playing:
             time.sleep(1)  # 음악 재생 중
@@ -175,12 +178,12 @@ class EmptyWindow(QMainWindow, from_class_Empty):
         self.setCentralWidget(central_widget)
 
         # 스타일시트를 사용하여 배경 이미지 설정
-        self.setStyleSheet("""
-            QMainWindow {
-                background-image: url("/home/messi/ws_amr/qt/dall.jpg"); /* 배경 이미지 설정 */
+        self.setStyleSheet(f"""
+            QMainWindow {{
+                background-image: url("{uipath}/dall.jpg"); /* 배경 이미지 설정 */
                 background-position: center; /* 이미지 중앙 정렬 */
                 background-repeat: no-repeat; /* 이미지 반복 안함 */
-            }
+            }}
         """)
 
 
@@ -195,38 +198,16 @@ class LoadingWindow(QMainWindow, from_class2):
         self.label = self.findChild(QtWidgets.QLabel, 'label')
 
         # QLabel에 배경 이미지 설정
-        self.label.setStyleSheet("""
-            QLabel {
-                background-image: url("/home/messi/Downloads/background.png"); /* 배경 이미지 설정 */
+        self.label.setStyleSheet(f"""
+            QLabel {{
+                background-image: url("{uipath}/background.png"); /* 배경 이미지 설정 */
                 background-position: center; /* 이미지 중앙 정렬 */
                 background-repeat: no-repeat; /* 이미지 반복 안함 */
-            }
+            }}
         """)
 
-        # # 중앙 위젯 설정
-        # central_widget = QWidget(self)
-        # self.setCentralWidget(central_widget)
-
-        # # 스타일시트를 사용하여 배경 이미지 설정
-        # self.setStyleSheet("""
-        #     QMainWindow {
-        #         background-image: url("/home/messi/ws_amr/qt/dall.jpg"); /* 배경 이미지 설정 */
-        #         background-position: center; /* 이미지 중앙 정렬 */
-        #         background-repeat: no-repeat; /* 이미지 반복 안함 */
-        #     }
-        # """)
-
-        
-        # # QLabel에 GIF 설정
-        # self.movie = QMovie("loading.gif")
-        # if self.movie.isValid():
-        #     self.label_pic.setMovie(self.movie)
-        #     self.movie.start()
-        # else:
-        #     print("GIF를 로드할 수 없습니다.")
-
         # 로딩 3초 후
-        QTimer.singleShot(100, self.open_DirectionWindow)
+        QTimer.singleShot(3000, self.open_DirectionWindow)
 
 
     def open_DirectionWindow(self):
@@ -238,6 +219,15 @@ class DirectionWindow(QMainWindow, from_class_Direction):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+
+        # QLabel 객체 접근s
+        self.widget = self.findChild(QtWidgets.QWidget, 'widget')
+        self.pushButton_front = self.findChild(QtWidgets.QPushButton, 'pushButton_front')
+        self.pushButton_home = self.findChild(QtWidgets.QPushButton, 'pushButton_home')
+        self.pushButton_back = self.findChild(QtWidgets.QPushButton, 'pushButton_back')
+
+        self.pushButton_next1 = self.findChild(QtWidgets.QTextBrowser, 'next_png1')
+        self.pushButton_next2 = self.findChild(QtWidgets.QTextBrowser, 'next_png2')
         self.pushButton_front.clicked.connect(self.open_Recommend_window)
         self.pushButton_back.clicked.connect(self.open_loading_window)
         self.pushButton_home.clicked.connect(self.open_Title_window)
@@ -245,31 +235,66 @@ class DirectionWindow(QMainWindow, from_class_Direction):
         self.pushButton_back.clicked.connect(self.on_click)
         self.pushButton_home.clicked.connect(self.on_click)
 
-        # QLabel 객체 접근s
-        self.widget = self.findChild(QtWidgets.QWidget, 'widget')
-        self.pushButton_front = self.findChild(QtWidgets.QPushButton, 'pushButton_front')
+        # QLabel에 배경 이미지 설정
+
+        self.pushButton_next1.setStyleSheet(f"""
+            QTextBrowser {{
+                background-image: url({uipath}/button/next.png);
+            }}
+        """)
+
+        self.pushButton_next2.setStyleSheet(f"""
+            QTextBrowser {{
+                background-image: url({uipath}/button/next.png);
+            }}
+        """)
 
         # QLabel에 배경 이미지 설정
-        self.widget.setStyleSheet("""
-            QWidget {
-                background-image: url("/home/messi/Downloads/background.png"); /* 배경 이미지 설정 */
+        self.widget.setStyleSheet(f"""
+            QWidget {{
+                background-image: url("{uipath}/background.png"); /* 배경 이미지 설정 */
                 background-position: center; /* 이미지 중앙 정렬 */
                 background-repeat: no-repeat; /* 이미지 반복 안함 */
-            }
+            }}
         """)
-        # self.pushButton.setStyleSheet("""
-        #     QPushButton {
-        #         color: #3E2723; /* 다크 브라운 글씨 색 */
-        #         background-color: rgba(100, 0, 0, 20);  /* 배경색을 투명하게 설정 */
-        #         font-size: 32px; /* 글씨 크기 */
-        #         border: 2px solid #F48FB1; /* 핑크 테두리 */
-        #         border-radius: 45px; /* 둥근 모서리 */
-        #         padding: 10px;
-        #     }
-        #     QPushButton:hover{
-        #         background-color: #FFC0CB
-        #     }
-        # """)
+        self.pushButton_front.setStyleSheet(f"""
+            QPushButton {{
+                color: #3E2723; /* 다크 브라운 글씨 색 */
+                background-image: url({uipath}/button/after.png);  
+                font-size: 32px; /* 글씨 크기 */
+                border-radius: 45px; /* 둥근 모서리 */
+                padding: 10px;
+            }}
+            QPushButton:hover {{
+                background-color: #FFC0CB; /* 마우스 오버시 배경색 */
+            }}
+        """)
+
+        self.pushButton_home.setStyleSheet(f"""
+            QPushButton {{
+                color: #3E2723; /* 다크 브라운 글씨 색 */
+                background-image: url({uipath}/button/home.png);  
+                font-size: 32px; /* 글씨 크기 */
+                border-radius: 45px; /* 둥근 모서리 */
+                padding: 10px;
+            }}
+            QPushButton:hover {{
+                background-color: #FFC0CB; /* 마우스 오버시 배경색 */
+            }}
+        """)
+
+        self.pushButton_back.setStyleSheet(f"""
+            QPushButton {{
+                color: #3E2723; /* 다크 브라운 글씨 색 */
+                background-image: url({uipath}/button/before.png);  
+                font-size: 32px; /* 글씨 크기 */
+                border-radius: 45px; /* 둥근 모서리 */
+                padding: 10px;
+            }}
+            QPushButton:hover {{
+                background-color: #FFC0CB; /* 마우스 오버시 배경색 */
+            }}
+        """)      
 
         
 
@@ -287,7 +312,7 @@ class DirectionWindow(QMainWindow, from_class_Direction):
         threading.Thread(target=self.play_mp3).start()
 
     def play_mp3(self):
-        song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/cat_like1b.mp3")
+        song = AudioSegment.from_mp3(f"{uipath}/cat_like1b.mp3")
         play(song)
 
     def open_Recommend_window(self):
@@ -299,7 +324,14 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
+        # self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
+
+        self.frame = self.findChild(QtWidgets.QFrame, 'frame')
+        self.frame.setStyleSheet(f"""
+            QFrame {{
+            background-image: url({uipath}/background.png);
+                                 }}
+            """)
 
         # 디폴트는 추천대로
         self.taste = "초코"
@@ -310,18 +342,13 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         self.recommended_topping = "토핑C"
         self.label_2.setText(f"손님께 추천드리는 맛과 토핑은 {self.recommended_flavor}와 {self.recommended_topping}입니다.")
 
-        # 버튼 디자인
-        self.setStyleSheet("""
-            QPushButton {
-                color: #3E2723; /* 다크 브라운 글씨 색 */
-                font-size: 28px; /* 글씨 크기 */
-                border-radius: 15px; /* 둥근 모서리 */
-                padding: 10px;
-            }
-        """)
 
         # 소리
         #uic.loadUi('your_ui_file.ui', self)
+
+        self.pushButton_front = self.findChild(QtWidgets.QPushButton, 'pushButton_front')
+        self.pushButton_home = self.findChild(QtWidgets.QPushButton, 'pushButton_home')
+        self.pushButton_back = self.findChild(QtWidgets.QPushButton, 'pushButton_back')
 
         # 홈 버튼, 뒤로가기 버튼
         self.pushButton_back.clicked.connect(self.open_Direction_window)
@@ -337,14 +364,6 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         self.pushButton_5.setCheckable(True)
         self.pushButton_6.setCheckable(True)
 
-        # 각 버튼에 대해 토글 이벤트 연결
-        self.pushButton_1.clicked.connect(self.toggle_button)
-        self.pushButton_2.clicked.connect(self.toggle_button)
-        self.pushButton_3.clicked.connect(self.toggle_button)
-        self.pushButton_4.clicked.connect(self.toggle_button)
-        self.pushButton_5.clicked.connect(self.toggle_button)
-        self.pushButton_6.clicked.connect(self.toggle_button)
-
         # 버튼 소리
         self.pushButton_1.clicked.connect(self.on_click)
         self.pushButton_2.clicked.connect(self.on_click)
@@ -354,15 +373,116 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         self.pushButton_6.clicked.connect(self.on_click)
 
         # Next 버튼 이벤트 연결
-        self.pushButton.clicked.connect(self.check_selection_and_next)
+        self.pushButton_front.clicked.connect(self.check_selection_and_next)
         # 추천 버튼 눌렀을 때
-        self.pushButton_rec.clicked.connect(self.open_Prepare_window_rec)
-
-
+        # self.pushButton_rec.clicked.connect(self.open_Prepare_window_rec)
         
         self.yesno = 0
         
-        
+        # self.pushButton_front = self.findChild(QtWidgets.QPushButton, 'pushButton_front')
+        # self.pushButton_home = self.findChild(QtWidgets.QPushButton, 'pushButton_home')
+        # self.pushButton_back = self.findChild(QtWidgets.QPushButton, 'pushButton_back')
+
+
+        self.pushButton_front.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/after.png);  
+                border: 1px solid rgba(0, 0, 0, 0); /* 투명 테두리 */
+                background-color: rgba(0, 0, 0, 0);
+            }}
+            QPushButton:hover {{
+                background-color: #FFC0CB; /* 마우스 오버시 배경색 */
+            }}
+        """)
+
+        self.pushButton_home.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/home.png);  
+                border: 1px solid rgba(0, 0, 0, 0); /* 투명 테두리 */
+                background-color: rgba(0, 0, 0, 0);
+            }}
+            QPushButton:hover {{
+                background-color: #FFC0CB; /* 마우스 오버시 배경색 */
+            }}
+        """)
+
+        self.pushButton_back.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/before.png);  
+                border: 1px solid rgba(0, 0, 0, 0); /* 투명 테두리 */
+                background-color: rgba(0, 0, 0, 0);
+                
+            }}
+            QPushButton:hover {{
+                background-color: #FFC0CB; /* 마우스 오버시 배경색 */
+            }}
+        """)      
+
+
+        self.pushButton_1.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/choco.png);
+                border: 1px solid rgba(0, 0, 0, 0); /* 투명 테두리 */
+            }}
+            QPushButton:checked {{
+                background-image: url({uipath}/button/choco.png);
+                border: 4px solid brown; /* 초코 색 */
+            }}
+        """)
+        self.pushButton_2.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/vanilla.png);
+                border: 1px solid rgba(0, 0, 0, 0); /* 투명 테두리 */
+            }}
+            QPushButton:checked {{
+                background-image: url({uipath}/button/vanilla.png);
+                border: 4px solid yellow; /* 바닐라 색 */
+            }}
+        """)
+        self.pushButton_3.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/berry.png);
+                border: 1px solid rgba(0, 0, 0, 0); /* 투명 테두리 */
+            }}
+            QPushButton:checked {{
+                background-image: url({uipath}/button/berry.png);
+                border: 4px solid red; /* 딸기 색 */
+            }}
+        """)
+        self.pushButton_4.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/topa.png);
+                border: 1px solid lightgray; /* 회색 테두리 */
+            }}
+            QPushButton:checked {{
+                background-image: url({uipath}/button/topa.png);
+                border: 4px solid lightgray; /* 회색 */
+            }}
+        """)
+        self.pushButton_5.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/topb.png);
+                border: 1px solid lightgray; /* 회색 테두리 */
+            }}
+            QPushButton:checked {{
+                background-image: url({uipath}/button/topb.png);
+                border: 4px solid lightgray; /* 녹색 */
+            }}
+        """)
+        self.pushButton_6.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/topc.png);
+                border: 1px solid lightgray; /* 회색 테두리 */
+            }}
+            QPushButton:checked {{
+                background-image: url({uipath}/button/topc.png);
+                border: 4px solid lightgray; /* 파란색 */
+            }}
+        """)
+
+        self.yesno = 0
+
+       
         self.initUI()
 
     def initUI(self):
@@ -377,7 +497,7 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         self.recommendation_dialog.setGeometry(0, 0, 700, 700)
         self.recommendation_dialog.setStyleSheet("""
             QDialog {
-                background-image: url(/home/messi/Downloads/blue.png); /* 배경 이미지 설정 */
+                background-image: url(/home/messi/Downloads/backimg.png); /* 배경 이미지 설정 */
                 background-position: center; /* 이미지 중앙 정렬 */
                 background-repeat: no-repeat; /* 이미지 반복 안함 */
             }
@@ -446,7 +566,7 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         self.speechorder_dialog.setGeometry(0, 0, 700, 700)
         self.speechorder_dialog.setStyleSheet("""
             QDialog {
-                background-image: url(/home/messi/Downloads/blue.png); /* 배경 이미지 설정 */
+                background-image: url(/home/messi/Downloads/backimg.png); /* 배경 이미지 설정 */
                 background-position: center; /* 이미지 중앙 정렬 */
                 background-repeat: no-repeat; /* 이미지 반복 안함 */
             }
@@ -489,78 +609,6 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         dialog.move(x, y)
 
 
-        
-
-        ## 기존 메시지박스
-    #     # 초기화 메서드 끝에 음성인식 경고창을 표시하는 메서드 호출 추가
-    #     self.show_voice_warning()
-    
-    # def show_voice_warning(self):
-    #     self.warning_dialog = QDialog(self)
-    #     self.warning_dialog.setWindowTitle('음성 인식 중')
-    #     self.warning_dialog.setFixedSize(1200, 800)
-
-    #     layout = QVBoxLayout()
-
-    #     label = QLabel("추천드린 메뉴로 주문하시겠습니까?\n\n음성인식 중입니다.\n\n( 예 / 아니요 )로 대답해주세요.")
-    #     label.setAlignment(Qt.AlignCenter)
-
-    #     font = QFont()
-    #     font.setPointSize(24)
-    #     label.setFont(font)
-
-    #     layout.addWidget(label)
-
-    #     self.warning_dialog.setLayout(layout)
-    #     self.warning_dialog.setWindowModality(Qt.ApplicationModal)
-    #     self.warning_dialog.show()
-
-    #     threading.Thread(target=self.voice_recognition_process).start()
-
-    # def voice_recognition_process(self):
-    #     time.sleep(1)
-    #     QTimer.singleShot(0, self.hide_warning_dialog)
-    #     time.sleep(1)
-    #     QTimer.singleShot(0, self.start_recording)
-
-    # def hide_warning_dialog(self):
-    #     self.warning_dialog.hide()
-
-    # def start_recording(self):
-    #     self.recording_dialog = QDialog(self)
-    #     self.recording_dialog.setWindowTitle('녹음 중')
-    #     self.recording_dialog.setFixedSize(1200, 800)
-
-    #     layout = QVBoxLayout()
-
-    #     self.recording_label = QLabel("녹음 시작\n\n3초 남음")
-    #     self.recording_label.setAlignment(Qt.AlignCenter)
-
-    #     font = QFont()
-    #     font.setPointSize(24)
-    #     self.recording_label.setFont(font)
-
-    #     layout.addWidget(self.recording_label)
-
-    #     self.recording_dialog.setLayout(layout)
-    #     self.recording_dialog.setWindowModality(Qt.ApplicationModal)
-    #     self.recording_dialog.show()
-
-    #     self.countdown = 3
-    #     self.timer = QTimer(self)
-    #     self.timer.timeout.connect(self.update_countdown)
-    #     self.timer.start(1000)
-
-    # def update_countdown(self):
-    #     if self.countdown > 0:
-    #         self.recording_label.setText(f"녹음 시작\n\n{self.countdown}초 남음")
-    #         self.countdown -= 1
-    #     else:
-    #         self.recording_label.setText("녹음 시작\n\n0초 남음")
-    #         self.timer.stop()
-    #         QTimer.singleShot(1000, self.recording_dialog.hide)
-
-
 
     def open_Prepare_window_rec(self):
         # 맛과 토핑 변경 없음
@@ -572,14 +620,14 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         threading.Thread(target=self.play_mp3).start()
 
     def play_mp3(self):
-        song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/cat_like1b.mp3")
+        song = AudioSegment.from_mp3(f"{uipath}/cat_like1b.mp3")
         play(song)
 
     def on_click_warn(self):
         threading.Thread(target=self.play_mp3_warn).start()
 
     def play_mp3_warn(self):
-        song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/blip01.mp3")
+        song = AudioSegment.from_mp3(f"{uipath}/blip01.mp3")
         play(song)
         
     def open_Title_window(self):
@@ -591,20 +639,6 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         self.Direction_window = DirectionWindow()
         self.Direction_window.show()
         self.close()
-
-    def toggle_button(self):  
-        button = self.sender()
-        if button.isChecked():
-            if button == self.pushButton_1:
-                button.setStyleSheet('background-color: brown')  # 초코 색
-            elif button == self.pushButton_2:
-                button.setStyleSheet('background-color: beige')  # 바닐라 색
-            elif button == self.pushButton_3:
-                button.setStyleSheet('background-color: red')  # 딸기 색
-            else:
-                button.setStyleSheet('background-color: lightgray')  # 토핑 색상
-        else:
-            button.setStyleSheet('')  # 초기 상태로 되돌림
 
     # 한 가지씩 선택하고 다음 눌렀을 때 재확인창
     def showMessage(self):
@@ -683,6 +717,7 @@ class PreparingWindow(QMainWindow, from_class_Preparing):
         self.pushButton_back.clicked.connect(self.on_click)
         self.pushButton_next.clicked.connect(self.on_click)
 
+
         # QLabel 객체 접근
         self.label_3 = self.findChild(QtWidgets.QLabel, 'label_3')
 
@@ -695,8 +730,6 @@ class PreparingWindow(QMainWindow, from_class_Preparing):
             }
         """)
 
-        # 쓰레기 처리, 아이스크림 대기 완료 과정을 3초로 임시 가정 -> 이것도 버그땜에 일단 없앰
-        # QTimer.singleShot(3000, self.open_Making_window)
 
     def open_Recommend_window(self):
         self.Recommend_window = RecommendWindow()
@@ -707,7 +740,7 @@ class PreparingWindow(QMainWindow, from_class_Preparing):
         threading.Thread(target=self.play_mp3).start()
 
     def play_mp3(self):
-        song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/cat_like1b.mp3")
+        song = AudioSegment.from_mp3(f"{uipath}/cat_like1b.mp3")
         play(song)
 
     def open_Making_window(self):
@@ -837,7 +870,7 @@ class CouponWindow(QMainWindow, from_class_Coupon):
         threading.Thread(target=self.play_mp3).start()
 
     def play_mp3(self):
-        song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/cat_like1b.mp3")
+        song = AudioSegment.from_mp3(f"{uipath}/cat_like1b.mp3")
         play(song)
 
     def add_text(self, text):
@@ -955,7 +988,7 @@ class PaymentWindow(QMainWindow, from_class_Payment):
         threading.Thread(target=self.play_mp3).start()
 
     def play_mp3(self):
-        song = AudioSegment.from_mp3("/home/messi/Downloads/mp3/cat_like1b.mp3")
+        song = AudioSegment.from_mp3(f"{uipath}/cat_like1b.mp3")
         play(song)
 
     def open_Bye_window(self):
@@ -972,9 +1005,7 @@ class ByeWindow(QMainWindow, from_class_Bye):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
-
-        # QLabel 객체 접근
+                # QLabel 객체 접근
         self.label_3 = self.findChild(QtWidgets.QLabel, 'label_3')
 
         # QLabel에 배경 이미지 설정
@@ -985,6 +1016,22 @@ class ByeWindow(QMainWindow, from_class_Bye):
                 background-repeat: no-repeat; /* 이미지 반복 안함 */
             }
         """)
+        self.pushButton.clicked.connect(self.showValues)
+        self.show()
+    def showValues(self):
+        # global Flavor, Topping    
+        # print(f"show Values ==> {Flavor}, {Topping}")
+       # result, stock, flavor_flag, topping_flag = DB_main().update_stock(Flavor, Topping)\
+        result = ['322','100','200','30','40','20']
+        print(f"Final list ====================== {result}")
+        self.tableWidget.setItem(0,0,QTableWidgetItem(str(result[0]))) #vanilla
+        self.tableWidget.setItem(0,1,QTableWidgetItem(str(result[1]))) # choco
+        self.tableWidget.setItem(0,2,QTableWidgetItem(str(result[2]))) # berry
+        self.tableWidget.setItem(0,3,QTableWidgetItem(str(result[3]))) # topA
+        self.tableWidget.setItem(0,4,QTableWidgetItem(str(result[4]))) # topB
+        self.tableWidget.setItem(0,5,QTableWidgetItem(str(result[5]))) # topC
+        self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -1012,31 +1059,3 @@ if __name__ == '__main__':
 ## Recommend와 Preparing 사이 warning box 표시
 # 제조중 박스 두개 카운트, 그리고 색깔 변화
 ## gif 파일 다른 것 찾기, 자꾸 로드 오류남
-
-
-
-
-'''
-QPushButton {
-    color: #3E2723; /* 다크 브라운 글씨 색 */
-    font-size: 32px; /* 글씨 크기 */
-	background-image: url(/home/messi/Downloads/before.png);  
-    border-radius: 45px; /* 둥근 모서리 */
-    padding: 10px;
-}
-QPushButton:hover{
-	background-color: #FFC0CB
-}
-
-
-QPushButton {
-    color: #3E2723; /* 다크 브라운 글씨 색 */
-    font-size: 32px; /* 글씨 크기 */
-	background-image: url(/home/messi/Downloads/after.png);
-    border-radius: 45px; /* 둥근 모서리 */
-    padding: 10px;
-}
-QPushButton:hover{
-	background-color: #FFC0CB
-}
-'''
