@@ -10,9 +10,9 @@ from cv_bridge import CvBridge
 import cv2 as cv
 from cv2 import aruco
 import numpy as np
-import cv2 as cv
 from cv2 import aruco
 import numpy as np
+import time
 
 class Cupdetect(Node):
     def __init__(self):
@@ -35,12 +35,11 @@ class Cupdetect(Node):
             callback_group=self.image_callback_group
         )
 
-        #  Topic 구독
-        self.server_subscription = self.create_subscription(
-            TopicString,
-            '/Server_to_Cup',
-            self.Server_callback,
-            10,
+        # 서비스 서버 생성
+        self.HM = self.create_service(
+            ServiceString,
+            '/Call_to_HM',
+            self.HM_callback,
             callback_group=self.server_callback_group
         )
 
@@ -64,6 +63,28 @@ class Cupdetect(Node):
         
         self.x = None
         self.y = None
+        
+        self.x=None
+        self.y=None
+        self.cap = None
+        self.frame = None
+
+        threading.Thread(target=self.display_frames).start()
+
+    def display_frames(self):
+        while True:
+            if self.cap is not None:  
+                cv.imshow("Frame", self.cap)
+
+            else:
+                if self.frame is not None:
+                    cv.imshow("Frame", self.frame)
+                else:
+                    self.get_logger().info("No frame available") 
+
+            if cv.waitKey(1) & 0xFF == ord('q'):
+                cv.destroyAllWindows()
+                break
 
     def transformation_matrix(self, yaw, pitch, roll, translation):
         # Yaw (Z-axis rotation)
@@ -106,86 +127,82 @@ class Cupdetect(Node):
         return T_inv
 
     def run(self):
-        T = self.transformation_matrix(self.yaw, self.pitch, self.roll, self.translation)
-        T_inv = self.inverse_transformation_matrix(T)
-
-        while True:
-            frame = self.cap
-
-            # gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-            marker_corners, marker_IDs, reject = aruco.detectMarkers(
-                frame, self.marker_dict, parameters=self.param_markers
-            )
-
-            print(marker_corners , marker_IDs)
+            T = self.transformation_matrix(self.yaw, self.pitch, self.roll, self.translation)
+            T_inv = self.inverse_transformation_matrix(T)
             
-            if marker_corners:
-                rVec, tVec, _ = aruco.estimatePoseSingleMarkers(
-                    marker_corners, self.MARKER_SIZE, self.cam_mat, self.dist_coef
+            start_time = time.time()
+            success_count = 0
+            coordinates = []
+            
+            while time.time() - start_time < 5:  # Run for 5 seconds
+                self.frame = self.cap
+
+                if self.frame is None:
+                    self.get_logger().info("No frame available")
+                    continue
+
+                gray_frame = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
+                marker_corners, marker_IDs, reject = aruco.detectMarkers(
+                    gray_frame, self.marker_dict, parameters=self.param_markers
                 )
 
-                num_markers = len(marker_IDs)
-                
-                # Initialize self.x and self.y arrays based on the number of detected markers
-                if num_markers > 0:
-                    self.x = np.zeros(num_markers)
-                    self.y = np.zeros(num_markers)
-                
-                for ids, corners, i in zip(marker_IDs, marker_corners, range(num_markers)):
-                    cv.polylines(
-                        frame, [corners.astype(np.int32)], True, (0, 255, 255), 4, cv.LINE_AA
+                if marker_corners:
+                    rVec, tVec, _ = aruco.estimatePoseSingleMarkers(
+                        marker_corners, self.MARKER_SIZE, self.cam_mat, self.dist_coef
                     )
-                    corners = corners.reshape(4, 2)
-                    corners = corners.astype(int)
-                    top_right = corners[0].ravel()
-                    top_left = corners[1].ravel()
-                    bottom_right = corners[2].ravel()
-                    bottom_left = corners[3].ravel()
-                    
-                    #####
-                    T_Vec = np.array([tVec[i][0][0], tVec[i][0][1], 1, 1])
-                    T_result_Vec = T_inv @ T_Vec
-                    
-                    self.x[i] = T_result_Vec[0]
-                    self.x[i]=1.2*self.x[i]
-                    self.y[i] = T_result_Vec[1]
-                    
-                    print(f"x[{i}]: {self.x[i]}, \n y[{i}]: {self.y[i]}")
-                    
-                    # Calculating the distance
-                    distance = np.sqrt(
-                        tVec[i][0][2] ** 2 + tVec[i][0][0] ** 2 + tVec[i][0][1] ** 2
-                    )
-                    # Draw the pose of the marker
-                    point = cv.drawFrameAxes(frame, self.cam_mat, self.dist_coef, rVec[i], tVec[i], 4, 4)
-                    cv.putText(
-                        frame,
-                        f"id: {ids[0]} Dist: {round(distance, 2)}",
-                        top_right,
-                        cv.FONT_HERSHEY_PLAIN,
-                        1.3,
-                        (0, 0, 255),
-                        2,
-                        cv.LINE_AA,
-                    )
-                    cv.putText(
-                        frame,
-                        f"x:{round(self.x[i])} y: {round(self.y[i])} ",
-                        bottom_right,
-                        cv.FONT_HERSHEY_PLAIN,
-                        1.0,
-                        (0, 0, 255),
-                        2,
-                        cv.LINE_AA,
-                    )
-                    
-            cv.imshow("frame", frame)
-            key = cv.waitKey(1)
-            if key == ord("q"):
-                break
-        
-        self.cap.release()
-        cv.destroyAllWindows()
+
+                    for ids, corners, i in zip(marker_IDs, marker_corners, range(len(marker_IDs))):
+                        cv.polylines(
+                            self.frame, [corners.astype(np.int32)], True, (0, 255, 255), 4, cv.LINE_AA
+                        )
+                        corners = corners.reshape(4, 2).astype(int)
+                        top_right = corners[0].ravel()
+
+                        T_Vec = np.array([tVec[i][0][0], tVec[i][0][1], 1, 1])
+                        T_result_Vec = T_inv @ T_Vec
+
+                        self.x = T_result_Vec[0]
+                        self.y = T_result_Vec[1]
+                        coordinates.append((self.x, self.y))
+
+                        # Draw the pose of the marker
+                        distance = np.sqrt(
+                            tVec[i][0][2] ** 2 + tVec[i][0][0] ** 2 + tVec[i][0][1] ** 2
+                        )
+                        point = cv.drawFrameAxes(self.frame, self.cam_mat, self.dist_coef, rVec[i], tVec[i], 4, 4)
+                        cv.putText(
+                            self.frame,
+                            f"id: {ids[0]} Dist: {round(distance, 2)}",
+                            top_right,
+                            cv.FONT_HERSHEY_PLAIN,
+                            1.3,
+                            (0, 0, 255),
+                            2,
+                            cv.LINE_AA,
+                        )
+                        cv.putText(
+                            self.frame,
+                            f"x:{round(self.x)} y: {round(self.y)} ",
+                            top_right,
+                            cv.FONT_HERSHEY_PLAIN,
+                            1.0,
+                            (0, 0, 255),
+                            2,
+                            cv.LINE_AA,
+                        )
+
+                    success_count += 1
+
+            if success_count > 30:
+                # Calculate the average coordinates if there were successful detections
+                avg_x = np.mean([coord[0] for coord in coordinates])
+                avg_y = np.mean([coord[1] for coord in coordinates])
+                print(success_count)
+                return f"Success! Average x: {avg_x:.2f}, Average y: {avg_y:.2f}"
+            else:
+                print(success_count)
+                return "Failure: No markers detected"
+
 
     def Webcam_callback(self, msg):
         try:
@@ -193,13 +210,19 @@ class Cupdetect(Node):
         except Exception as e:
             self.get_logger().error(f'Webcam_callback에서 오류 발생: {str(e)}')
 
-    def Server_callback(self, msg):
-        self.get_logger().info(f'명령 수신: {msg.command}')
+    def HM_callback(self, request, response):
+        self.get_logger().info(f'Starting detection with command: {request.command}')
 
-        if msg.command == "start":
-            self.run()
-        elif msg.command == "stop":
-            print("stop")
+        if request.command == "start":
+            self.get_logger().info(f'Received: {request.command}')
+            result = self.run()
+            response.result = f'result: {result}'
+        else:
+            self.get_logger().error(f'ERROR')
+            response.result = 'Invalid command'
+
+        response.success = True
+        return response
 
 def main(args=None):
     rp.init(args=args)

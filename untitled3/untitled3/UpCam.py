@@ -37,7 +37,6 @@ class UpCam(Node):
             frame = cv2.resize(frame, (640, 480))
 
             # Flip image horizontally
-            frame = cv2.flip(frame, 1)
 
             # Convert OpenCV image to ROS Image message
             ros_image = self.bridge.cv2_to_imgmsg(frame, encoding='bgr8')

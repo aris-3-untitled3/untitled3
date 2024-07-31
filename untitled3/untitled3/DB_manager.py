@@ -3,7 +3,7 @@
 #FOREIGN KEY (date) REFERENCES sales (date)
 import mysql.connector
 import pandas as pd
-import datetime
+from datetime import datetime
 
 class DB_Manager:
     def __init__(self):
@@ -22,7 +22,7 @@ class DB_Manager:
                 host=self.host,
                 user=self.user,
                 database=database,
-                password=self.passwordq
+                password=self.password
             )
             
         except mysql.connector.Error as err:
@@ -55,35 +55,35 @@ class DB_Manager:
         
     def create_sample_data(self):
         #customer_info
-        query = "INSERT INTO customer_info (phone, age, gender, coupon) VALUES (12341234, '19-29', 'F', 1);"
-        self.cur.execute(query)
-        query = "INSERT INTO customer_info (phone, age, gender, coupon) VALUES (12341223, '19-29', 'F', 1);"
-        self.cur.execute(query)
-        query = "INSERT INTO customer_info (phone, age, gender, coupon) VALUES (33331234, '19-29', 'F', 1);"
-        self.cur.execute(query)
-        query = "INSERT INTO customer_info (phone, age, gender, coupon) VALUES (12312363, '19-29', 'F', 1);"
-        self.cur.execute(query)
-        query = "INSERT INTO customer_info (phone, age, gender, coupon) VALUES (50302060, '19-29', 'F', 1);"
-        self.cur.execute(query)
-        self.conn.commit()
+        # query = "INSERT INTO customer_info (phone, age, gender, coupon) VALUES (12341244, '19-29', 'F', 1);"
+        # self.cur.execute(query)
+        # query = "INSERT INTO customer_info (phone, age, gender, coupon) VALUES (12331223, '19-29', 'F', 1);"
+        # self.cur.execute(query)
+        # query = "INSERT INTO customer_info (phone, age, gender, coupon) VALUES (32331234, '19-29', 'F', 1);"
+        # self.cur.execute(query)
+        # query = "INSERT INTO customer_info (phone, age, gender, coupon) VALUES (12312363, '19-29', 'F', 1);"
+        # self.cur.execute(query)
+        # query = "INSERT INTO customer_info (phone, age, gender, coupon) VALUES (50302060, '19-29', 'F', 1);"
+        # self.cur.execute(query)
+        # self.conn.commit()
 
         #sales
-        query = "INSERT INTO customer_info (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('berry', 'topA', 3650, 12341234, '19-29', 'F', 'N');"
-        self.cur.execute(query)
-        query = "INSERT INTO customer_info (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('choco', 'topB', 3652, 12341223, '7-18', 'M', 'N');"
-        self.cur.execute(query)
-        query = "INSERT INTO customer_info (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('vanilla', 'topA', 3590, 12341234, '19-29', 'F', 'N');"
-        self.cur.execute(query)
-        query = "INSERT INTO customer_info (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('berry', 'topC', 3650, 50302060, '19-29', 'M', 'N');"
-        self.cur.execute(query)
-        query = "INSERT INTO customer_info (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('vanilla', 'topC', 3650, 12341234, '19-29', 'F', 'N');"
-        self.cur.execute(query)
-        query = "INSERT INTO customer_info (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('berry', 'topA', 0, 12341234, '19-29', 'F', 'Y');"
-        self.cur.execute(query)
-        self.conn.commit()
+        # query = "INSERT INTO sales (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('berry', 'topA', 3650, 12341234, '19-29', 'F', 'N');"
+        # self.cur.execute(query)
+        # query = "INSERT INTO sales (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('choco', 'topB', 3652, 12341223, '7-18', 'M', 'N');"
+        # self.cur.execute(query)
+        # query = "INSERT INTO sales (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('vanilla', 'topA', 3590, 12331234, '19-29', 'F', 'N');"
+        # self.cur.execute(query)
+        # query = "INSERT INTO sales (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('berry', 'topC', 3650, 50302060, '19-29', 'M', 'N');"
+        # self.cur.execute(query)
+        # query = "INSERT INTO sales (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('vanilla', 'topC', 3650, 12341224, '19-29', 'F', 'N');"
+        # self.cur.execute(query)
+        # query = "INSERT INTO sales (flavor, topping, price, phone, age, gender, use_coupon) VALUES ('berry', 'topA', 0, 11341234, '19-29', 'F', 'Y');"
+        # self.cur.execute(query)
+        # self.conn.commit()
 
         #price
-        query = "INSERT INTO price (topC) VALUES (20);"
+        query = "INSERT INTO price (topA , topB , topC) VALUES (18,15,20);"
         self.cur.execute(query)
         self.conn.commit()
 
@@ -288,7 +288,8 @@ class DB_main:
     def __init__(self):
         self.mydb = DB_Manager()
         self.mydb.DB_connect()
-        self.mydb.create_table()
+        # self.mydb.create_table()
+        # self.mydb.create_sample_data()
 
         # 팀원과 임의로 정한 맛 추천 테이블
         self.None_flavor = {'0-6': {'F':'berry', 'M':'choco'},
@@ -306,7 +307,7 @@ class DB_main:
                         }
 
     def load_age_gender(self):
-        with open('latest_age_gender.txt','r') as f:
+        with open('/home/jchj/Untitled3/src/untitled3/resource/latest_age_gender.txt','r') as f:
             info_txt = f.read()
 
         infos = info_txt.split('\t')  # 탭 문자로 분리
@@ -335,26 +336,26 @@ class DB_main:
 
         return age, gender, most_flavor, most_topping
 
-    def API_module(self, audio_file, text_file, response_time):
-        # 추천 메뉴에 대한 응답 음성 인식
-        if response_time == 3:
-            print("추천드린 맛으로 선택하시겠습니까? (네/아니요)")
-            # time.sleep(0.5)
-        if response_time == 5:
-            print("메뉴 선택 후 말씀해주세요")
-            print("예시) 딸기맛 하나랑 토핑 A로 부탁해")
-            # time.sleep(0.5)
+    # def API_module(self, audio_file, text_file, response_time):
+    #     # 추천 메뉴에 대한 응답 음성 인식
+    #     if response_time == 3:
+    #         print("추천드린 맛으로 선택하시겠습니까? (네/아니요)")
+    #         # time.sleep(0.5)
+    #     if response_time == 5:
+    #         print("메뉴 선택 후 말씀해주세요")
+    #         print("예시) 딸기맛 하나랑 토핑 A로 부탁해")
+    #         # time.sleep(0.5)
 
-        # record_api = Record_API(audio_file, text_file, response_time)
-        # flag = record_api.run()
+    #     # record_api = Record_API(audio_file, text_file, response_time)
+    #     # flag = record_api.run()
 
-        if text_file:
-            print(f"audio_file = {audio_file}. VoicetoText = {text_file} 성공적으로 저장됨")
-        else:
-            print("API_module --> text_file 생성되지 않음")
-            audio_file, response_time = None
+    #     if text_file:
+    #         print(f"audio_file = {audio_file}. VoicetoText = {text_file} 성공적으로 저장됨")
+    #     else:
+    #         print("API_module --> text_file 생성되지 않음")
+    #         audio_file, response_time = None
 
-        # return text_file, response_time, flag
+    #     # return text_file, response_time, flag
     
     def word_detect(self, text_file, response_time, flag):
         flavor_list = ["딸기", 
@@ -364,19 +365,6 @@ class DB_main:
         topping_list = ["A", "에이",
                         "B", "비", "삐",
                         "C", "씨", "시"]
-
-        # 응답 Y/N 판별하는 구문
-        if response_time == 3:
-            with open(text_file, 'r') as f:
-                vtot = f.read()
-            if '네' in vtot:
-                YorN = 'Y'
-            elif "아니요" in vtot or "아니오" in vtot or "아니" in vtot:
-                YorN = 'N'
-            else:
-                print("다시 말씀해주세요")
-                YorN = 'E' #error
-            return YorN
 
         # Flavor, Topping 녹화-변환-저장 파일 불러오기(ex. 딸기맛 하나랑 토핑 A로 부탁해)
         if response_time == 5:
@@ -539,3 +527,10 @@ class DB_main:
             print("Final ERROR------------------------------")
 
         return result, stock_dict, flavor_flag, topping_flag
+    
+if __name__ == '__main__':
+    # app = QApplication(sys.argv)
+    main_window = DB_main()
+
+    # main_window.show()
+    # sys.exit(app.exec_())

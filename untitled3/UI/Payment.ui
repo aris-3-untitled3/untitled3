@@ -14,24 +14,13 @@
    <string>Dialog</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QPushButton {
-    border: 2px solid #1E90FF;  /* 테두리 색상: DodgerBlue */
-    border-radius: 10px;        /* 둥근 테두리 */
-    padding: 5px;               /* 버튼 내부 여백 */
-    background-color: #F0F8FF;  /* 배경 색상: AliceBlue */
-}
-
-QPushButton:hover {
-    border: 2px solid #00BFFF;  /* 마우스 올렸을 때 테두리 색상: DeepSkyBlue */
-    background-color: #E6F2FF;  /* 마우스 올렸을 때 배경 색상 */
-}
-</string>
+   <string notr="true"/>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
      <x>910</x>
-     <y>50</y>
+     <y>110</y>
      <width>311</width>
      <height>161</height>
     </rect>
@@ -50,16 +39,29 @@ QPushButton:hover {
   <widget class="QPushButton" name="pushButton_6">
    <property name="geometry">
     <rect>
-     <x>1100</x>
-     <y>270</y>
-     <width>161</width>
-     <height>115</height>
+     <x>1280</x>
+     <y>220</y>
+     <width>480</width>
+     <height>240</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>14</pointsize>
+     <pointsize>-1</pointsize>
     </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    color: #3E2723; /* 다크 브라운 글씨 색 */
+    background-color: #FFEBEE; /* 라이트 핑크 배경 */
+    font-size: 32px; /* 글씨 크기 */
+    border: 2px solid #F48FB1; /* 핑크 테두리 */
+    border-radius: 45px; /* 둥근 모서리 */
+    padding: 10px;
+}
+QPushButton:hover{
+	background-color: #FFC0CB
+}</string>
    </property>
    <property name="text">
     <string>쿠폰 사용</string>
@@ -68,16 +70,29 @@ QPushButton:hover {
   <widget class="QPushButton" name="pushButton_8">
    <property name="geometry">
     <rect>
-     <x>1100</x>
-     <y>390</y>
-     <width>161</width>
-     <height>115</height>
+     <x>1280</x>
+     <y>470</y>
+     <width>480</width>
+     <height>240</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>14</pointsize>
+     <pointsize>-1</pointsize>
     </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    color: #3E2723; /* 다크 브라운 글씨 색 */
+    background-color: #FFEBEE; /* 라이트 핑크 배경 */
+    font-size: 32px; /* 글씨 크기 */
+    border: 2px solid #F48FB1; /* 핑크 테두리 */
+    border-radius: 45px; /* 둥근 모서리 */
+    padding: 10px;
+}
+QPushButton:hover{
+	background-color: #FFC0CB
+}</string>
    </property>
    <property name="text">
     <string>결제</string>
@@ -86,10 +101,10 @@ QPushButton:hover {
   <widget class="QTextBrowser" name="textBrowser">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>390</y>
-     <width>411</width>
-     <height>115</height>
+     <x>760</x>
+     <y>490</y>
+     <width>420</width>
+     <height>180</height>
     </rect>
    </property>
    <property name="font">
@@ -109,7 +124,7 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>630</x>
-     <y>580</y>
+     <y>720</y>
      <width>311</width>
      <height>161</height>
     </rect>
@@ -129,7 +144,7 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>750</x>
-     <y>620</y>
+     <y>760</y>
      <width>501</width>
      <height>91</height>
     </rect>
@@ -150,10 +165,10 @@ p, li { white-space: pre-wrap; }
   <widget class="QTextBrowser" name="textBrowser_3">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>270</y>
-     <width>411</width>
-     <height>115</height>
+     <x>760</x>
+     <y>260</y>
+     <width>420</width>
+     <height>180</height>
     </rect>
    </property>
    <property name="font">
@@ -169,32 +184,75 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:28pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_back">
+  <widget class="QFrame" name="frame">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>1090</y>
-     <width>89</width>
-     <height>25</height>
+     <x>-40</x>
+     <y>-40</y>
+     <width>1920</width>
+     <height>1080</height>
     </rect>
    </property>
-   <property name="text">
-    <string>뒤로가기</string>
+   <property name="styleSheet">
+    <string notr="true">QFrame {
+    background-position: center; /* 이미지 중앙 정렬 */
+    background-repeat: no-repeat; /* 이미지 반복 안함 */
+}</string>
    </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QPushButton" name="pushButton_back">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>760</y>
+      <width>420</width>
+      <height>240</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    color: #3E2723; /* 다크 브라운 글씨 색 */
+    background-color: #FFEBEE; /* 라이트 핑크 배경 */
+    font-size: 32px; /* 글씨 크기 */
+    border: 2px solid #F48FB1; /* 핑크 테두리 */
+    border-radius: 45px; /* 둥근 모서리 */
+    padding: 10px;
+}
+QPushButton:hover{
+	background-color: #FFC0CB
+}</string>
+    </property>
+    <property name="text">
+     <string>뒤로가기</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>-40</x>
+      <y>-40</y>
+      <width>1920</width>
+      <height>1080</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
   </widget>
-  <widget class="QPushButton" name="pushButton_home">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>1130</y>
-     <width>89</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>초기화면</string>
-   </property>
-  </widget>
+  <zorder>frame</zorder>
+  <zorder>label</zorder>
+  <zorder>pushButton_6</zorder>
+  <zorder>pushButton_8</zorder>
+  <zorder>textBrowser</zorder>
+  <zorder>label_2</zorder>
+  <zorder>textBrowser_2</zorder>
+  <zorder>textBrowser_3</zorder>
  </widget>
  <resources/>
  <connections/>

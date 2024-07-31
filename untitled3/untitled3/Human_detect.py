@@ -42,7 +42,7 @@ class HumanDetect(Node):
             callback_group=self.server_callback_group
         )
 
-        self.model_path = '/home/jchj/Untitled3/src/models/Best.pt'
+        self.model_path = '/home/jchj/Untitled3/src/AI_models/Best.pt'
         self.model = self.load_model()
 
         self.guest_detected = False
@@ -53,11 +53,11 @@ class HumanDetect(Node):
         self.frame = None
         self.annotated_frame = None
 
-        threading.Thread(target=self.display_frames).start()
+        # threading.Thread(target=self.display_frames).start()
 
     # Load YOLOv5 model
     def load_model(self):
-        return torch.hub.load('ultralytics/yolov5', 'custom', path=self.model_path, force_reload=True)
+        return torch.hub.load('/home/jchj/Untitled3/src/AI_models/yolov5', 'custom', path=self.model_path, source='local')
 
     def estimate_distance(self, bbox_height):
         KNOWN_HEIGHT = 1.7  # Human's average height (m)
@@ -97,20 +97,20 @@ class HumanDetect(Node):
                 self.far_human_detected = False
 
     def detect_human(self, distance):
-        if distance <= 0.5 and not self.guest_detected:
+        if distance <= 0.7 and not self.guest_detected:
+            self.loop_running = False  # Stop loop
             self.guest_detect()
             self.guest_detected = True
             self.human_detected = False
             self.far_human_detected = False
             self.no_human_detected = False
-            self.loop_running = False  # Stop loop
-        elif 0.5 < distance <= 1.5 and not self.human_detected:
+        elif 0.7 < distance <= 2.0 and not self.human_detected:
             self.human_detect()
             self.human_detected = True
             self.guest_detected = False
             self.far_human_detected = False
             self.no_human_detected = False
-        elif distance > 1.5 and not self.far_human_detected:
+        elif distance > 2.0 and not self.far_human_detected:
             self.far_human_detect()
             self.far_human_detected = True
             self.guest_detected = False
@@ -131,15 +131,10 @@ class HumanDetect(Node):
 
     def far_human_detect(self):
         self.get_logger().info('far_human detected!')
-        msg = TopicString()
-        msg.command = f'far_human'
-        self.human_detect_publisher.publish(msg)
 
     def no_human_detect(self):
         self.get_logger().info('No human detected!')
-        msg = TopicString()
-        msg.command = 'no_human'
-        self.human_detect_publisher.publish(msg)
+
 
     def run(self):
         while self.loop_running:

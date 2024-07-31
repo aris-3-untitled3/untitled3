@@ -3,6 +3,7 @@ from rclpy.node import Node
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
 from untitled_msgs.msg import TopicString
+from untitled_msgs.srv import ServiceString
 from cv_bridge import CvBridge
 import cv2
 import argparse
@@ -28,30 +29,29 @@ class GuestDetect(Node):
         )
 
         # Server에서 토픽 받기 (guest_detect)
-        self.guest = self.create_subscription(
-            TopicString,
-            '/Server_to_Guest',
+        self.guest = self.create_service(
+            ServiceString,
+            '/Call_to_Guest',
             self.guest_detect_callback,
-            10,
             callback_group=self.guest_callback_group
         )
 
         self.guest
 
-        # Robot_Server로 토픽 퍼블리셔
-        self.guest_publisher = self.create_publisher(TopicString, '/Guest_to_Server', 10)
+        # # Robot_Server로 토픽 퍼블리셔
+        # self.guest_publisher = self.create_publisher(TopicString, '/Guest_to_Server', 10)
 
         self.parser = argparse.ArgumentParser()
         self.parser.add_argument('--image')
 
         self.args = self.parser.parse_args()
 
-        self.faceProto = "/home/jchj/Untitled3/src/models/age_gender/opencv_face_detector.pbtxt"
-        self.faceModel = "/home/jchj/Untitled3/src/models/age_gender/opencv_face_detector_uint8.pb"
-        self.ageProto = "/home/jchj/Untitled3/src/models/age_gender/age_deploy.prototxt"
-        self.ageModel = "/home/jchj/Untitled3/src/models/age_gender/age_net.caffemodel"
-        self.genderProto = "/home/jchj/Untitled3/src/models/age_gender/gender_deploy.prototxt"
-        self.genderModel = "/home/jchj/Untitled3/src/models/age_gender/gender_net.caffemodel"   
+        self.faceProto = "/home/jchj/Untitled3/src/AI_models/age_gender/opencv_face_detector.pbtxt"
+        self.faceModel = "/home/jchj/Untitled3/src/AI_models/age_gender/opencv_face_detector_uint8.pb"
+        self.ageProto = "/home/jchj/Untitled3/src/AI_models/age_gender/age_deploy.prototxt"
+        self.ageModel = "/home/jchj/Untitled3/src/AI_models/age_gender/age_net.caffemodel"
+        self.genderProto = "/home/jchj/Untitled3/src/AI_models/age_gender/gender_deploy.prototxt"
+        self.genderModel = "/home/jchj/Untitled3/src/AI_models/age_gender/gender_net.caffemodel"   
 
         self.MODEL_MEAN_VALUES = (78.4263377603, 87.7689143744, 114.895847746)
         self.ageList = ['(0-2)', '(3-6)', '(7-12)', '(13-18)', '(19-29)', '(30-43)', '(44-49)', '(50-100)']
@@ -62,20 +62,24 @@ class GuestDetect(Node):
         self.frame = None  # 초기 프레임을 None으로 설정
         self.resultImg = None
         
-        threading.Thread(target=self.display_frames).start()
+        # threading.Thread(target=self.display_frames).start()
 
 
-    def guest_detect_callback(self,msg):
-        if msg.command == "guest_detect":
-            self.get_logger().info(f'Received : {msg.command}')
+    def guest_detect_callback(self,request,response):
+        if request.command == "guest_detect":
+            self.get_logger().info(f'Received : {request.command}')
             most_common_age, most_common_gender = self.run()
             result = f"Age : {most_common_age}, Gender : {most_common_gender}"
 
-            response_msg = TopicString()
-            response_msg.command = result
-            self.guest_publisher.publish(response_msg)
+            response.success = True
+            response.result = f'{request.command} completed! : {result}'
+            # self.guest_publisher.publish(response_msg)
+            return response
         else:
             self.get_logger().error('ERROR')
+            response.success = False
+            response.result = f'{request.command} failed!'
+            return response
 
     def Webcam_callback(self, msg):
         try:

@@ -8,6 +8,7 @@ import threading
 import os
 import pygame
 from gtts import gTTS
+import pyttsx3
 
 class VoiceOut(Node):
 
@@ -47,6 +48,7 @@ class VoiceOut(Node):
 
         response.success = True
         response.result = f'{request.command} completed!'
+        print(response.result)
         return response
 
     def voice_control_callback(self, msg):
@@ -65,7 +67,18 @@ class VoiceOut(Node):
 
     def play_bgm(self):
         pygame.mixer.music.load("/home/jchj/Untitled3/src/untitled3/UI/bgm.mp3")
+        pygame.mixer.music.set_volume(0.7)  # BGM 볼륨을 30%로 설정
         pygame.mixer.music.play(-1)  # 무한 반복 재생
+
+    def play_tt_no(self,text):
+        engine = pyttsx3.init()  # Initialize the TTS engine
+        voices = engine.getProperty('voices')
+        print(voices[10].id)
+        engine.setProperty('voice', voices[2].id)  # 원하는 음성 인덱스 선택
+        engine.setProperty('rate', 150)  # 음성 속도 조절
+        engine.setProperty('volume', 1)  # 볼륨 조절
+        engine.say(text)         # Queue the text to be spoken
+        engine.runAndWait()
 
     def play_tts(self, text):
         # TTS 생성

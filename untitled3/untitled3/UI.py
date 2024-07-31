@@ -1,29 +1,34 @@
 import rclpy as rp
 from rclpy.node import Node
 from untitled_msgs.msg import TopicString
-import time
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QStackedWidget
-from PyQt5 import uic
-from PyQt5.QtGui import QPixmap, QMovie
-from PyQt5.QtCore import pyqtSignal, QThread
-from PyQt5 import uic 
+import os
+from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget , QMessageBox , QTableWidgetItem , QAbstractItemView , QWidget , QPushButton ,QLabel,QVBoxLayout,QDialog
+from PyQt5 import uic , QtWidgets 
+from PyQt5.QtGui import QPixmap, QMovie ,QScreen,QFont
+from PyQt5.QtCore import pyqtSignal, QThread, QObject , QTimer , Qt
 import pygame
 import os
 import threading
-from untitled3.DB_manager import DB_Manager
+sys.path.append('/home/jchj/Untitled3/src/untitled3/untitled3')
+from DB_manager import DB_main
+from Voice_Input import Record_API
+from Voice_out import VoiceOut
+import time
+
+uipath = '/home/jchj/Untitled3/src/untitled3/UI'
 
 # UI 파일 경로 설정
-ui_file = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Title.ui")
-ui_file2 = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Loading.ui")
-ui_Direction = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Direction.ui")
-ui_Recommend = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Recommend_kor.ui")
-ui_Preparing = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Preparing.ui")
-ui_Making = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Making.ui")
-ui_Maked = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Maked.ui")
-ui_Coupon = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Coupon.ui")
-ui_Payment = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Payment.ui")
-ui_Bye = os.path.join('/home/jchj/Untitled3/src/untitled3/UI/', "Bye.ui")
+ui_file = os.path.join(uipath, "Title.ui")
+ui_file2 = os.path.join(uipath, "Loading.ui")
+ui_Direction = os.path.join(uipath, "Direction.ui")
+ui_Recommend = os.path.join(uipath, "Recommend_kor.ui")
+ui_Preparing = os.path.join(uipath, "Preparing.ui")
+ui_Making = os.path.join(uipath, "Making.ui")
+ui_Maked = os.path.join(uipath, "Maked.ui")
+ui_Coupon = os.path.join(uipath, "Coupon.ui")
+ui_Payment = os.path.join(uipath, "Payment.ui")
+ui_Bye = os.path.join(uipath, "Bye.ui")
 
 from_class = uic.loadUiType(ui_file)[0]
 from_class2 = uic.loadUiType(ui_file2)[0]
@@ -36,14 +41,15 @@ from_class_Coupon = uic.loadUiType(ui_Coupon)[0]
 from_class_Payment = uic.loadUiType(ui_Payment)[0]
 from_class_Bye = uic.loadUiType(ui_Bye)[0]
 
-class PyQt(Node):
-    # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
+class SignalEmitter(QObject):
+    # 신호 정의
     ui_update_signal = pyqtSignal(str)
 
-    def __init__(self , main_window , first_window ,loading_window , recommend_window , preparing_window , making_window , maked_window , bye_window):
-        super().__init__('PyQt')
+class PyQtNode(Node):
+    def __init__(self, signal_emitter):
+        super().__init__('PyQtNode')
+        self.signal_emitter = signal_emitter
 
-        # Robot_Server에서 토픽 받기 (3초 정면 대기 / 설명장면 / 메뉴선택화면 / 추천메뉴선택 / 메뉴선택 / 쓰레기처리 / 제조준비완료 / 제조완료 / 결제장면 / 마지막장면)
         self.Robot_server_subscriber = self.create_subscription(
             TopicString,
             '/Server_to_UI',
@@ -51,155 +57,194 @@ class PyQt(Node):
             10
         )
 
-        # prevent unused variable warning
-        self.Robot_server_subscriber
-
-        # Robot_Server로 토픽 퍼블리셔 (화면 전환)
         self.robot_server_publisher = self.create_publisher(TopicString, '/UI_to_Server', 10)
-
-        # 시작
-        msg = TopicString()
-        msg.command = "start"
-        self.robot_server_publisher.publish(msg)
-
-        self.main_window = main_window
-        self.first_window = first_window
-        self.loading_window = loading_window
-        self.recommend_window = recommend_window
-        self.preparing_window = preparing_window
-        self.making_window = making_window
-        self.maked_window = maked_window
-        self.bye_window = bye_window
-
 
     def Robot_Server_callback(self, msg):
         self.get_logger().info(f'Received command: {msg.command}')
-
         if msg.command == "guest_detect":
-            self.main_window.open_LoadingWindow()
-            # self.first_window.update_signal.emit(msg.command)
-
-        elif "Age" and "Gender" in msg.command:
-            self.loading_window.update_signal.emit(msg.command)
-
-        elif msg.command == "Pre-production":
-            self.preparing_window.update_signal.emit(msg.command)
-
-        elif msg.command == "ice_cream_production_complete":
-            self.making_window.update_signal.emit(msg.command)
-            time.sleep(3)
-            self.maked_window.update_signal.emit(msg.command)
-
-        elif "Conclusion" in msg.command :
-            
-            if "ok" in msg.command :
-                self.bye_window.update_signal.emit("restart")
-            else :
-                print("음성출력 - 재고량 없음")
-                return
+            self.signal_emitter.ui_update_signal.emit("open_Loading")
+        elif "guest_confirm" in msg.command :
+            self.signal_emitter.ui_update_signal.emit("open_Direction")
+        elif msg.command == "ice_cream_ready":
+            self.signal_emitter.ui_update_signal.emit("open_Making")
+        elif msg.command == "ice_cream_completed":
+            self.signal_emitter.ui_update_signal.emit("open_Maked")
+        elif msg.command == "open_coupon":
+            self.signal_emitter.ui_update_signal.emit("open_Coupon")
+        elif msg.command == "return":
+            self.signal_emitter.ui_update_signal.emit("open_First")
         else:
-            return
+            print("NO")
 
-    def Pre_production(self):
-        self.get_logger().info('UI to Server , Pre-production!')
-
+    def publish_message(self, command):
+        self.get_logger().info('UI to Server!')
         msg = TopicString()
-        msg.command = 'Pre-production'
-        print(msg)
+        msg.command = command
         self.robot_server_publisher.publish(msg)
+        print(msg)
 
-# 전체 UI 관리  
-class MainWindow(QMainWindow, Node):
-    def __init__(self):
-        QMainWindow.__init__(self)
-        Node.__init__(self, 'qt_ros2_node')
+class MainWindow(QMainWindow):
+    def __init__(self, signal_emitter):
+        super().__init__()
 
-        self.stacked_widget = QStackedWidget(self)  # QStackedWidget 인스턴스 생성   
-        self.setCentralWidget(self.stacked_widget)  # MainWindow의 중앙 위젯으로 설정
+        self.stacked_widget = QStackedWidget(self)
+        self.setCentralWidget(self.stacked_widget)
 
-        self.publisher = self.create_publisher(TopicString, '/qt_to_server', 10)
-        self.subscription = self.create_subscription(TopicString, '/server_to_qt', self.listener_callback, 10)
-
-        # self.ros_thread = ROS2Thread(self)
-        # self.ros_thread.ros_signal.connect(self.handle_ros_message)
-        # self.ros_thread.start()
+        self.node = PyQtNode(signal_emitter)
+        self.node.signal_emitter.ui_update_signal.connect(self.handle_ui_update)
 
         self.open_FirstWindow()
 
-    def ui_callback(self,msg):
-        if msg.command == "loading":
+    def handle_ui_update(self, command):
+        if command == "open_Loading":
             self.open_LoadingWindow()
+        elif command == "open_Direction":
+            self.open_DirectionWindow()
+        elif command == "open_Making":
+            self.open_MakingWindow()
+        elif command == "open_Maked":
+            self.open_MakedWindow()
+        elif command == "open_Coupon":
+            self.open_CouponWindow()
+        elif command == "open_First":
+            self.open_FirstWindow()
+        else:
+            print("NO")
 
     def open_FirstWindow(self):
         self.FirstWindow = FirstWindow(self)
-        self.stacked_widget.addWidget(self.FirstWindow)  # MainWindow 페이지를 stacked widget에 추가
-        self.stacked_widget.setCurrentWidget(self.FirstWindow)  # MainWindow 페이지를 보여줌
+        self.stacked_widget.addWidget(self.FirstWindow)
+        self.stacked_widget.setCurrentWidget(self.FirstWindow)
+        if self.node:
+            self.node.publish_message("open_First")
 
     def open_LoadingWindow(self):
         self.LoadingWindow = LoadingWindow(self)
-        self.stacked_widget.addWidget(self.LoadingWindow)  # LoadingWindow 페이지를 stacked widget에 추가
-        self.stacked_widget.setCurrentWidget(self.LoadingWindow)  # LoadingWindow 페이지를 보여줌
+        self.stacked_widget.addWidget(self.LoadingWindow)
+        self.stacked_widget.setCurrentWidget(self.LoadingWindow)
+        # if self.node:
+        #     self.node.publish_message("open_Loading")
 
     def open_DirectionWindow(self):
         self.DirectionWindow = DirectionWindow(self)
         self.stacked_widget.addWidget(self.DirectionWindow)  # DirectionWindow 페이지를 stacked widget에 추가
         self.stacked_widget.setCurrentWidget(self.DirectionWindow)  # DirectionWindow 페이지를 보여줌
+        if self.node:
+            self.node.publish_message("open_Direction")
 
     def open_RecommendWindow(self):
         self.RecommendWindow = RecommendWindow(self)
         self.stacked_widget.addWidget(self.RecommendWindow)  # RecommendWindow 페이지를 stacked widget에 추가
         self.stacked_widget.setCurrentWidget(self.RecommendWindow)  # RecommendWindow 페이지를 보여줌
+        if self.node:
+            self.node.publish_message("open_Recommand")
 
     def open_PreparingWindow(self):
         self.PreparingWindow = PreparingWindow(self)
         self.stacked_widget.addWidget(self.PreparingWindow)  # PreparingWindow 페이지를 stacked widget에 추가
         self.stacked_widget.setCurrentWidget(self.PreparingWindow)  # PreparingWindow 페이지를 보여줌
+        if self.node:
+            self.node.publish_message("open_Prepare")
 
     def open_MakingWindow(self):
         self.MakingWindow = MakingWindow(self)
         self.stacked_widget.addWidget(self.MakingWindow)  # MakingWindow 페이지를 stacked widget에 추가
         self.stacked_widget.setCurrentWidget(self.MakingWindow)  # MakingWindow 페이지를 보여줌
+        if self.node:
+            self.node.publish_message("open_making")
 
     def open_MakedWindow(self):
         self.MakedWindow = MakedWindow(self)
         self.stacked_widget.addWidget(self.MakedWindow)  # MakedWindow 페이지를 stacked widget에 추가
         self.stacked_widget.setCurrentWidget(self.MakedWindow)  # MakedWindow 페이지를 보여줌
+        if self.node:
+            self.node.publish_message("open_maked")
 
     def open_CouponWindow(self):
         self.CouponWindow = CouponWindow(self)
         self.stacked_widget.addWidget(self.CouponWindow)  # CouponWindow 페이지를 stacked widget에 추가
         self.stacked_widget.setCurrentWidget(self.CouponWindow)  # CouponWindow 페이지를 보여줌
+        if self.node:
+            self.node.publish_message("open_coupon")
     
     def open_PaymentWindow(self,coupon,number):
         self.PaymentWindow = PaymentWindow(self,coupon,number)
         self.stacked_widget.addWidget(self.PaymentWindow)  # PaymentWindow 페이지를 stacked widget에 추가
         self.stacked_widget.setCurrentWidget(self.PaymentWindow)  # PaymentWindow 페이지를 보여줌
+        if self.node:
+            self.node.publish_message("open_payment")
 
     def open_ByeWindow(self):
         self.ByeWindow = ByeWindow(self)
         self.stacked_widget.addWidget(self.ByeWindow)  # ByeWindow 페이지를 stacked widget에 추가
         self.stacked_widget.setCurrentWidget(self.ByeWindow)  # ByeWindow 페이지를 보여줌
-
+        if self.node:
+            self.node.publish_message("open_bye")
 
 class FirstWindow(QMainWindow, from_class):
-    # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
-    update_signal = pyqtSignal(str)
-    
-    def __init__(self,main_window):
+    def __init__(self, main_window):
         super().__init__()
         self.setupUi(self)
-    
         self.load_image()
-
         self.main_window = main_window
-    
+
+        self.setWindowTitle('Background Image Example')
+        self.resize(1920, 1080)
+
+        # 중앙 위젯 설정
+        central_widget = QWidget(self)
+        self.setCentralWidget(central_widget)
+
+        # 스타일시트를 사용하여 중앙 위젯에 배경 이미지 설정
+        central_widget.setStyleSheet(f"""
+            QWidget {{
+                background-image: url("{uipath}/background.png"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }}
+        """)
+
+        # 버튼 설정
+        self.pushButton = QPushButton('주문\n\nOrder Now', self)
+        self.pushButton.setGeometry(1400, 600, 360, 360)  # 버튼 위치와 크기 설정
+
+        # 버튼 스타일 설정
+        self.pushButton.setStyleSheet("""
+            QPushButton {
+                background-color: #f1c40f; /* 버튼 배경색 */
+                color: white; /* 버튼 글자색 */
+                font-size: 26px; /* 글자 크기 */
+                font-weight: bold; /* 글자 굵기 */
+                border-radius: 15px; /* 둥근 모서리 */
+                border: 2px solid #e67e22; /* 테두리 색과 굵기 */
+            }
+            QPushButton:hover {
+                background-color: #e67e22; /* 마우스 오버시 배경색 */
+            }
+            QPushButton:pressed {
+                background-color: #d35400; /* 클릭시 배경색 */
+            }
+        """)
+
+        # QLabel 수동 생성 및 설정
+        self.label = QLabel("온 가족이 함께 즐기는 무제 아이스크림", self)
+        self.label.setGeometry(500, 340, 881, 131)
+        self.label.setStyleSheet("""
+            QLabel {
+                color: black; /* 글자 색상 */
+                font-size: 50px; /* 글자 크기 */
+                font-weight: bold; /* 글자 굵기 */
+                background-color: rgba(0, 0, 0, 0); /* 배경 투명하게 */
+            }
+        """)
+        self.label.setAlignment(Qt.AlignCenter)  # 텍스트를 중앙에 정렬
+        self.label.raise_()  # QLabel을 최상위로 올림
+
         self.pushButton.clicked.connect(self.next)
         self.pushButton.clicked.connect(self.on_click)
-    
-        self.update_signal.connect(self.next)
 
     def load_image(self):
-        pixmap = QPixmap("/home/jchj/Untitled3/src/untitled3/UI/Title.jpg")
+        pixmap = QPixmap(f"{uipath}/Title.jpg")
         self.label_2.setPixmap(pixmap)
         self.label_2.setScaledContents(True)
 
@@ -214,45 +259,116 @@ class FirstWindow(QMainWindow, from_class):
     def next(self):
         self.main_window.open_LoadingWindow()
 
-
 class LoadingWindow(QMainWindow, from_class2):
-    # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
-    update_signal = pyqtSignal(str)
-
-    def __init__(self,main_window):
+    def __init__(self, main_window):
         super().__init__()
         self.setupUi(self)
-
         self.main_window = main_window
 
-        # QLabel에 GIF 설정
-        self.movie = QMovie("/home/jchj/Untitled3/src/untitled3/UI/loading.gif")
-        if self.movie.isValid():
-            self.label_pic.setMovie(self.movie)
-            self.movie.start()
+        self.resize(1920, 1080)
 
-        self.update_signal.connect(self.next)
+        # QLabel 객체 접근
+        self.label = self.findChild(QtWidgets.QLabel, 'label')
 
+        # QLabel에 배경 이미지 설정
+        self.label.setStyleSheet(f"""
+            QLabel {{
+                background-image: url("{uipath}/background.png"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }}
+        """)
+
+        # self.movie = QMovie("/home/jchj/Untitled3/src/untitled3/UI/loading.gif")
+        # if self.movie.isValid():
+        #     self.label_2.setMovie(self.movie)
+        #     self.movie.start()
 
     def next(self):
         self.main_window.open_DirectionWindow()
 
 class DirectionWindow(QMainWindow, from_class_Direction):
-    # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
-    update_signal = pyqtSignal(str)
-
     def __init__(self,main_window):
         super().__init__()
         self.setupUi(self)
         
         self.main_window = main_window
 
-        self.pushButton.clicked.connect(self.next)
+        # QLabel 객체 접근s
+        self.widget = self.findChild(QtWidgets.QWidget, 'widget')
+        self.pushButton_front = self.findChild(QtWidgets.QPushButton, 'pushButton_front')
+        self.pushButton_home = self.findChild(QtWidgets.QPushButton, 'pushButton_home')
+        self.pushButton_back = self.findChild(QtWidgets.QPushButton, 'pushButton_back')
+
+        self.pushButton_next1 = self.findChild(QtWidgets.QTextBrowser, 'next_png1')
+        self.pushButton_next2 = self.findChild(QtWidgets.QTextBrowser, 'next_png2')
+        self.pushButton_front.clicked.connect(self.next)
         self.pushButton_back.clicked.connect(self.open_loading_window)
         self.pushButton_home.clicked.connect(self.open_Title_window)
-        self.pushButton.clicked.connect(self.on_click)
+        self.pushButton_front.clicked.connect(self.on_click)
         self.pushButton_back.clicked.connect(self.on_click)
         self.pushButton_home.clicked.connect(self.on_click)
+
+        # QLabel에 배경 이미지 설정
+
+        self.pushButton_next1.setStyleSheet(f"""
+            QTextBrowser {{
+                background-image: url({uipath}/button/next.png);
+            }}
+        """)
+
+        self.pushButton_next2.setStyleSheet(f"""
+            QTextBrowser {{
+                background-image: url({uipath}/button/next.png);
+            }}
+        """)
+
+        # QLabel에 배경 이미지 설정
+        self.widget.setStyleSheet(f"""
+            QWidget {{
+                background-image: url("{uipath}/background.png"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }}
+        """)
+        self.pushButton_front.setStyleSheet(f"""
+            QPushButton {{
+                color: #3E2723; /* 다크 브라운 글씨 색 */
+                background-image: url({uipath}/button/after.png);  
+                font-size: 32px; /* 글씨 크기 */
+                border-radius: 45px; /* 둥근 모서리 */
+                padding: 10px;
+            }}
+            QPushButton:hover {{
+                background-color: #FFC0CB; /* 마우스 오버시 배경색 */
+            }}
+        """)
+
+        self.pushButton_home.setStyleSheet(f"""
+            QPushButton {{
+                color: #3E2723; /* 다크 브라운 글씨 색 */
+                background-image: url({uipath}/button/home.png);  
+                font-size: 32px; /* 글씨 크기 */
+                border-radius: 45px; /* 둥근 모서리 */
+                padding: 10px;
+            }}
+            QPushButton:hover {{
+                background-color: #FFC0CB; /* 마우스 오버시 배경색 */
+            }}
+        """)
+
+        self.pushButton_back.setStyleSheet(f"""
+            QPushButton {{
+                color: #3E2723; /* 다크 브라운 글씨 색 */
+                background-image: url({uipath}/button/before.png);  
+                font-size: 32px; /* 글씨 크기 */
+                border-radius: 45px; /* 둥근 모서리 */
+                padding: 10px;
+            }}
+            QPushButton:hover {{
+                background-color: #FFC0CB; /* 마우스 오버시 배경색 */
+            }}
+        """)      
 
     def open_Title_window(self):
         self.main_window.open_FirstWindow()
@@ -270,80 +386,42 @@ class DirectionWindow(QMainWindow, from_class_Direction):
 
     def next(self):
         self.main_window.open_RecommendWindow()
-
+   
 class RecommendWindow(QMainWindow, from_class_Recommend):
-
-    update_signal = pyqtSignal(str)
-
     def __init__(self , main_window):
         super().__init__()
+        global age, gender, taste,top
         self.setupUi(self)
 
         self.main_window = main_window
         
+        self.frame = self.findChild(QtWidgets.QFrame, 'frame')
+        self.frame.setStyleSheet(f"""
+            QFrame {{
+            background-image: url({uipath}/background.png);
+                                 }}
+            """)
+
+        #맛 추천 표시 두 가지 방법 중 선택하기
+        age, gender, recommended_flavor, recommended_topping = DB_main().recommend_flavor_topping()
+        print(f"{age},{gender}{recommended_flavor}, {recommended_topping}")
+        self.label_2.setText(f"손님께 추천드리는 맛과 토핑은 {recommended_flavor}와 {recommended_topping}입니다.")
+
+        # 디폴트는 추천대로
+        taste = recommended_flavor
+        top = recommended_topping
+
+        self.pushButton_front = self.findChild(QtWidgets.QPushButton, 'pushButton_front')
+        self.pushButton_home = self.findChild(QtWidgets.QPushButton, 'pushButton_home')
+        self.pushButton_back = self.findChild(QtWidgets.QPushButton, 'pushButton_back')
+
+        # 홈 버튼, 뒤로가기 버튼
         self.pushButton_back.clicked.connect(self.open_Direction_window)
         self.pushButton_home.clicked.connect(self.open_Title_window)
         self.pushButton_back.clicked.connect(self.on_click)
         self.pushButton_home.clicked.connect(self.on_click)
 
-        self.setStyleSheet("""
-            QPushButton {
-                border: 2px solid #1E90FF;  /* 테두리 색상: DodgerBlue */
-                border-radius: 10px;        /* 둥근 테두리 */
-                padding: 5px;               /* 버튼 내부 여백 */
-                background-color: #F0F8FF;  /* 배경 색상: AliceBlue */
-            }
-
-            QPushButton:hover {
-                border: 2px solid #00BFFF;  /* 마우스 올렸을 때 테두리 색상: DeepSkyBlue */
-                background-color: #E6F2FF;  /* 마우스 올렸을 때 배경 색상 */
-            }
-
-            /* pushButton_1에 대한 스타일 */
-            #pushButton_1 {
-                border: 6px solid;
-                border-image: linear-gradient(45deg, #FFFF00, #00FFFF) 1;  /* 그라데이션 테두리 */
-                border-radius: 10px;        /* 둥근 테두리 */
-                padding: 5px;               /* 버튼 내부 여백 */
-                background-color: #F0F8FF;  /* 배경 색상: AliceBlue */
-                color: #000000;             /* 텍스트 색상: 검정색 */
-                font-weight: bold;          /* 텍스트 두껍게 */
-            }
-
-            #pushButton_1:hover {
-                border: 2px solid;
-                border-image: linear-gradient(45deg, #00FFFF, #FFFF00) 1;  /* 마우스 올렸을 때 그라데이션 변경 */
-                background-color: #E6F2FF;  /* 마우스 올렸을 때 배경 색상 */
-                color: #000000;             /* 텍스트 색상: 검정색 */
-                font-weight: bold;          /* 텍스트 두껍게 */
-            }
-
-            /* pushButton_4에 대한 스타일 */
-            #pushButton_4 {
-                border: 6px solid;
-                border-image: linear-gradient(45deg, #FFFF00, #00FFFF) 1;  /* 그라데이션 테두리 */
-                border-radius: 10px;        /* 둥근 테두리 */
-                padding: 5px;               /* 버튼 내부 여백 */
-                background-color: #F0F8FF;  /* 배경 색상: AliceBlue */
-                color: #000000;             /* 텍스트 색상: 검정색 */
-                font-weight: bold;          /* 텍스트 두껍게 */
-            }
-
-            #pushButton_4:hover {
-                border: 2px solid;
-                border-image: linear-gradient(45deg, #00FFFF, #FFFF00) 1;  /* 마우스 올렸을 때 그라데이션 변경 */
-                background-color: #E6F2FF;  /* 마우스 올렸을 때 배경 색상 */
-                color: #000000;             /* 텍스트 색상: 검정색 */
-                font-weight: bold;          /* 텍스트 두껍게 */
-            }
-        """)
-
-        # 맛 추천 표시 두 가지 방법 중 선택하기
-        recommended_flavor = "초코"
-        recommended_topping = "토핑C"
-        self.label_2.setText(f"손님께 추천드리는 맛과 토핑은 {recommended_flavor}와 {recommended_topping}입니다.")
-
-        # QPushButton을 토글 버튼으로 만들기
+        # 아이스크림과 토핑을 토글 버튼으로 만들기
         self.pushButton_1.setCheckable(True)
         self.pushButton_2.setCheckable(True)
         self.pushButton_3.setCheckable(True)
@@ -351,15 +429,7 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         self.pushButton_5.setCheckable(True)
         self.pushButton_6.setCheckable(True)
 
-        # 각 버튼에 대해 토글 이벤트 연결
-        self.pushButton_1.clicked.connect(self.toggle_button)
-        self.pushButton_2.clicked.connect(self.toggle_button)
-        self.pushButton_3.clicked.connect(self.toggle_button)
-        self.pushButton_4.clicked.connect(self.toggle_button)
-        self.pushButton_5.clicked.connect(self.toggle_button)
-        self.pushButton_6.clicked.connect(self.toggle_button)
-
-        # 소리
+        # 버튼 소리
         self.pushButton_1.clicked.connect(self.on_click)
         self.pushButton_2.clicked.connect(self.on_click)
         self.pushButton_3.clicked.connect(self.on_click)
@@ -368,57 +438,114 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         self.pushButton_6.clicked.connect(self.on_click)
 
         # Next 버튼 이벤트 연결
-        self.pushButton.clicked.connect(self.check_selection_and_next)
+        self.pushButton_front.clicked.connect(self.check_selection_and_next)
+        # 추천 버튼 눌렀을 때
+        # self.pushButton_rec.clicked.connect(self.open_Prepare_window_rec)
+        
+        self.yesno = 0
 
-        # 손님 성별,연령대에 따른 맛 선호도 가져오기: 서비스 : UI -> DB_Manager
-        #   테투리 - 선호도 (성별,연령대) 
-        #   음성 출력 - "추천 메뉴를 선택하시겠습니까?"
-        #   음성 인식: 서비스 : UI -> Voice_Input (네 or 아니요)
-        # self.main_window.voice_input()
-        #       네 - 음성출력 및 다음화면 "선택한 메뉴를 제조하겠습니다"
-        #       아니요 - 음성출력 : "메뉴를 선택해 주세요"
-        #           음성 인식 : 서비스 : UI -> Voice_Input (아이스크림 맛, 토핑맛)
-        # self.main_window.voice_input()
-        #               맛 선택 : "선택한 맛으로 제조하겠습니다."
-        #               nop : 음성출력 - "메뉴가 부정확합니다 . 마우스로 클릭해 주세요"
+        self.pushButton_front.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/after.png);  
+                border: 1px solid rgba(0, 0, 0, 0); /* 투명 테두리 */
+                background-color: rgba(0, 0, 0, 0);
+            }}
+            QPushButton:hover {{
+                background-color: #FFC0CB; /* 마우스 오버시 배경색 */
+            }}
+        """)
 
-        self.update_signal.connect(self.next)
+        self.pushButton_home.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/home.png);  
+                border: 1px solid rgba(0, 0, 0, 0); /* 투명 테두리 */
+                background-color: rgba(0, 0, 0, 0);
+            }}
+            QPushButton:hover {{
+                background-color: #FFC0CB; /* 마우스 오버시 배경색 */
+            }}
+        """)
 
-        # 맛 추천 표시 두 가지 방법 중 선택하기
-        # age, gender, recommended_flavor, recommended_topping = DB_main().recommend_flavor_topping()
-        # print(f"{recommended_flavor}, {recommended_topping}")
-        # self.label_2.setText(f"손님께 추천드리는 맛과 토핑은 {recommended_flavor}와 {recommended_topping}입니다.")
+        self.pushButton_back.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/before.png);  
+                border: 1px solid rgba(0, 0, 0, 0); /* 투명 테두리 */
+                background-color: rgba(0, 0, 0, 0);
+                
+            }}
+            QPushButton:hover {{
+                background-color: #FFC0CB; /* 마우스 오버시 배경색 */
+            }}
+        """)      
 
-        # self.Flavor, self.Topping = DB_main().YorN_response(recommended_flavor, recommended_topping)
 
-        # print(f"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@{self.Flavor} {self.Topping}")
+        self.pushButton_1.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/choco.png);
+                border: 1px solid rgba(0, 0, 0, 0); /* 투명 테두리 */
+            }}
+            QPushButton:checked {{
+                background-image: url({uipath}/button/choco.png);
+                border: 4px solid brown; /* 초코 색 */
+            }}
+        """)
+        self.pushButton_2.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/vanilla.png);
+                border: 1px solid rgba(0, 0, 0, 0); /* 투명 테두리 */
+            }}
+            QPushButton:checked {{
+                background-image: url({uipath}/button/vanilla.png);
+                border: 4px solid yellow; /* 바닐라 색 */
+            }}
+        """)
+        self.pushButton_3.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/berry.png);
+                border: 1px solid rgba(0, 0, 0, 0); /* 투명 테두리 */
+            }}
+            QPushButton:checked {{
+                background-image: url({uipath}/button/berry.png);
+                border: 4px solid red; /* 딸기 색 */
+            }}
+        """)
+        self.pushButton_4.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/topa.png);
+                border: 1px solid lightgray; /* 회색 테두리 */
+            }}
+            QPushButton:checked {{
+                background-image: url({uipath}/button/topa.png);
+                border: 4px solid lightgray; /* 회색 */
+            }}
+        """)
+        self.pushButton_5.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/topb.png);
+                border: 1px solid lightgray; /* 회색 테두리 */
+            }}
+            QPushButton:checked {{
+                background-image: url({uipath}/button/topb.png);
+                border: 4px solid lightgray; /* 녹색 */
+            }}
+        """)
+        self.pushButton_6.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({uipath}/button/topc.png);
+                border: 1px solid lightgray; /* 회색 테두리 */
+            }}
+            QPushButton:checked {{
+                background-image: url({uipath}/button/topc.png);
+                border: 4px solid lightgray; /* 파란색 */
+            }}
+        """)
 
-        # # 인식 못했으면 클릭 활성화 --> 손님 직접 메뉴 선택
-        # if self.Flavor is None and self.Topping is None:
-        #     # QPushButton을 토글 버튼으로 만들기
-        #     self.pushButton_1.setCheckable(True) # choco
-        #     self.pushButton_2.setCheckable(True) # vanilla
-        #     self.pushButton_3.setCheckable(True) # berry
-        #     self.pushButton_4.setCheckable(True) # topC
-        #     self.pushButton_5.setCheckable(True) # topB
-        #     self.pushButton_6.setCheckable(True) # topA
+        self.yesno = 0
 
-        #     # 소리
-        #     self.pushButton_1.clicked.connect(self.on_click)
-        #     self.pushButton_2.clicked.connect(self.on_click)
-        #     self.pushButton_3.clicked.connect(self.on_click)
-        #     self.pushButton_4.clicked.connect(self.on_click)
-        #     self.pushButton_5.clicked.connect(self.on_click)
-        #     self.pushButton_6.clicked.connect(self.on_click)
-        #     # Next 버튼 이벤트 연결
-        #     self.pushButton.clicked.connect(self.check_selection_and_next)
-        # else:
-        #     Flavor = self.Flavor
-        #     Topping = self.Topping
-        #     print(f"check_selection_and_next ==========> global4 {Flavor}, {Topping}")
-        #     print(f"check_selection_and_next ==========> global5 self.{Flavor}, self.{Topping}")
-        #     QTimer.singleShot(30,  self.open_Preparing_window)
-    
+        self.initUI()
+        
+
+
     def on_click(self):
         threading.Thread(target=self.play_mp3).start()
 
@@ -432,7 +559,7 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
 
     def play_mp3_warn(self):
         pygame.mixer.init()
-        pygame.mixer.music.load("/home/jchj/Untitled3/src/untitled3/UI/cat_like1b.mp3")
+        pygame.mixer.music.load("/home/jchj/Untitled3/src/untitled3/UI/blip01.mp3")
         pygame.mixer.music.play()
         
     def open_Title_window(self):
@@ -441,47 +568,176 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
     def open_Direction_window(self):
         self.main_window.open_DirectionWindow()
 
-    def toggle_button(self):
-        button = self.sender()
-        if button.isChecked():
-            if button == self.pushButton_1:
-                button.setStyleSheet('background-color: brown')  # 초코 색
-            elif button == self.pushButton_2:
-                button.setStyleSheet('background-color: beige')  # 바닐라 색
-            elif button == self.pushButton_3:
-                button.setStyleSheet('background-color: red')  # 딸기 색
-            else:
-                button.setStyleSheet('background-color: lightgray')  # 토핑 색상
-        else:
-            button.setStyleSheet('')  # 초기 상태로 되돌림
+    def initUI(self):
+        self.setGeometry(0, 0, 1920, 1080)
+        self.show()
+        # 초기 UI 설정 및 음성 인식 시작
+        QTimer.singleShot(500, self.show_recommendation_dialog)
 
-    # def toggle_button(self):
-    #     global Flavor, Topping
-    #     button = self.sender()
-    #     if button.isChecked():
-    #         if button == self.pushButton_1:
-    #             button.setStyleSheet('background-color: brown')  # 초코 색
-    #             Flavor = "choco"
-    #         elif button == self.pushButton_2:
-    #             button.setStyleSheet('background-color: beige')  # 바닐라 색
-    #             Flavor = "vanilla"
-    #         elif button == self.pushButton_3:
-    #             button.setStyleSheet('background-color: red')  # 딸기 색
-    #             Flavor = "berry"
-    #         elif button == self.pushButton_4:
-    #             button.setStyleSheet('background-color: lightgray')  # 토핑 색상
-    #             Topping = "topC"
-    #         elif button == self.pushButton_5:
-    #             button.setStyleSheet('background-color: lightgray')  # 토핑 색상
-    #             Topping = "topB"
-    #         elif button == self.pushButton_6:
-    #             button.setStyleSheet('background-color: lightgray')  # 토핑 색상
-    #             Topping = "topA"
-    #     else:
-    #         button.setStyleSheet('')  # 초기 상태로 되돌림
+    def show_recommendation_dialog(self):
+        self.recommendation_dialog = QDialog(self)
+        self.recommendation_dialog.setWindowTitle('추천 메뉴')
+        self.recommendation_dialog.setGeometry(0, 0, 700, 700)
+        self.recommendation_dialog.setStyleSheet("""
+            QDialog {
+                background-image: url(/home/jchj/Untitled3/src/untitled3/UI/backimg.png); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
+
+        layout = QVBoxLayout()
+
+        label = QLabel(f"추천드린 메뉴로 주문하시겠습니까?\n\n추천메뉴는 {taste}와 {top}입니다.\n\n'예' 또는 '아니오'로 대답해주세요.")
+        label.setAlignment(Qt.AlignCenter)
+
+        font = QFont()
+        font.setPointSize(28)
+        label.setFont(font)
+
+        layout.addWidget(label)
+        self.recommendation_dialog.setLayout(layout)
+        self.recommendation_dialog.setWindowModality(Qt.ApplicationModal)
+        self.center_dialog(self.recommendation_dialog)
+        self.recommendation_dialog.show()
+
+        QTimer.singleShot(3000, self.show_buffering_dialog)
+
+    def show_buffering_dialog(self):
+        self.recommendation_dialog.close()
+
+        self.buffering_dialog = QDialog(self)
+        self.buffering_dialog.setWindowTitle('음성 인식 중')
+        self.buffering_dialog.setGeometry(0, 0, 700, 700)
+        self.buffering_dialog.setStyleSheet("""
+            QDialog {
+                background-image: url(/home/jchj/Untitled3/src/untitled3/UI/button/record.png); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
+
+        layout = QVBoxLayout()
+
+        label = QLabel("\n\n\n\n\n\n\n\n\n\n음성 인식 중")
+        label.setAlignment(Qt.AlignCenter)
+
+        font = QFont()
+        font.setPointSize(28)
+        label.setFont(font)
+
+        layout.addWidget(label)
+        self.buffering_dialog.setLayout(layout)
+        self.buffering_dialog.setWindowModality(Qt.ApplicationModal)
+        self.center_dialog(self.buffering_dialog)
+        self.buffering_dialog.show()
+        QTimer.singleShot(1000, self.voice_1)
+
+        #음성받기
+    def voice_1(self):   
+        text = Record_API().run()
+
+        print(text)
+
+        if text == None:
+            QTimer.singleShot(1000, self.show_speechorder_dialog)
+        elif "선택" in text:
+            print("Yes라고 답변 받았을 때")
+            QTimer.singleShot(1000, self.buffering_dialog.close)
+            QTimer.singleShot(1000, self.open_Prepare_window_rec)
+        else:
+            print("No라고 답변 받았을 때")
+            QTimer.singleShot(1000, self.show_speechorder_dialog)
+
+    def show_speechorder_dialog(self):
+        self.buffering_dialog.close()
+
+        self.speechorder_dialog = QDialog(self)
+        self.speechorder_dialog.setWindowTitle('음성인식 주문 창')
+        self.speechorder_dialog.setGeometry(0, 0, 700, 700)
+        self.speechorder_dialog.setStyleSheet("""
+            QDialog {
+                background-image: url(/home/jchj/Untitled3/src/untitled3/UI/backimg.png); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
+        layout = QVBoxLayout()
+
+        label = QLabel("음성 인식 중입니다.\n원하시는 메뉴를 말씀해주세요.\n예시문장 (**맛과 **토핑 주세요.)")
+        label.setAlignment(Qt.AlignCenter)
+
+        font = QFont()
+        font.setPointSize(28)
+        label.setFont(font)
+
+        layout.addWidget(label)
+        self.speechorder_dialog.setLayout(layout)
+        self.speechorder_dialog.setWindowModality(Qt.ApplicationModal)
+        self.center_dialog(self.speechorder_dialog)
+        self.speechorder_dialog.show()
+
+        self.recognize = 0 # 음성인식 유무 ## 인식 창 안꺼짐
+        QTimer.singleShot(1000, self.voice_2)
+
+        #음성받기
+    def voice_2(self):   
+        text = Record_API().run()
+
+        print(text)
+
+        if text == None:
+            flag = 0
+        else:
+            flag = 1
+
+        text_file = "/home/jchj/Untitled3/src/untitled3/resource/response.txt"
+
+        taste , top = DB_main().word_detect(text_file,5,flag)
+        print(f"{taste},{top}--------------------------1")
+
+        ## 인식 기회 1번
+        if taste == "error" or top == "error":
+            print("답변 못 받았을 때")
+            self.speechorder_dialog.close()
+        else:
+            print("답변 받았을 때")
+            self.speechorder_dialog.close()
+            print(f"{taste},{top}--------------------------2")
+            QTimer.singleShot(1000, self.open_Preparing_window)
+        
+    def center_dialog(self, dialog):
+        # 화면 중앙에 다이얼로그 배치
+        screen = QScreen.availableGeometry(QApplication.primaryScreen())
+        x = (screen.width() - dialog.width()) // 2
+        y = (screen.height() - dialog.height()) // 2
+        dialog.move(x, y)
+
+    def open_Prepare_window_rec(self):
+        # 맛과 토핑 변경 없음
+        self.main_window.open_CouponWindow()
+        
+    def open_Title_window(self):
+        self.main_window.open_FirstWindow()
+
+    def open_Direction_window(self):
+        self.main_window.open_DirectionWindow()
+
+    # 한 가지씩 선택하고 다음 눌렀을 때 재확인창
+    def showMessage(self):
+        message = f'선택하신 메뉴를 확인해주세요. \n아이스크림: {taste}\n토핑: {top}'
+        reply = QMessageBox.question(self, 'Message', message, 
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        
+        if reply == QMessageBox.Yes:
+            self.open_Preparing_window()
+            print('Yes selected')
+        else:
+            print('No selected')
 
     def check_selection_and_next(self):
-
+        # 아이스크림 맛이 하나가 선택되었는지 확인
+        global taste,top
         ice_cream_selected = (
             (self.pushButton_1.isChecked() and not self.pushButton_2.isChecked() and not self.pushButton_3.isChecked()) or
             (not self.pushButton_1.isChecked() and self.pushButton_2.isChecked() and not self.pushButton_3.isChecked()) or
@@ -493,6 +749,23 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
             (not self.pushButton_4.isChecked() and not self.pushButton_5.isChecked() and self.pushButton_6.isChecked())
         )
 
+        # 하나씩 선택하면 DB에 넣을 거 초기화
+        if ice_cream_selected:
+            if self.pushButton_1.isChecked():
+                taste = "choco"
+            elif self.pushButton_2.isChecked():
+                taste = "vanilla"
+            elif self.pushButton_3.isChecked():
+                taste = "berry"
+            
+        if topping_selected:
+            if self.pushButton_6.isChecked():
+                top = "topA"
+            elif self.pushButton_5.isChecked():
+                top = "topB"
+            elif self.pushButton_4.isChecked():
+                top = "topC"
+
         if not ice_cream_selected:
             self.on_click_warn()
             QMessageBox.warning(self, 'Warning', '아이스크림 맛을 한 가지만 골라주세요.')
@@ -502,163 +775,42 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
             QMessageBox.warning(self, 'Warning', '토핑을 한 가지만 골라주세요.')
 
         if ice_cream_selected and topping_selected:
-            self.next()
+            self.showMessage()
+            self.setWindowTitle('QMessageBox.question Example')
 
-    # def check_selection_and_next(self):
-    #     global Flavor, Topping
-    #     print(f"check_selection_and_next ==========> global1 {Flavor}, {Topping}")
-    #     # 아이스크림 맛이 하나가 선택되었는지 확인
-    #     ice_cream_selected = (
-    #         (self.pushButton_1.isChecked() and not self.pushButton_2.isChecked() and not self.pushButton_3.isChecked()) or
-    #         (not self.pushButton_1.isChecked() and self.pushButton_2.isChecked() and not self.pushButton_3.isChecked()) or
-    #         (not self.pushButton_1.isChecked() and not self.pushButton_2.isChecked() and self.pushButton_3.isChecked())
-    #     )
-    #     topping_selected = (
-    #         (self.pushButton_4.isChecked() and not self.pushButton_5.isChecked() and not self.pushButton_6.isChecked()) or
-    #         (not self.pushButton_4.isChecked() and self.pushButton_5.isChecked() and not self.pushButton_6.isChecked()) or
-    #         (not self.pushButton_4.isChecked() and not self.pushButton_5.isChecked() and self.pushButton_6.isChecked())
-    #     )
+        # if ice_cream_selected and topping_selected:
+        #     self.open_Preparing_window()
 
-    #     if not ice_cream_selected:
-    #         self.on_click_warn()
-    #         QMessageBox.warning(self, 'Warning', '아이스크림 맛을 한 가지만 골라주세요.')
-
-    #     if not topping_selected:
-    #         self.on_click_warn()
-    #         QMessageBox.warning(self, 'Warning', '토핑을 한 가지만 골라주세요.')
-
-    #     if ice_cream_selected and topping_selected:
-    #         if self.pushButton_1.isChecked():
-    #             self.Flavor = "choco"
-    #         elif self.pushButton_2.isChecked():
-    #             self.Flavor = "vanilla"
-    #         else:
-    #             self.Flavor = "berry"
-
-    #         if self.pushButton_4.isChecked():
-    #             self.Topping = "topC"
-    #         elif self.pushButton_5.isChecked():
-    #             self.Topping = "topB"
-    #         else:
-    #             self.Topping = "topA"
-
-    #         Flavor = self.Flavor
-    #         Topping = self.Topping
-
-    #         print(f"check_selection_and_next ==========> self.{self.Flavor}, {self.Topping}")
-    #         print(f"check_selection_and_next ==========> global2 {Flavor}, {Topping}")
-    #         self.open_Preparing_window()
-
-    def play_sound(self):
-        if self.mixer_initialized:
-            try:
-                pygame.mixer.music.load("sound.mp3")  # 소리 파일 로드
-                pygame.mixer.music.play()  # 소리 재생
-            except pygame.error as e:
-                print(f"Error playing sound: {e}")
-        else:
-            print("Mixer not initialized. Cannot play sound.")
+    def open_Preparing_window(self):
+        print(taste,top)
+        self.main_window.open_CouponWindow()
 
     def next(self):
-        self.main_window.open_PreparingWindow()
-
-class PreparingWindow(QMainWindow, from_class_Preparing):
-
-    # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
-    update_signal = pyqtSignal(str)
-
-    def __init__(self,main_window):
-        super().__init__()
-        self.setupUi(self)
-
-        self.main_window = main_window
-        
-        self.pushButton_back.clicked.connect(self.returning)
-        self.pushButton_next.clicked.connect(self.next)
-        self.pushButton_back.clicked.connect(self.on_click)
-        self.pushButton_next.clicked.connect(self.on_click)
-
-        self.update_signal.connect(self.command)
-
-    def plus_init(self, node):
-
-        self.node = node
-        self.node.Pre_production()
-
-    def command(self, command):
-        if "," in command:
-            # 쓰레기 처리중 화면 강조
-            print("음성출력 - 쓰레기를 처리 중입니다")
-        elif command == "Pre-production":
-            # 쓰레기 없음 - 화면강조
-            print("음성출력 - 쓰레기가 없습니다")
-        else:
-            # 아이스크림 테투리 강조
-            print("음성출력 - 아이스크림을 제조 하겠습니다.")
-            self.next()
-
-    def on_click(self):
-        threading.Thread(target=self.play_mp3).start()
-
-    def play_mp3(self):
-        pygame.mixer.init()
-        pygame.mixer.music.load("/home/jchj/Untitled3/src/untitled3/UI/cat_like1b.mp3")
-        pygame.mixer.music.play()
-
-    def returning(self):
-        self.main_window.open_RecommendWindow()
-
-    def next(self):
-        self.main_window.open_MakingWindow()
-
-class MakingWindow(QMainWindow, from_class_Making):
-    # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
-    update_signal = pyqtSignal(str)
-
-    def __init__(self,main_window):
-        super().__init__()
-        self.setupUi(self)
-
-        self.main_window = main_window
-
-        # QLabel에 GIF 설정
-        self.movie = QMovie("/home/jchj/Untitled3/src/untitled3/UI/loading.gif")
-        if self.movie.isValid():
-            self.label_pic.setMovie(self.movie)
-            self.movie.start()
-
-        self.update_signal.connect(self.next)
-        
-    def next(self):
-        self.main_window.open_MakedWindow()
-
-class MakedWindow(QMainWindow, from_class_Maked):
-    # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
-    update_signal = pyqtSignal(str)
-
-    def __init__(self,main_window):
-        super().__init__()
-        self.setupUi(self)
-
-        self.main_window = main_window
-
-        self.update_signal.connect(self.next)
-
-    def next(self):
+        print(taste,top)
         self.main_window.open_CouponWindow()
 
 class CouponWindow(QMainWindow, from_class_Coupon):
-    # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
-    update_signal = pyqtSignal(str)
-
     def __init__(self,main_window):
         super().__init__()
         self.setupUi(self)
 
         self.main_window = main_window
 
+        self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
         self.coupon = 1
         self.number = ""
+
+        # QLabel 객체 접근
+        self.label_3 = self.findChild(QtWidgets.QLabel, 'label_3')
+
+        # QLabel에 배경 이미지 설정
+        self.label_3.setStyleSheet("""
+            QLabel {
+                background-image: url("/home/jchj/Untitled3/src/untitled3/UI/background.png"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
 
         # 번호 누르기
         self.pushButton0.clicked.connect(lambda: self.add_text("0"))
@@ -693,6 +845,7 @@ class CouponWindow(QMainWindow, from_class_Coupon):
         self.pushButton_Back.clicked.connect(self.on_click)
         self.pushButton.clicked.connect(self.on_click)
         self.pushButton_2.clicked.connect(self.on_click)
+
 
     def on_click(self):
         threading.Thread(target=self.play_mp3).start()
@@ -740,38 +893,63 @@ class CouponWindow(QMainWindow, from_class_Coupon):
         self.coupon = 0
         self.main_window.open_PaymentWindow(self.coupon,self.number)
 
-    def open_Maked_window(self):
-        self.main_window.MakedWindow()
-
 class PaymentWindow(QMainWindow, from_class_Payment):
-
-    update_signal = pyqtSignal(str)
-
     def __init__(self, main_window , coupon_value, number):
         super().__init__()
 
-        global Flavor, Topping, age, gender
+        global taste, top, age, gender 
+
+        print(age,gender,taste,top)
 
         self.setupUi(self)
 
         self.main_window = main_window
 
+        self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
         self.coupon_value = coupon_value
         self.number = number
 
+        # QLabel 객체 접근
+        self.label_3 = self.findChild(QtWidgets.QLabel, 'label_3')
+
+        # QLabel에 배경 이미지 설정
+        self.label_3.setStyleSheet("""
+            QLabel {
+                background-image: url("/home/jchj/Untitled3/src/untitled3/UI/background.png"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
+
+        #DB
+        self.Use_coupon = 'N' # default 값
+        
+        if self.coupon_value == 1:  # stamp 적립 Y
+            YorN = 'Y'
+        if self.coupon_value == 0:
+            YorN = 'N'
+
+        if self.number is not None and self.number != "":
+            phone = int(self.number)
+            self.number, self.coupon = DB_main().YorN_stamp(YorN, phone)
+            print(f"고객 정보 --> {self.number}, {self.coupon}")
+        else:
+            phone = None
+
+        topping_time = 5 # topping time은 토크 혹은 나오는 실제 시간으로 판단할 예정
+
         # 임의의 금액
-        self.price = 3500
-        self.priceText()
+        self.price = DB_main().show_price(top, topping_time)
+        self.priceText(self.price)
 
         # 임의의 쿠폰 수 적용 및 텍스트 출력
-        self.coupons = 13
         if self.coupon_value != 0:
-            self.set_coupon_text()
+            self.set_coupon_text(self.coupon)
         
         # 사용 버튼 시
-        self.pushButton_6.clicked.connect(self.use_coupon)
+        self.pushButton_6.clicked.connect(self.use_coupon)   
         # 결제 버튼 시
-        self.pushButton_8.clicked.connect(self.next)
+        self.pushButton_8.clicked.connect(self.payment)
         # Back 버튼 추가
         self.pushButton_back.clicked.connect(self.returning)
         
@@ -782,106 +960,59 @@ class PaymentWindow(QMainWindow, from_class_Payment):
         self.pushButton_8.clicked.connect(self.on_click)
         # Back 버튼 추가
         self.pushButton_back.clicked.connect(self.on_click)
-
-        # 손님정보 : 성별,연령대 저장 및 번호에 따른 쿠폰 갯수 가져오기 
-        # 쿠폰 개수 : UI -> DB_Manager
-        # 맛 가격 :  UI -> DB_Manager
-        # 일 매출 : UI -> DB_Manager
-
-        # self.Use_coupon = 'N' # default 값
-        
-        # if self.coupon_value == 1:  # stamp 적립 Y
-        #     YorN = 'Y'
-        # if self.coupon_value == 0:
-        #     YorN = 'N'
-
-        # if self.number is not None and self.number != "":
-        #     phone = int(self.number)
-        #     self.number, self.coupon = DB_main().YorN_stamp(YorN, phone)
-        #     print(f"고객 정보 --> {self.number}, {self.coupon}")
-        # else:
-        #     phone = None
-
-
-
-        # topping_time = 5 # topping time은 토크 혹은 나오는 실제 시간으로 판단할 예정
-
-        # # 임의의 금액
-        # self.price = DB_main().show_price(Topping, topping_time)
-        # self.priceText(self.price)
-
-        # # 임의의 쿠폰 수 적용 및 텍스트 출력
-        # if self.coupon_value != 0:
-        #     self.set_coupon_text(self.coupon)
-        
-        # # 사용 버튼 시
-        # self.pushButton_6.clicked.connect(self.use_coupon)   
-        # # 결제 버튼 시
-        # self.pushButton_8.clicked.connect(self.payment)
-        # #self.pushButton_8.clicked.connect(self.no_use_coupon)
-        # # Back 버튼 추가
-        # self.pushButton_back.clicked.connect(self.open_Coupon_window)
-        
-        # ## 소리!
-        # # 사용 버튼 시
-        # self.pushButton_6.clicked.connect(self.on_click)
-        # # 결제 버튼 시
-        # self.pushButton_8.clicked.connect(self.on_click)
-        # # Back 버튼 추가
-        # self.pushButton_back.clicked.connect(self.on_click)
         
 
-    # def priceText(self, price):
-    #     text = str(price) + ' 원'
-    #     self.textBrowser_2.setText(text)
+    def priceText(self,price):
+        text = str(price) + ' 원'
+        self.textBrowser_2.setText(text)
         
-    # def set_coupon_text(self, coupon):
-    #     message = f"회원님의 쿠폰 수는 {coupon}개입니다."
-    #     self.textBrowser.setText(message)
-    #     message2 = f"회원번호: 010-" + self.number[:4] + '-' + self.number[4:]
-    #     self.textBrowser_3.setText(message2)
+    def set_coupon_text(self,coupons):
+        message = f"회원님의 쿠폰 수는 {coupons}개입니다."
+        self.textBrowser.setText(message)
+        message2 = f"회원번호: 010-" + self.number[:4] + '-' + self.number[4:]
+        self.textBrowser_3.setText(message2)
 
-    # def use_coupon(self):
-    #     if self.number is not None and self.number != "":
-    #         if self.coupon >= 10 and self.coupon_value == 1: #여기 coupons --> coupon
-    #             self.Use_coupon = 'Y' # 사용하면 Y로 바꿈
-    #             coupon = self.coupon
-    #             coupon -= 10
-    #             price = self.price
-    #             price = 0
-    #             phone = self.number
-    #             self.priceText(price)
-    #             self.set_coupon_text(coupon)
-    #             message2 = f"남은 쿠폰 수는 {coupon}개 입니다."
-    #             if self.Use_coupon == 'Y':
-    #                 update_info, coupon = DB_main().update_infos(Flavor, Topping, price, int(phone), age, gender, self.Use_coupon)
-    #                 print(f"update_info | coupon {update_info}, {coupon}")
-    #             QMessageBox.warning(self, '쿠폰 사용 완료', message2)
-    #         else:
-    #             message2 = f"쿠폰이 10개 미만일 경우에는 사용이 불가합니다."
-    #             QMessageBox.warning(self, '쿠폰 사용 불가', message2)
-    #         #self.open_Bye_window()
+    def use_coupon(self):
+        if self.number is not None and self.number != "":
+            if self.coupon >= 10 and self.coupon_value == 1: #여기 coupons --> coupon
+                self.Use_coupon = 'Y' # 사용하면 Y로 바꿈
+                coupon = self.coupon
+                coupon -= 10
+                price = self.price
+                price = 0
+                phone = self.number
+                self.priceText(price)
+                self.set_coupon_text(coupon)
+                message2 = f"남은 쿠폰 수는 {coupon}개 입니다."
+                if self.Use_coupon == 'Y':
+                    update_info, coupon = DB_main().update_infos(taste, top, price, int(phone), age, gender, self.Use_coupon)
+                    print(f"update_info | coupon {update_info}, {coupon}")
+                QMessageBox.warning(self, '쿠폰 사용 완료', message2)
+            else:
+                message2 = f"쿠폰이 10개 미만일 경우에는 사용이 불가합니다."
+                QMessageBox.warning(self, '쿠폰 사용 불가', message2)
+            #self.open_Bye_window()
 
-    # def payment(self):
-    #     if self.Use_coupon == 'N' and self.coupon_value == 1 and self.number is not None and self.number != "":
-    #         phone = self.number
-    #         # update_info, coupon = DB_main().update_infos(Flavor, Topping, self.price, int(phone), age, gender, self.Use_coupon)
-    #         print(f"적립은 하지만 쿠폰 사용 x update_info | coupon {update_info}, {coupon}")
-    #         self.open_Bye_window()
+    def payment(self):
+        if self.Use_coupon == 'N' and self.coupon_value == 1 and self.number is not None and self.number != "":
+            phone = self.number
+            update_info, coupon = DB_main().update_infos(taste, top, self.price, int(phone), age, gender, self.Use_coupon)
+            print(f"적립은 하지만 쿠폰 사용 x update_info | coupon {update_info}, {coupon}")
+            self.next()
         
-    #     elif self.Use_coupon == 'Y':
-    #         print("쿠폰 사용한 고객은 이미 업데이트 했으니 그냥 바로 넘어감")
-    #         self.open_Bye_window()
+        elif self.Use_coupon == 'Y':
+            print("쿠폰 사용한 고객은 이미 업데이트 했으니 그냥 바로 넘어감")
+            self.next()
 
-    #     elif self.coupon_value == 0:
-    #         phone = None
-    #         coupon = None
-    #         Use_coupon = 'N'
-    #         # update_info, coupon = DB_main().update_infos(Flavor, Topping, self.price, phone, age, gender, Use_coupon)
-    #         print(f"적립 안함 update_info | coupon {update_info}, {coupon}")
-    #         self.open_Bye_window()
-    #     else:
-    #         print("payment Error--------------")   
+        elif self.coupon_value == 0:
+            phone = None
+            coupon = None
+            Use_coupon = 'N'
+            update_info, coupon = DB_main().update_infos(taste, top, self.price, phone, age, gender, Use_coupon)
+            print(f"적립 안함 update_info | coupon {update_info}, {coupon}")
+            self.next()
+        else:
+            print("payment Error--------------")   
 
     def on_click(self):
         threading.Thread(target=self.play_mp3).start()
@@ -895,60 +1026,151 @@ class PaymentWindow(QMainWindow, from_class_Payment):
         self.main_window.open_CouponWindow()
 
     def next(self):
-        self.main_window.open_ByeWindow()
+        self.main_window.open_PreparingWindow()
 
-
-class ByeWindow(QMainWindow, from_class_Bye):
-    # ROS2에서 수신한 데이터를 업데이트하는 신호 정의
-    update_signal = pyqtSignal(str)
-    
+class PreparingWindow(QMainWindow, from_class_Preparing):
     def __init__(self,main_window):
         super().__init__()
         self.setupUi(self)
 
         self.main_window = main_window
 
-        # 토핑 재고량 전달 : 서비스 : UI -> DB_Manager
+        self.setupUi(self)
+        self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
+        self.pushButton_back.clicked.connect(self.returning)
+        self.pushButton_next.clicked.connect(self.next)
+        self.pushButton_back.clicked.connect(self.on_click)
+        self.pushButton_next.clicked.connect(self.on_click)
 
-        self.stock = "ok"
+        # QLabel 객체 접근
+        self.label_3 = self.findChild(QtWidgets.QLabel, 'label_3')
 
-        self.update_signal.connect(self.next)
+        # QLabel에 배경 이미지 설정
+        self.label_3.setStyleSheet("""
+            QLabel {
+                background-image: url("/home/jchj/Untitled3/src/untitled3/UI/background.png"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
 
-    #     self.pushButton.clicked.connect(self.showValues)
-    #     self.show()
+    def on_click(self):
+        threading.Thread(target=self.play_mp3).start()
 
-    # def showValues(self):
-    #     global Flavor, Topping
-    #     print(f"show Values ==> {Flavor}, {Topping}")
-    #     result, stock, flavor_flag, topping_flag = DB_main().update_stock(Flavor, Topping)
+    def play_mp3(self):
+        pygame.mixer.init()
+        pygame.mixer.music.load("/home/jchj/Untitled3/src/untitled3/UI/cat_like1b.mp3")
+        pygame.mixer.music.play()
 
-    #     print(f"Final list ====================== {result}")
-
-    #     self.tableWidget.setItem(0,0,QTableWidgetItem(str(result[0]))) #vanilla
-    #     self.tableWidget.setItem(0,1,QTableWidgetItem(str(result[1]))) # choco
-    #     self.tableWidget.setItem(0,2,QTableWidgetItem(str(result[2]))) # berry
-    #     self.tableWidget.setItem(0,3,QTableWidgetItem(str(result[3]))) # topA
-    #     self.tableWidget.setItem(0,4,QTableWidgetItem(str(result[4]))) # topB
-    #     self.tableWidget.setItem(0,5,QTableWidgetItem(str(result[5]))) # topC
-    #     self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
-
-    # def plus_init(self, node):
-    #     self.node = node
-    #     self.node.Conclusion(self.stock)
-
-    def command(self,command):
-        # topic , Conclusion , ok
-        if "restart" in command :
-            self.next()
-        # service , Colclusion , 12,13
-        elif "," in command:
-            print("음성출력 - 쓰레기를 처리 중입니다")
-        else:
-            print("음성출력 - 쓰레기가 없습니다.")
+    def returning(self):
+        self.main_window.open_PaymentWindow()
 
     def next(self):
-        self.main_window.open_FirstWindow()
-        
+        self.main_window.open_MakingWindow()
+
+class MakingWindow(QMainWindow, from_class_Making):
+    def __init__(self,main_window):
+        super().__init__()
+        self.setupUi(self)
+
+        self.main_window = main_window
+
+        self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
+
+        # QLabel 객체 접근
+        self.label_3 = self.findChild(QtWidgets.QLabel, 'label_3')
+
+        # 디버깅 정보 출력
+        if self.label_3 is None:
+            print("Error: QLabel 'label_3' not found.")
+        else:
+            # QLabel에 배경 이미지 설정
+            self.label_3.setStyleSheet("""
+                QLabel {
+                    background-image: url("/home/jchj/Untitled3/src/untitled3/UI/background.png"); /* 배경 이미지 설정 */
+                    background-position: center; /* 이미지 중앙 정렬 */
+                    background-repeat: no-repeat; /* 이미지 반복 안함 */
+                }
+            """)
+
+        # QLabel에 GIF 설정
+        self.movie = QMovie("/home/jchj/Untitled3/src/untitled3/UI/loading.gif")
+        if self.movie.isValid():
+            self.label_pic.setMovie(self.movie)
+            self.movie.start()
+        else:
+            print("GIF를 로드할 수 없습니다.")
+
+    def next(self):
+        self.main_window.open_MakedWindow()
+
+class MakedWindow(QMainWindow, from_class_Maked):
+    def __init__(self,main_window):
+        super().__init__()
+        self.setupUi(self)
+
+        self.main_window = main_window
+
+        self.setStyleSheet("QMainWindow { background-color: #ADD8E6; }")   
+
+        # QLabel 객체 접근
+        self.label_3 = self.findChild(QtWidgets.QLabel, 'label_3')
+
+        # QLabel에 배경 이미지 설정
+        self.label_3.setStyleSheet("""
+            QLabel {
+                background-image: url("/home/jchj/Untitled3/src/untitled3/UI/background.png"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
+
+        QTimer.singleShot(3000, self.next)
+
+    def next(self):
+        self.main_window.open_ByeWindow()
+
+class ByeWindow(QMainWindow, from_class_Bye):
+    def __init__(self,main_window):
+        super().__init__()
+        self.setupUi(self)
+
+        self.main_window = main_window
+        self.stock = "ok"
+
+        # QLabel 객체 접근
+        self.label_3 = self.findChild(QtWidgets.QLabel, 'label_3')
+
+        # QLabel에 배경 이미지 설정
+        self.label_3.setStyleSheet("""
+            QLabel {
+                background-image: url("/home/jchj/Untitled3/src/untitled3/UI/background.png"); /* 배경 이미지 설정 */
+                background-position: center; /* 이미지 중앙 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 안함 */
+            }
+        """)
+        self.pushButton.clicked.connect(self.showValues)
+        self.show()
+
+    def showValues(self):
+        global taste, top    
+        print(f"show Values ==> {taste}, {top}")
+        result, stock, flavor_flag, topping_flag = DB_main().update_stock(taste, top)
+        print(f"Final list ====================== {result}")
+        self.tableWidget.setItem(0,0,QTableWidgetItem(str(result[0]))) #vanilla
+        self.tableWidget.setItem(0,1,QTableWidgetItem(str(result[1]))) # choco
+        self.tableWidget.setItem(0,2,QTableWidgetItem(str(result[2]))) # berry
+        self.tableWidget.setItem(0,3,QTableWidgetItem(str(result[3]))) # topA
+        self.tableWidget.setItem(0,4,QTableWidgetItem(str(result[4]))) # topB
+        self.tableWidget.setItem(0,5,QTableWidgetItem(str(result[5]))) # topC
+        self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
+        if flavor_flag is None and topping_flag is None:
+            self.next()
+
+    def next(self):
+        QTimer.singleShot(3000, self.next)
+
 class Ros2Thread(QThread):
     def __init__(self, node):
         super().__init__()
@@ -962,23 +1184,13 @@ def main(args=None):
 
     app = QApplication(sys.argv)
 
-    main_window = MainWindow()
-    first_window =  FirstWindow(main_window)
-    loading_window = LoadingWindow(main_window)
-    recommend_window = RecommendWindow(main_window)
-    preparing_window = PreparingWindow(main_window)
-    making_window = MakingWindow(main_window)
-    maked_window = MakedWindow(main_window)
-    bye_window = ByeWindow(main_window)
+    # Create SignalEmitter instance
+    signal_emitter = SignalEmitter()
 
-    Node = PyQt(main_window , first_window , loading_window , recommend_window , preparing_window , making_window , maked_window , bye_window)
-
-    # preparing_window.plus_init(Node)
-    # bye_window.plus_init(Node)
-
+    main_window = MainWindow(signal_emitter)
     main_window.showMaximized()
 
-    ros2_thread = Ros2Thread(Node)
+    ros2_thread = Ros2Thread(main_window.node)
     ros2_thread.start()
 
     sys.exit(app.exec_())

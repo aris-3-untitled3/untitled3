@@ -1427,7 +1427,9 @@ class RobotControl(Node):
         elif msg.command == "guest_detect":
             self.get_logger().info("환영인사") # greet
             self.Robot_Control.motion_greet()
-            self.Robot_Control.motion_home() 
+            print("ok1")
+            self.Robot_Control.motion_home()
+            print("ok2") 
         elif msg.command == "bye":
             self.get_logger().info("작별인사") # greet
             self.Robot_Control.motion_greet()
