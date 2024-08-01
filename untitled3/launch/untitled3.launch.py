@@ -3,13 +3,19 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     return LaunchDescription(
-        [
+        [   
+            Node(
+                namespace= "" , package= "untitled3" ,
+                executable= "FrontCam" , output = "screen"),
+            Node(
+                namespace= "" , package= "untitled3" ,
+                executable= "UpCam" , output = "screen"),
             Node(
                 namespace= "" , package= "untitled3" ,
                 executable= "Robot_Server" , output = "screen"),
             Node(
                 namespace= "" , package= "untitled3" ,
-                executable= "Robot_Control" , output = "screen"),
+                executable= "Human_detect" , output = "screen"),
             Node(
                 namespace= "" , package= "untitled3" ,
                 executable= "Guest_detect" , output = "screen"),
@@ -18,9 +24,12 @@ def generate_launch_description():
                 executable= "Cup_detect" , output = "screen"),
             Node(
                 namespace= "" , package= "untitled3" ,
-                executable= "UI" , output = "screen"),
+                executable= "Container_Sealing_detect" , output = "screen"),
             Node(
                 namespace= "" , package= "untitled3" ,
-                executable= "Voice_Input" , output = "screen"),
+                executable= "Robot_Control" , output = "screen"),
+            Node(
+                namespace= "" , package= "untitled3" ,
+                executable= "UI" , output = "screen"),
         ]
     )

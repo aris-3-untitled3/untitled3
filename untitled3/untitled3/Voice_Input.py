@@ -10,7 +10,7 @@ class Record_API(Node):
 
         self.file_name="/home/jchj/Untitled3/src/untitled3/resource/output.wav"
         self.save_path="/home/jchj/Untitled3/src/untitled3/resource/response.txt"
-        self.respone_time=7
+        self.respone_time=5
 
         # /Signal_Voice_out 서비스
         self.voice_in_server = self.create_service(

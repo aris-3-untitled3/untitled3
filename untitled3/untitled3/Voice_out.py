@@ -67,7 +67,7 @@ class VoiceOut(Node):
 
     def play_bgm(self):
         pygame.mixer.music.load("/home/jchj/Untitled3/src/untitled3/UI/bgm.mp3")
-        pygame.mixer.music.set_volume(0.7)  # BGM 볼륨을 30%로 설정
+        pygame.mixer.music.set_volume(0.4)  # BGM 볼륨을 30%로 설정
         pygame.mixer.music.play(-1)  # 무한 반복 재생
 
     def play_tt_no(self,text):

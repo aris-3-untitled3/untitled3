@@ -69,6 +69,8 @@ class PyQtNode(Node):
             self.signal_emitter.ui_update_signal.emit("open_Making")
         elif msg.command == "ice_cream_completed":
             self.signal_emitter.ui_update_signal.emit("open_Maked")
+        elif msg.command == "prepare":
+            self.signal_emitter.ui_update_signal.emit("open_Prepare")
         elif msg.command == "open_coupon":
             self.signal_emitter.ui_update_signal.emit("open_Coupon")
         elif msg.command == "return":
@@ -102,6 +104,8 @@ class MainWindow(QMainWindow):
             self.open_DirectionWindow()
         elif command == "open_Making":
             self.open_MakingWindow()
+        elif command == "open_Prepare":
+            self.open_PreparingWindow()          
         elif command == "open_Maked":
             self.open_MakedWindow()
         elif command == "open_Coupon":
@@ -115,8 +119,8 @@ class MainWindow(QMainWindow):
         self.FirstWindow = FirstWindow(self)
         self.stacked_widget.addWidget(self.FirstWindow)
         self.stacked_widget.setCurrentWidget(self.FirstWindow)
-        if self.node:
-            self.node.publish_message("open_First")
+        # if self.node:
+        #     self.node.publish_message("open_First")
 
     def open_LoadingWindow(self):
         self.LoadingWindow = LoadingWindow(self)
@@ -368,7 +372,7 @@ class DirectionWindow(QMainWindow, from_class_Direction):
             QPushButton:hover {{
                 background-color: #FFC0CB; /* 마우스 오버시 배경색 */
             }}
-        """)      
+        """)
 
     def open_Title_window(self):
         self.main_window.open_FirstWindow()
@@ -543,6 +547,8 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         self.yesno = 0
 
         self.initUI()
+
+        self.voice = VoiceOut()
         
 
 
@@ -588,7 +594,7 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
 
         layout = QVBoxLayout()
 
-        label = QLabel(f"추천드린 메뉴로 주문하시겠습니까?\n\n추천메뉴는 {taste}와 {top}입니다.\n\n'예' 또는 '아니오'로 대답해주세요.")
+        label = QLabel(f"추천드린 메뉴로 주문하시겠습니까?\n\n추천메뉴는 {taste}와 {top}입니다.\n\n'선택' 또는 '아니오'로 대답해주세요.")
         label.setAlignment(Qt.AlignCenter)
 
         font = QFont()
@@ -604,7 +610,11 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         QTimer.singleShot(3000, self.show_buffering_dialog)
 
     def show_buffering_dialog(self):
+        # self.voice.play_tts("추천한 메뉴를 선택하시겠습니까?")
+
         self.recommendation_dialog.close()
+
+        
 
         self.buffering_dialog = QDialog(self)
         self.buffering_dialog.setWindowTitle('음성 인식 중')
@@ -631,23 +641,23 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         self.buffering_dialog.setWindowModality(Qt.ApplicationModal)
         self.center_dialog(self.buffering_dialog)
         self.buffering_dialog.show()
-        QTimer.singleShot(1000, self.voice_1)
+        QTimer.singleShot(3000, self.show_speechorder_dialog)
 
         #음성받기
-    def voice_1(self):   
-        text = Record_API().run()
+    # def voice_1(self):   
+    #     text = Record_API().run()
 
-        print(text)
+    #     print(text)
 
-        if text == None:
-            QTimer.singleShot(1000, self.show_speechorder_dialog)
-        elif "선택" in text:
-            print("Yes라고 답변 받았을 때")
-            QTimer.singleShot(1000, self.buffering_dialog.close)
-            QTimer.singleShot(1000, self.open_Prepare_window_rec)
-        else:
-            print("No라고 답변 받았을 때")
-            QTimer.singleShot(1000, self.show_speechorder_dialog)
+    #     if text == None:
+    #         QTimer.singleShot(1000, self.show_speechorder_dialog)
+    #     elif "선택" in text:
+    #         print("Yes라고 답변 받았을 때")
+    #         QTimer.singleShot(1000, self.buffering_dialog.close)
+    #         QTimer.singleShot(1000, self.open_Prepare_window_rec)
+    #     else:
+    #         print("No라고 답변 받았을 때")
+    #         QTimer.singleShot(1000, self.show_speechorder_dialog)
 
     def show_speechorder_dialog(self):
         self.buffering_dialog.close()
@@ -678,33 +688,37 @@ class RecommendWindow(QMainWindow, from_class_Recommend):
         self.speechorder_dialog.show()
 
         self.recognize = 0 # 음성인식 유무 ## 인식 창 안꺼짐
-        QTimer.singleShot(1000, self.voice_2)
+
+        QTimer.singleShot(3000, self.speechorder_dialog.close)
 
         #음성받기
-    def voice_2(self):   
-        text = Record_API().run()
+    # def voice_2(self):
+        # self.voice.play_tts("메뉴를 말씀해주세요")
 
-        print(text)
+        # text = Record_API().run()
 
-        if text == None:
-            flag = 0
-        else:
-            flag = 1
+        # print(text)
 
-        text_file = "/home/jchj/Untitled3/src/untitled3/resource/response.txt"
+        # if text == None:
+        #     flag = 0
+        # else:
+        #     flag = 1
 
-        taste , top = DB_main().word_detect(text_file,5,flag)
-        print(f"{taste},{top}--------------------------1")
+        # text_file = "/home/jchj/Untitled3/src/untitled3/resource/response.txt"
 
-        ## 인식 기회 1번
-        if taste == "error" or top == "error":
-            print("답변 못 받았을 때")
-            self.speechorder_dialog.close()
-        else:
-            print("답변 받았을 때")
-            self.speechorder_dialog.close()
-            print(f"{taste},{top}--------------------------2")
-            QTimer.singleShot(1000, self.open_Preparing_window)
+        # taste , top = DB_main().word_detect(text_file,5,flag)
+        # print(f"{taste},{top}--------------------------1")
+
+        # ## 인식 기회 1번
+        # if taste == "error" or top == "error":
+        #     print("답변 못 받았을 때")
+        #     self.speechorder_dialog.close()
+        #     # self.voice.play_tts("마우스로 메뉴를 클릭해주세요")
+        # else:
+        #     print("답변 받았을 때")
+        #     self.speechorder_dialog.close()
+        #     print(f"{taste},{top}--------------------------2")
+            # QTimer.singleShot(1000, self.open_Preparing_window)
         
     def center_dialog(self, dialog):
         # 화면 중앙에 다이얼로그 배치
@@ -1153,7 +1167,9 @@ class ByeWindow(QMainWindow, from_class_Bye):
         self.show()
 
     def showValues(self):
-        global taste, top    
+        # taste= "choco"
+        # top="topB"
+        # global taste, top    
         print(f"show Values ==> {taste}, {top}")
         result, stock, flavor_flag, topping_flag = DB_main().update_stock(taste, top)
         print(f"Final list ====================== {result}")

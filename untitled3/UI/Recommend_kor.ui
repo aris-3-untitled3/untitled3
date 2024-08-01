@@ -173,24 +173,6 @@ QPushButton:hover {
     <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>610</x>
-     <y>760</y>
-     <width>821</width>
-     <height>91</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>30</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>TextLabel</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="pushButton_rec">
    <property name="geometry">
     <rect>
@@ -292,6 +274,24 @@ QPushButton:hover {
      <string/>
     </property>
    </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>800</y>
+      <width>821</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>30</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
   </widget>
   <zorder>frame</zorder>
   <zorder>label</zorder>
@@ -301,7 +301,6 @@ QPushButton:hover {
   <zorder>pushButton_4</zorder>
   <zorder>pushButton_5</zorder>
   <zorder>pushButton_6</zorder>
-  <zorder>label_2</zorder>
   <zorder>pushButton_rec</zorder>
  </widget>
  <resources/>

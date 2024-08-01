@@ -51,8 +51,8 @@ class Container_Sealing(Node):
         # 박스 상태 유지
         self.detection_boxes = []  # (x1, y1, x2, y2, class_name, timestamp)
 
-        # Start the display frames thread
-        threading.Thread(target=self.display_frames, daemon=True).start()
+        # # Start the display frames thread
+        # threading.Thread(target=self.display_frames, daemon=True).start()
 
         # 고정된 영역의 좌표 및 크기
         self.regions = [
@@ -96,9 +96,11 @@ class Container_Sealing(Node):
 
                 cv2.imshow("Frame", display_img)
             elif self.frame is not None:
-                cv2.imshow("Frame", self.frame)
+                # cv2.imshow("Frame", self.frame)
+                continue
             else:
-                self.get_logger().info("No frame available")
+                # self.get_logger().info("No frame available")
+                continue
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 cv2.destroyAllWindows()
@@ -135,7 +137,7 @@ class Container_Sealing(Node):
         # 각 영역에서 객체 감지 여부 초기화
         self.region_detection_counts = {name: 0 for name in self.region_names}
 
-        while (time.time() - start_time) < 60:  # 60초 동안 감지
+        while (time.time() - start_time) < 30:  # 60초 동안 감지
             if self.frame is None:
                 time.sleep(0.1)  # 프레임이 없을 경우 잠시 대기
                 continue
@@ -198,7 +200,7 @@ class Container_Sealing(Node):
 
         sealing_count = 0
 
-        while (time.time() - start_time) < 60:  # 60초 동안 감지
+        while (time.time() - start_time) < 30:  # 60초 동안 감지
             if self.frame is None:
                 time.sleep(0.1)  # 프레임이 없을 경우 잠시 대기
                 continue
@@ -231,7 +233,7 @@ class Container_Sealing(Node):
                 self.get_logger().info("No objects detected")
 
         self.get_logger().info(f'Detection completed: {sealing_count} sealings')
-        return "none"
+        return None
 
 
     def Container_Sealing_callback(self, request, response):

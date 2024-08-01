@@ -9,6 +9,7 @@ class UpCam(Node):
         super().__init__('UpCam')
 
         self.cap = self.find_video_capture_device()
+        # self.cap = cv2.VideoCapture(1)
 
         if self.cap is None:
             self.get_logger().error('No video capture device found.')

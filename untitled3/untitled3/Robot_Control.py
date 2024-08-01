@@ -576,7 +576,7 @@ class RobotMain(object):
                                          mvacc=self._angle_acc, wait=False, radius=40.0)
         if not self._check_code(code, 'set_servo_angle'):
             return
-        for i in range(int(2)):
+        for i in range(int(1)):
             if not self.is_alive:
                 break
             t1 = time.monotonic()
@@ -712,12 +712,15 @@ class RobotMain(object):
                                          mvacc=self._angle_acc, wait=True, radius=0.0)
         if not self._check_code(code, 'set_servo_angle'):
             return
-        while True:
-            try:
-                self.clientSocket.send('motion_greet_finish'.encode('utf-8'))
-                break
-            except:
-                print('socket error')
+        
+        self.motion_home()
+
+        # while True:
+        #     try:
+        #         self.clientSocket.send('motion_greet_finish'.encode('utf-8'))
+        #         break
+        #     except:
+        #         print('socket error')
 
     def joint_state(self):
         while self.is_alive:
@@ -746,6 +749,7 @@ class RobotMain(object):
             return
         time.sleep(1)
         if aruco_x <= 0:
+            aruco_x = aruco_x-40
             if -60 <= aruco_y_2 <= -13:
                 print(aruco_y_2,"ok1")
                 code = self._arm.set_position(*[aruco_x, aruco_y_2, 463.4, -52.1, 89.1, 126.1], speed=self._tcp_speed,    # z값 높게 이동
@@ -786,22 +790,22 @@ class RobotMain(object):
                                             mvacc=self._tcp_acc, radius=20.0, wait=True)
                 if not self._check_code(code, 'set_position'):
                     return
-            if -63 < aruco_y_3 < 27:
-                print("ok3")
-                code = self._arm.set_position(*[aruco_xx, aruco_y_3, 463.4, -52.1, 89.1, 126.1], speed=self._tcp_speed,    # z값 높게 이동
-                                        mvacc=self._tcp_acc, radius=20.0, wait=True)
-                if not self._check_code(code, 'set_position'):
-                    return
-                time.sleep(1)
-                code = self._arm.set_position(*[aruco_xx, aruco_y_3, 463.4, 43.8, -88.5, -46.2], speed=self._tcp_speed_gripper,    # gripper 180도 회전
-                                            mvacc=self._tcp_acc, radius=20.0, wait=True)
-                if not self._check_code(code, 'set_position'):
-                    return
-                time.sleep(2.5)
-                code = self._arm.set_position(*[aruco_xx, aruco_y_3, 153, 43.8, -88.5, -46.2], speed=self._tcp_speed,    # z1 & gripper 방향 동시 이동
-                                        mvacc=self._tcp_acc, radius=20.0, wait=True)
-                if not self._check_code(code, 'set_position'):
-                    return
+            # if -63 < aruco_y_3 < 27:
+            #     print("ok3")
+            #     code = self._arm.set_position(*[aruco_xx, aruco_y_3, 463.4, -52.1, 89.1, 126.1], speed=self._tcp_speed,    # z값 높게 이동
+            #                             mvacc=self._tcp_acc, radius=20.0, wait=True)
+            #     if not self._check_code(code, 'set_position'):
+            #         return
+            #     time.sleep(1)
+            #     code = self._arm.set_position(*[aruco_xx, aruco_y_3, 463.4, 43.8, -88.5, -46.2], speed=self._tcp_speed_gripper,    # gripper 180도 회전
+            #                                 mvacc=self._tcp_acc, radius=20.0, wait=True)
+            #     if not self._check_code(code, 'set_position'):
+            #         return
+            #     time.sleep(2.5)
+            #     code = self._arm.set_position(*[aruco_xx, aruco_y_3, 153, 43.8, -88.5, -46.2], speed=self._tcp_speed,    # z1 & gripper 방향 동시 이동
+            #                             mvacc=self._tcp_acc, radius=20.0, wait=True)
+            #     if not self._check_code(code, 'set_position'):
+            #         return
             time.sleep(2)
             code = self._arm.close_lite6_gripper()                      # gripper close
             if not self._check_code(code, 'close_lite6_gripper'):
@@ -1072,7 +1076,7 @@ class RobotMain(object):
                 code = self._arm.set_cgpio_digital(3, 1, delay_sec=0)
                 if not self._check_code(code, 'set_cgpio_digital'):
                     return
-                code = self._arm.set_pause_time(4) # 줄이?
+                code = self._arm.set_pause_time(3) # 줄이?
                 if not self._check_code(code, 'set_pause_time'):
                     return
                 code = self._arm.set_cgpio_digital(1, 0, delay_sec=0)
@@ -1427,13 +1431,11 @@ class RobotControl(Node):
         elif msg.command == "guest_detect":
             self.get_logger().info("환영인사") # greet
             self.Robot_Control.motion_greet()
-            print("ok1")
-            self.Robot_Control.motion_home()
-            print("ok2") 
+            # self.Robot_Control.motion_home()
         elif msg.command == "bye":
             self.get_logger().info("작별인사") # greet
             self.Robot_Control.motion_greet()
-            self.Robot_Control.motion_home() 
+            # self.Robot_Control.motion_home() 
         elif msg.command == "home":
             self.get_logger().info("홈복귀") # greet
             self.Robot_Control.motion_home()
@@ -1467,6 +1469,10 @@ class RobotControl(Node):
             self.get_logger().info("쓰레기위치")
             self.Robot_Control.trash_detect()
 
+        if request.command == "home":
+            self.get_logger().info("다시 복귀")
+            self.Robot_Control.motion_home()
+
         elif "trash_detected" in request.command:
             self.get_logger().info("쓰레기처리")  # trash + 좌표(x,y)
             parts = request.command.split(',')
@@ -1474,7 +1480,6 @@ class RobotControl(Node):
             x = float(parts[1].strip())  
             y = float(parts[2].strip()) 
             print(x, y)
-            self.Robot_Control.motion_home()
             threading.Thread(target=self.Robot_Control.trash, args=(x, y)).start()
 
         elif "pre_making" in request.command:

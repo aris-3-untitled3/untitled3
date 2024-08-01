@@ -59,7 +59,7 @@ class Cupdetect(Node):
         self.yaw = np.deg2rad(180)  # Convert 180 degrees to radians
         self.pitch = np.deg2rad(0)  # Convert 0 degrees to radians
         self.roll = np.deg2rad(180)  # Convert 180 degrees to radians
-        self.translation = np.array([-56, -55, 0])  # Translation vector
+        self.translation = np.array([-49, -61, 0])  # Translation vector
         
         self.x = None
         self.y = None
@@ -69,18 +69,15 @@ class Cupdetect(Node):
         self.cap = None
         self.frame = None
 
-        threading.Thread(target=self.display_frames).start()
+        # threading.Thread(target=self.display_frames).start()
 
     def display_frames(self):
         while True:
-            if self.cap is not None:  
-                cv.imshow("Frame", self.cap)
-
+            if self.frame is not None:
+                cv.imshow("Frame", self.frame)
             else:
-                if self.frame is not None:
-                    cv.imshow("Frame", self.frame)
-                else:
-                    self.get_logger().info("No frame available") 
+                # self.get_logger().info("No frame available")
+                continue 
 
             if cv.waitKey(1) & 0xFF == ord('q'):
                 cv.destroyAllWindows()
@@ -193,15 +190,19 @@ class Cupdetect(Node):
 
                     success_count += 1
 
-            if success_count > 30:
+            if success_count > 15:
                 # Calculate the average coordinates if there were successful detections
                 avg_x = np.mean([coord[0] for coord in coordinates])
                 avg_y = np.mean([coord[1] for coord in coordinates])
                 print(success_count)
-                return f"Success! Average x: {avg_x:.2f}, Average y: {avg_y:.2f}"
+                cv.waitKey(1) & 0xFF == ord('q')
+                cv.destroyAllWindows()
+                return f"{avg_x:.2f},{avg_y:.2f}"
             else:
                 print(success_count)
-                return "Failure: No markers detected"
+                cv.waitKey(1) & 0xFF == ord('q')
+                cv.destroyAllWindows()
+                return None
 
 
     def Webcam_callback(self, msg):
