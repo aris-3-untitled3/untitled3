@@ -1,0 +1,98 @@
+running egg_info
+writing ../build/camera_ar_marker/camera_ar_marker.egg-info/PKG-INFO
+writing dependency_links to ../build/camera_ar_marker/camera_ar_marker.egg-info/dependency_links.txt
+writing entry points to ../build/camera_ar_marker/camera_ar_marker.egg-info/entry_points.txt
+writing requirements to ../build/camera_ar_marker/camera_ar_marker.egg-info/requires.txt
+writing top-level names to ../build/camera_ar_marker/camera_ar_marker.egg-info/top_level.txt
+reading manifest file '../build/camera_ar_marker/camera_ar_marker.egg-info/SOURCES.txt'
+writing manifest file '../build/camera_ar_marker/camera_ar_marker.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/messi/camera_ar_marker/build/camera_ar_marker/build
+creating /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib
+creating /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/cmd_vel_listener.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/ar_marker_subscriber.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/test.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/ar_marker_distance_webcam.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/camera_publisher.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/compressed_fps.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/turtlesim_rotate.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/ar_marker_subscriber_executor.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/ar_marker_distance_webcam_kalman.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/__init__.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/depthpoint_subscriber.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/image_publisher.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/calibration.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/camera_fps.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/ar_marker_test.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/cheese.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/test_ar_marker_subscriber.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/cmd_vel_controller.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/ar_marker_subscriber_mfilter.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/rotate_robot.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+copying camera_ar_marker/rotate_robot_test.py -> /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker
+running install
+running install_lib
+creating /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/cmd_vel_listener.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/ar_marker_subscriber.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/test.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/ar_marker_distance_webcam.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/camera_publisher.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/compressed_fps.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/turtlesim_rotate.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/ar_marker_subscriber_executor.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/ar_marker_distance_webcam_kalman.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/__init__.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/depthpoint_subscriber.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/image_publisher.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/calibration.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/camera_fps.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/ar_marker_test.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/cheese.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/test_ar_marker_subscriber.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/cmd_vel_controller.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/ar_marker_subscriber_mfilter.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/rotate_robot.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+copying /home/messi/camera_ar_marker/build/camera_ar_marker/build/lib/camera_ar_marker/rotate_robot_test.py -> /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/cmd_vel_listener.py to cmd_vel_listener.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/ar_marker_subscriber.py to ar_marker_subscriber.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/test.py to test.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/ar_marker_distance_webcam.py to ar_marker_distance_webcam.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/camera_publisher.py to camera_publisher.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/compressed_fps.py to compressed_fps.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/turtlesim_rotate.py to turtlesim_rotate.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/ar_marker_subscriber_executor.py to ar_marker_subscriber_executor.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/ar_marker_distance_webcam_kalman.py to ar_marker_distance_webcam_kalman.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/__init__.py to __init__.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/depthpoint_subscriber.py to depthpoint_subscriber.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/image_publisher.py to image_publisher.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/calibration.py to calibration.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/camera_fps.py to camera_fps.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/ar_marker_test.py to ar_marker_test.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/cheese.py to cheese.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/test_ar_marker_subscriber.py to test_ar_marker_subscriber.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/cmd_vel_controller.py to cmd_vel_controller.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/ar_marker_subscriber_mfilter.py to ar_marker_subscriber_mfilter.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/rotate_robot.py to rotate_robot.cpython-310.pyc
+byte-compiling /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/rotate_robot_test.py to rotate_robot_test.cpython-310.pyc
+running install_data
+running install_egg_info
+removing '/home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker-0.0.0-py3.10.egg-info' (and everything under it)
+Copying ../build/camera_ar_marker/camera_ar_marker.egg-info to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker-0.0.0-py3.10.egg-info
+running install_scripts
+Installing ar_marker_subscriber script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+Installing ar_marker_subscriber_executor script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+Installing ar_marker_test script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+Installing camera_fps script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+Installing camera_publisher script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+Installing cheese script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+Installing cmd_vel_controller script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+Installing cmd_vel_listener script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+Installing compressed_fps script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+Installing depthpoint_subscriber script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+Installing rotate_robot script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+Installing rotate_robot_test script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+Installing turtlesim_rotate script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+writing list of installed files to '/home/messi/camera_ar_marker/build/camera_ar_marker/install.log'

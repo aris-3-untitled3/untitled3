@@ -1,0 +1,5 @@
+  File "/home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/rotate_robot.py", line 16
+    self.id_subscription = self.create_subscription(String, 'ar_marker_id', self.id_callback, 10))
+                                                                                                 ^
+SyntaxError: unmatched ')'
+

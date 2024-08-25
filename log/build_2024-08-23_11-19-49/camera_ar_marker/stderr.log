@@ -1,0 +1,5 @@
+  File "/home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker/ar_marker_test.py", line 48
+    if marker_ids[i][0] == 4 or marker_ids[i][0] == 3 marker_ids[i][0] == 2:  # 특정 마커 ID를 확인 (예: ID 4)
+                                                      ^^^^^^^^^^
+SyntaxError: invalid syntax
+

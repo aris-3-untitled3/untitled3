@@ -1,0 +1,15 @@
+[console_scripts]
+ar_marker_subscriber = camera_ar_marker.ar_marker_subscriber:main
+ar_marker_subscriber_executor = camera_ar_marker.ar_marker_subscriber_executor:main
+ar_marker_test = camera_ar_marker.ar_marker_test:main
+camera_fps = camera_ar_marker.camera_fps:main
+camera_publisher = camera_ar_marker.camera_publisher:main
+cheese = camera_ar_marker.cheese:main
+cmd_vel_controller = camera_ar_marker.cmd_vel_controller:main
+cmd_vel_listener = camera_ar_marker.cmd_vel_listener:main
+compressed_fps = camera_ar_marker.compressed_fps:main
+depthpoint_subscriber = camera_ar_marker.depthpoint_subscriber:main
+rotate_robot = camera_ar_marker.rotate_robot:main
+rotate_robot_test = camera_ar_marker.rotate_robot_test:main
+turtlesim_rotate = camera_ar_marker.turtlesim_rotate:main
+

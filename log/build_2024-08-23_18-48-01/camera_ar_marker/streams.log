@@ -1,0 +1,33 @@
+[0.479s] Invoking command in '/home/messi/camera_ar_marker/src': PYTHONPATH=/home/messi/camera_ar_marker/build/camera_ar_marker/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py egg_info --egg-base ../build/camera_ar_marker build --build-base /home/messi/camera_ar_marker/build/camera_ar_marker/build install --record /home/messi/camera_ar_marker/build/camera_ar_marker/install.log --single-version-externally-managed install_data
+[0.665s] running egg_info
+[0.666s] writing ../build/camera_ar_marker/camera_ar_marker.egg-info/PKG-INFO
+[0.666s] writing dependency_links to ../build/camera_ar_marker/camera_ar_marker.egg-info/dependency_links.txt
+[0.666s] writing entry points to ../build/camera_ar_marker/camera_ar_marker.egg-info/entry_points.txt
+[0.666s] writing requirements to ../build/camera_ar_marker/camera_ar_marker.egg-info/requires.txt
+[0.666s] writing top-level names to ../build/camera_ar_marker/camera_ar_marker.egg-info/top_level.txt
+[0.667s] reading manifest file '../build/camera_ar_marker/camera_ar_marker.egg-info/SOURCES.txt'
+[0.668s] writing manifest file '../build/camera_ar_marker/camera_ar_marker.egg-info/SOURCES.txt'
+[0.668s] running build
+[0.668s] running build_py
+[0.669s] running install
+[0.669s] running install_lib
+[0.671s] running install_data
+[0.671s] running install_egg_info
+[0.672s] removing '/home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker-0.0.0-py3.10.egg-info' (and everything under it)
+[0.672s] Copying ../build/camera_ar_marker/camera_ar_marker.egg-info to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages/camera_ar_marker-0.0.0-py3.10.egg-info
+[0.673s] running install_scripts
+[0.687s] Installing ar_marker_subscriber script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+[0.687s] Installing ar_marker_subscriber_executor script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+[0.687s] Installing ar_marker_test script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+[0.687s] Installing camera_fps script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+[0.688s] Installing camera_publisher script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+[0.688s] Installing cheese script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+[0.688s] Installing cmd_vel_controller script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+[0.688s] Installing cmd_vel_listener script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+[0.688s] Installing compressed_fps script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+[0.688s] Installing depthpoint_subscriber script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+[0.688s] Installing rotate_robot script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+[0.688s] Installing rotate_robot_test script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+[0.688s] Installing turtlesim_rotate script to /home/messi/camera_ar_marker/install/camera_ar_marker/lib/camera_ar_marker
+[0.688s] writing list of installed files to '/home/messi/camera_ar_marker/build/camera_ar_marker/install.log'
+[0.703s] Invoked command in '/home/messi/camera_ar_marker/src' returned '0': PYTHONPATH=/home/messi/camera_ar_marker/build/camera_ar_marker/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/messi/camera_ar_marker/install/camera_ar_marker/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py egg_info --egg-base ../build/camera_ar_marker build --build-base /home/messi/camera_ar_marker/build/camera_ar_marker/build install --record /home/messi/camera_ar_marker/build/camera_ar_marker/install.log --single-version-externally-managed install_data
