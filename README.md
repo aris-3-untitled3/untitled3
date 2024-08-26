@@ -13,4 +13,7 @@
   노드 실행: ros2 launch storagy bringup.launch.py -> ros2 run my_image_publisher image_publiser -> ros2 run camera_ar_marker ar_marker_subscriber -> ros2 run camera_ar_marker rotate_robot    
 
     결론  
-    ros2 launch storagy bringup.launch.py  ros2 run my_image_publisher image_publiser  ros2 run camera_ar_marker ar_marker_subscriber  ros2 run camera_ar_marker rotate_robot    
+    ros2 launch storagy bringup.launch.py  # ssh storagy에서 실행
+    ros2 run my_image_publisher image_publiser  # ssh storagy에서 실행
+    ros2 run camera_ar_marker ar_marker_subscriber  # server 노트북에서 실행
+    ros2 run camera_ar_marker rotate_robot      # server 노트북에서 실행
