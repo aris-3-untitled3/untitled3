@@ -12,8 +12,16 @@
   발행: 로봇 속도('/cmd_vel')  
   노드 실행: ros2 launch storagy bringup.launch.py -> ros2 run my_image_publisher image_publiser -> ros2 run camera_ar_marker ar_marker_subscriber -> ros2 run camera_ar_marker rotate_robot    
 
+3. p_ar_marker_subscriber.py: ((주차)) 아루코마커 인식 노드
+   노드명: parking_marker_subscriber
+   
+4. p_rotate_robot.py: ((주차)) 로봇 이동 노드
+   노드명: parking_controller
+   
     결론  
     ros2 launch storagy bringup.launch.py  # ssh storagy에서 실행
     ros2 run my_image_publisher image_publiser  # ssh storagy에서 실행
     ros2 run camera_ar_marker ar_marker_subscriber  # server 노트북에서 실행
     ros2 run camera_ar_marker rotate_robot      # server 노트북에서 실행
+    ros2 run camera_ar_marker p_ar_marker_subscriber # server 노트북에서 실행
+    ros2 run camera_ar_marker p_rotate_robot    # server 노트북에서 실행
