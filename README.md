@@ -1,4 +1,4 @@
-# src/camera_ar_marker 디렉토리에 있는 ar_marker_subscriber.py, rotate_robot.py 두 노드만 실행하면 됩니다.  
+# src/camera_ar_marker 디렉토리에 있는 [ar_marker_subscriber.py, rotate_robot.py], [p_ar_marker_subscriber.py, p_rotate_robot.py] 두 노드씩 실행하면 됩니다.
 
 1.ar_marker_subscriber.py: 아루코마커 인식 노드  
   노드명: aruco_marker_subscriber  
@@ -14,7 +14,7 @@
 
 3. p_ar_marker_subscriber.py: ((주차)) 아루코마커 인식 노드
    노드명: parking_marker_subscriber
-   
+
 4. p_rotate_robot.py: ((주차)) 로봇 이동 노드
    노드명: parking_controller
    
