@@ -22,6 +22,7 @@ setup(
         'console_scripts': [
             'camera_publisher = camera_ar_marker.camera_publisher:main',
             'ar_marker_subscriber = camera_ar_marker.ar_marker_subscriber:main',
+            'p_ar_marker_subscriber = camera_ar_marker.p_ar_marker_subscriber:main',
             'camera_fps = camera_ar_marker.camera_fps:main',
             'compressed_fps = camera_ar_marker.compressed_fps:main',
             'cheese = camera_ar_marker.cheese:main', 
@@ -29,6 +30,7 @@ setup(
             #'test_ar_marker_subscriber = camera_ar_marker.test_ar_marker_subscriber:main',
             'ar_marker_subscriber_executor = camera_ar_marker.ar_marker_subscriber_executor:main', 
             'rotate_robot = camera_ar_marker.rotate_robot:main',
+            'p_rotate_robot = camera_ar_marker.p_rotate_robot:main',
             'cmd_vel_listener = camera_ar_marker.cmd_vel_listener:main',
             'rotate_robot_test = camera_ar_marker.rotate_robot_test:main',
             'turtlesim_rotate = camera_ar_marker.turtlesim_rotate:main',
